@@ -1,5 +1,5 @@
-import { RSVPPage, RSVPForm, RSVPFormSubmit } from "./RSVPPage";
-import { InfoPage, InfoHeader, InfoBody, Schedule } from "./InfoPage";
+import { RSVPPage, RSVPForm, RSVPFormSubmit } from "./components/RSVPPage";
+import { InfoPage, InfoHeader, InfoBody, Schedule } from "./components/InfoPage";
 import { useState } from "react";
 
 const temp_data = [
@@ -60,7 +60,6 @@ export default function App() {
       <RSVPPage>
         {/* conditionally need to render this invisible if rsvp = true */}
         <Header>
-          <div className="header-supreme-rsvp">rEpOnDs SiL vOuS pLaIt</div>
         </Header>
         <Body>
           {" "}
@@ -71,8 +70,11 @@ export default function App() {
         </Footer>
       </RSVPPage>
       {/* conditionally need to render everything below as invisible if rsvp = false */}
-
+      {/* i should use the class name timeline for the schedule! */}
+{/*
       <InfoPage>
+      
+      
         <Header>
           <InfoHeader>tHiS Is WhErE wE wIlL tElL yOu EvErYtHiNg</InfoHeader>
         </Header>
@@ -123,6 +125,7 @@ export default function App() {
           <ContactRequest />
         </Footer>
       </ThanksPage>
+  */}
     </div>
   );
 }

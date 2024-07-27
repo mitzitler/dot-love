@@ -3,6 +3,10 @@
 @import url("https://fonts.googleapis.com/css?family=Heebo&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Tenor+Sans&display=swap");
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* colors i like */
   --color-red: #ab094c; /* amaranth purple */
@@ -11,7 +15,7 @@
   --color-light-3: #ebddcd; /* almond */
   --color-pink: #df7a97; /* rose pompadour */
   --color-indigo: #78416f; /* plum */
-  --color-blue: ##100847; /* federal blue */
+  --color-blue: #100847; /* federal blue */
 }
 
 body {
@@ -23,42 +27,15 @@ body {
 
 * {
   margin-top: 0.5rem;
-  margin-left: 0.5rem;
+/*  margin-left: 0.5rem;
+  margin-right: 0.5rem
+  okay these are not even on either side it looks like - 
+  i will do padding within the containers for now
+  */
 }
 
 /* rsvp stuff */
 
-.header-supreme-rsvp {
-  /*position: absolute; */
-  display: flex;
-  border-radius: 50%;
-  color: var(--color-indigo);
-  font-size: 2rem;
-  font: "Gentium Book Basic";
-}
-
-.btn-submit-rsvp {
-  /* can this be an image */
-  display: flex;
-  top: 0.8rem;
-  right: 1.2rem;
-  height: 3rem;
-  aspect-ratio: 1;
-  border: none;
-  background-color: var(--color-indigo);
-  color: var(--color-light-3);
-  font-size: 1.4rem;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 999;
-  justify-self: center;
-}
-
-/* info page stuff */
-
-.info-h2 {
-  display: flex;
-}
 
 /* example stuff */
 /* 

@@ -1,0 +1,228 @@
+/**
+* @license
+*
+* Font Family: Epilogue
+* Designed by: Tyler Finck, Etcetera Type Co
+* URL: https://www.fontshare.com/fonts/epilogue
+* © 2024 Indian Type Foundry
+*
+* Epilogue Thin 
+* Epilogue ThinItalic 
+* Epilogue ExtraLight 
+* Epilogue ExtraLightItalic 
+* Epilogue Light 
+* Epilogue LightItalic 
+* Epilogue Regular 
+* Epilogue Italic 
+* Epilogue Medium 
+* Epilogue MediumItalic 
+* Epilogue SemiBold 
+* Epilogue SemiBoldItalic 
+* Epilogue Bold 
+* Epilogue BoldItalic 
+* Epilogue ExtraBold 
+* Epilogue ExtraBoldItalic 
+* Epilogue Black 
+* Epilogue BlackItalic 
+* Epilogue Variable (Variable font)
+* Epilogue VariableItalic (Variable font)
+
+*
+*/
+@font-face {
+  font-family: 'Epilogue-Thin';
+  src: url('../fonts/Epilogue-Thin.woff2') format('woff2'),
+       url('../fonts/Epilogue-Thin.woff') format('woff'),
+       url('../fonts/Epilogue-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-ThinItalic';
+  src: url('../fonts/Epilogue-ThinItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-ThinItalic.woff') format('woff'),
+       url('../fonts/Epilogue-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-ExtraLight';
+  src: url('../fonts/Epilogue-ExtraLight.woff2') format('woff2'),
+       url('../fonts/Epilogue-ExtraLight.woff') format('woff'),
+       url('../fonts/Epilogue-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-ExtraLightItalic';
+  src: url('../fonts/Epilogue-ExtraLightItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-ExtraLightItalic.woff') format('woff'),
+       url('../fonts/Epilogue-ExtraLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-Light';
+  src: url('../fonts/Epilogue-Light.woff2') format('woff2'),
+       url('../fonts/Epilogue-Light.woff') format('woff'),
+       url('../fonts/Epilogue-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-LightItalic';
+  src: url('../fonts/Epilogue-LightItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-LightItalic.woff') format('woff'),
+       url('../fonts/Epilogue-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-Regular';
+  src: url('../fonts/Epilogue-Regular.woff2') format('woff2'),
+       url('../fonts/Epilogue-Regular.woff') format('woff'),
+       url('../fonts/Epilogue-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-Italic';
+  src: url('../fonts/Epilogue-Italic.woff2') format('woff2'),
+       url('../fonts/Epilogue-Italic.woff') format('woff'),
+       url('../fonts/Epilogue-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-Medium';
+  src: url('../fonts/Epilogue-Medium.woff2') format('woff2'),
+       url('../fonts/Epilogue-Medium.woff') format('woff'),
+       url('../fonts/Epilogue-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-MediumItalic';
+  src: url('../fonts/Epilogue-MediumItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-MediumItalic.woff') format('woff'),
+       url('../fonts/Epilogue-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-SemiBold';
+  src: url('../fonts/Epilogue-SemiBold.woff2') format('woff2'),
+       url('../fonts/Epilogue-SemiBold.woff') format('woff'),
+       url('../fonts/Epilogue-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-SemiBoldItalic';
+  src: url('../fonts/Epilogue-SemiBoldItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-SemiBoldItalic.woff') format('woff'),
+       url('../fonts/Epilogue-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-Bold';
+  src: url('../fonts/Epilogue-Bold.woff2') format('woff2'),
+       url('../fonts/Epilogue-Bold.woff') format('woff'),
+       url('../fonts/Epilogue-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-BoldItalic';
+  src: url('../fonts/Epilogue-BoldItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-BoldItalic.woff') format('woff'),
+       url('../fonts/Epilogue-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-ExtraBold';
+  src: url('../fonts/Epilogue-ExtraBold.woff2') format('woff2'),
+       url('../fonts/Epilogue-ExtraBold.woff') format('woff'),
+       url('../fonts/Epilogue-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-ExtraBoldItalic';
+  src: url('../fonts/Epilogue-ExtraBoldItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-ExtraBoldItalic.woff') format('woff'),
+       url('../fonts/Epilogue-ExtraBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Epilogue-Black';
+  src: url('../fonts/Epilogue-Black.woff2') format('woff2'),
+       url('../fonts/Epilogue-Black.woff') format('woff'),
+       url('../fonts/Epilogue-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Epilogue-BlackItalic';
+  src: url('../fonts/Epilogue-BlackItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-BlackItalic.woff') format('woff'),
+       url('../fonts/Epilogue-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+  font-style: italic;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 400.0;
+*
+* available axes:
+'wght' (range from 100.0 to 900.0
+*/
+@font-face {
+  font-family: 'Epilogue-Variable';
+  src: url('../fonts/Epilogue-Variable.woff2') format('woff2'),
+       url('../fonts/Epilogue-Variable.woff') format('woff'),
+       url('../fonts/Epilogue-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 400.0;
+*
+* available axes:
+'wght' (range from 100.0 to 900.0
+*/
+@font-face {
+  font-family: 'Epilogue-VariableItalic';
+  src: url('../fonts/Epilogue-VariableItalic.woff2') format('woff2'),
+       url('../fonts/Epilogue-VariableItalic.woff') format('woff'),
+       url('../fonts/Epilogue-VariableItalic.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: italic;
+}
+

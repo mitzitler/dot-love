@@ -1,0 +1,148 @@
+/**
+* @license
+*
+* Font Family: Bespoke Stencil
+* Designed by: Jérémie Hornus, Théo Guillard, Morgane Pambrun, Alisa Nowak, Joachim Vu
+* URL: https://www.fontshare.com/fonts/bespoke-stencil
+* © 2024 Indian Type Foundry
+*
+* Bespoke Stencil Light 
+* Bespoke Stencil LightItalic 
+* Bespoke Stencil Regular 
+* Bespoke Stencil Italic 
+* Bespoke Stencil Medium 
+* Bespoke Stencil MediumItalic 
+* Bespoke Stencil Bold 
+* Bespoke Stencil BoldItalic 
+* Bespoke Stencil Extrabold 
+* Bespoke Stencil ExtraboldItalic 
+* Bespoke Stencil Variable (Variable font)
+* Bespoke Stencil VariableItalic (Variable font)
+
+*
+*/
+@font-face {
+  font-family: 'BespokeStencil-Light';
+  src: url('../fonts/BespokeStencil-Light.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Light.woff') format('woff'),
+       url('../fonts/BespokeStencil-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BespokeStencil-LightItalic';
+  src: url('../fonts/BespokeStencil-LightItalic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-LightItalic.woff') format('woff'),
+       url('../fonts/BespokeStencil-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'BespokeStencil-Regular';
+  src: url('../fonts/BespokeStencil-Regular.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Regular.woff') format('woff'),
+       url('../fonts/BespokeStencil-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BespokeStencil-Italic';
+  src: url('../fonts/BespokeStencil-Italic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Italic.woff') format('woff'),
+       url('../fonts/BespokeStencil-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'BespokeStencil-Medium';
+  src: url('../fonts/BespokeStencil-Medium.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Medium.woff') format('woff'),
+       url('../fonts/BespokeStencil-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BespokeStencil-MediumItalic';
+  src: url('../fonts/BespokeStencil-MediumItalic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-MediumItalic.woff') format('woff'),
+       url('../fonts/BespokeStencil-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'BespokeStencil-Bold';
+  src: url('../fonts/BespokeStencil-Bold.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Bold.woff') format('woff'),
+       url('../fonts/BespokeStencil-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BespokeStencil-BoldItalic';
+  src: url('../fonts/BespokeStencil-BoldItalic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-BoldItalic.woff') format('woff'),
+       url('../fonts/BespokeStencil-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'BespokeStencil-Extrabold';
+  src: url('../fonts/BespokeStencil-Extrabold.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Extrabold.woff') format('woff'),
+       url('../fonts/BespokeStencil-Extrabold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BespokeStencil-ExtraboldItalic';
+  src: url('../fonts/BespokeStencil-ExtraboldItalic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-ExtraboldItalic.woff') format('woff'),
+       url('../fonts/BespokeStencil-ExtraboldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+  font-style: italic;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 800.0;
+*
+* available axes:
+'wght' (range from 300.0 to 800.0
+*/
+@font-face {
+  font-family: 'BespokeStencil-Variable';
+  src: url('../fonts/BespokeStencil-Variable.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-Variable.woff') format('woff'),
+       url('../fonts/BespokeStencil-Variable.ttf') format('truetype');
+  font-weight: 300 800;
+  font-display: swap;
+  font-style: normal;
+}
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 800.0;
+*
+* available axes:
+'wght' (range from 300.0 to 800.0
+*/
+@font-face {
+  font-family: 'BespokeStencil-VariableItalic';
+  src: url('../fonts/BespokeStencil-VariableItalic.woff2') format('woff2'),
+       url('../fonts/BespokeStencil-VariableItalic.woff') format('woff'),
+       url('../fonts/BespokeStencil-VariableItalic.ttf') format('truetype');
+  font-weight: 300 800;
+  font-display: swap;
+  font-style: italic;
+}
+

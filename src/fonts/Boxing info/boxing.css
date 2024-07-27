@@ -1,0 +1,22 @@
+/**
+* @license
+*
+* Font Family: Boxing
+* Designed by: Ruosi Huang
+* URL: https://www.fontshare.com/fonts/boxing
+* © 2024 Indian Type Foundry
+*
+* Boxing Regular 
+
+*
+*/
+@font-face {
+  font-family: 'Boxing-Regular';
+  src: url('../fonts/Boxing-Regular.woff2') format('woff2'),
+       url('../fonts/Boxing-Regular.woff') format('woff'),
+       url('../fonts/Boxing-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
