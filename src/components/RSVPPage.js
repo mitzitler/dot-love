@@ -1,6 +1,7 @@
 // i need the rsvp_code here
 import { useState } from "react";
 import { GradientComponent } from "./Gradient";
+import { RSVPPageDietary } from "./RSVPPageDietary";
 import '../App.css';
 
 export function RSVPPage({ children }) {
@@ -12,6 +13,15 @@ export function RSVPPage({ children }) {
     </div>
   );
 }
+
+/* new error
+
+ERROR
+ResizeObserver loop completed with undelivered notifications.
+    at handleError (http://localhost:3000/static/js/bundle.js:39971:58)
+    at http://localhost:3000/static/js/bundle.js:39990:7
+
+*/
 
 const RsvpOptions = Object.freeze({
   ATTENDING: "ATTENDING",
@@ -187,40 +197,7 @@ export function RSVPForm({ children, rsvpCode }) {
             </div> 
           </div>
           <div class="card">
-            <span>Any dietary restrictions, please</span>
-            {/*it would be cool if this section was actually a checkbox where you click stuff and it x's out like ghostbusters */}
-            <img src="../images/dietary-restrictions/alcohol_1.png" alt="I drink alcohol" width="500" height="600"></img>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No meat</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No fish or shellfish</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No eggs</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No dairy</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No gluten</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No peanuts or legumes</label>
-            </ul>
-            <ul>
-              <input type="checkbox" class="toggle toggle-primary"></input>
-              <label>No tree nuts</label>
-            </ul>
-            <ul>
-              <input type="text" placeholder="Other restrictions"></input>
-            </ul>
+            <RSVPPageDietary />
           </div>
         </fieldset>
         </div>
