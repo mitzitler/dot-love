@@ -1,9 +1,15 @@
 // i need the rsvp_code here
 import { useState } from "react";
+import { GradientComponent } from "./Gradient";
+import '../App.css';
 
 export function RSVPPage({ children }) {
   return (
-    <div>{children}</div>
+   /* <div>{children}</div> */
+   <div id = "gradient">
+      <GradientComponent/>
+      <div id="overlay">{children}</div>
+    </div>
   );
 }
 
@@ -117,7 +123,7 @@ export function RSVPForm({ children, rsvpCode }) {
       <div class="card my-10 items-center bg-accent bg-opacity-60">
         <h1 class="card-title p-10 text-xl font-semibold">Please enter some personal information to RSVP</h1>
         <div class="card-body pt-2 pb-20">
-        <p class="text-sm px-5 leading-6 text-gray-600">Even if you can't make it, let us know! Your name, pronouns and contact info will help us communicate logistics.</p>
+        {/*<p class="text-sm px-5 leading-6 text-gray-600">Even if you can't make it, let us know! Your name, pronouns and contact info will help us communicate logistics.</p> */}
         <fieldset>
         {/*  <span class="block text-md px-10">What should we call you?</span> */}
           <div class="mt-5 sm:mt-8">
@@ -153,21 +159,21 @@ export function RSVPForm({ children, rsvpCode }) {
                 class="dropdown-content menu bg-neutral rounded-box z-[1] overflow-y-scroll max-h-72" 
                 value={stateProvince}>
                   {
-                  country == "United States"
+                  country === "United States"
                   ? Object.keys(usStates).map((usStateKey) => (
                       <li key={usStateKey} value={usStateKey} onClick={()=>handleCountry(usStates[usStateKey])}><a>
                         {usStates[usStateKey]}
                       </a></li>
                   ))
                   : ( 
-                    country == "Mexico"
+                    country === "Mexico"
                     ? Object.keys(mxStates).map((mxStateKey) => (
                       <li key={mxStateKey} value={mxStateKey} onClick={()=>handleCountry(mxStates[mxStateKey])}><a>
                         {mxStates[mxStateKey]}
                       </a></li>
                     ))
                     : ( 
-                      country == "Canada"
+                      country === "Canada"
                       ? Object.keys(caStates).map((caStateKey) => (
                         <li key={caStateKey} value={caStateKey} onClick={()=>handleCountry(caStates[caStateKey])}><a>
                           {caStates[caStateKey]}
@@ -183,6 +189,7 @@ export function RSVPForm({ children, rsvpCode }) {
           <div class="card">
             <span>Any dietary restrictions, please</span>
             {/*it would be cool if this section was actually a checkbox where you click stuff and it x's out like ghostbusters */}
+            <img src="../images/dietary-restrictions/alcohol_1.png" alt="I drink alcohol" width="500" height="600"></img>
             <ul>
               <input type="checkbox" class="toggle toggle-primary"></input>
               <label>No meat</label>

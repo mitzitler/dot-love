@@ -57,7 +57,7 @@ export default function App() {
 
   return (
     <div>
-      <RSVPPage>
+      <RSVPPage position = "absolute" height = "100">
         {/* conditionally need to render this invisible if rsvp = true */}
         <Header>
         </Header>

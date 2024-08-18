@@ -1,3 +1,33 @@
+#gradient {
+  position: relative;
+  height: 100;
+}
+
+#gradient canvas, #overlay {
+  position: absolute;
+  height: 100;
+  width: 100%;
+} 
+
+canvas {
+  border: 1px solid black;
+  height: 100;
+}
+
+/*
+#canvas-gradient {
+  position: absolute;
+  height: 100;
+  width: 100% 
+}
+
+.top-elements {
+  position: absolute;
+  height: 100px;
+  width: 100%
+}
+*/
+
 /*
 .App {
   text-align: center;

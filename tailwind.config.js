@@ -12,12 +12,14 @@ module.exports = {
       themes: [
       {
         rsvp: {
+          "bg-opacity": "5",
           "bg-primary": "#ebddcd",
           "primary": "#ab094c",
           "secondary": "#e4b9b9",
           "accent": "#e8cbc3",
           "neutral": "#ebddcd",
           "base-100": "#ebddcd",
+          "base-50": "#fcf2e6",
 
           "--rounded-box": "1rem", // border radius rounded-box utility class, used in card and other large boxes
           "--rounded-btn": "0.5rem", // border radius rounded-btn utility class, used in buttons and similar element
