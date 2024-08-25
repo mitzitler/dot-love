@@ -107,7 +107,7 @@ export function RSVPForm({ children, rsvpCode }) {
   console.log(country)
 
   return (
-    <div class="container m-10 m-auto">
+    <div class="container m-auto">
       <div class="card my-10 items-center bg-accent bg-opacity-60">
         <h1 class="card-title p-10 text-xl font-semibold">rEpOnDeZ SiL vOuS pLaIt</h1>
         <div class="card-body pt-2 pb-20">

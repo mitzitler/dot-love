@@ -65,12 +65,12 @@ export function RSVPPageDietary({children}) {
             <h2 className="text-bold">... and any dietary restrictions, please!</h2> 
         {/*it would be cool if this section was actually a checkbox where you click stuff and it x's out like ghostbusters */} {/* wow I did it !*/}
             <div className="m-auto grid grid-cols-4 gap-2 px-2 py-2">
-                <label className="swap swap-rotate" id="alcohol">
+                <label className="swap swap-flip" id="alcohol">
                     <input type="checkbox"  id="alcohol" onChange={()=>handleDrinkAlcohol(!drinkAlcohol)} />
                     <img className="swap-off h-32 w-32 fill-current p-2" viewBox="0 0 32 32" src={alcohol_yes} alt="I drink alcohol" />
                     <img className="swap-on h-32 w-32 fill-current p-2" viewBox="0 0 32 32" src={alcohol_no} alt="I don't drink alcohol" />
                 </label>
-                <label className="swap swap-rotate" id="meat" onChange={()=>handleEatMeat(!eatMeat)} >
+                <label className="swap swap-flip" id="meat" onChange={()=>handleEatMeat(!eatMeat)} >
                     <input type="checkbox"  id="meat"/>
                     <img className="swap-off h-32 w-32 fill-current p-2" viewBox="0 0 32 32" src={meat_yes} alt="I eat meat" />
                     <img className="swap-on h-32 w-32 fill-current p-2" viewBox="0 0 32 32" src={meat_no} alt="I don't eat meat"/>

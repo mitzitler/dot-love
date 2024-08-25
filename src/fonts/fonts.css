@@ -1,0 +1,434 @@
+
+
+/* */
+/* serif fonts */
+/* */
+/* */
+@font-face {
+    font-family: 'boxing';
+    src: url('./Boxing-Regular.woff')
+}
+
+@font-face {
+    font-family: 'bonbance';
+    src: url('./Bonbance-BoldCondensed.woff')
+}
+
+/* this one is thin but really cool - titles */
+@font-face {
+    font-family: 'dxgaster';
+    src: url('./DxGaster-Thin.otf')
+}
+
+@font-face {
+    font-family: 'dxgaster';
+    src: url('./DxGaster-ThinItalic.otf');
+    font-weight: 'italic'
+}
+
+/* very legible - text */
+@font-face {
+    font-family: 'elanor';
+    src: url('./ElanorFreePersonalUse-ExBdIt.otf');
+    font-weight: 'extra-bold-italic'
+}
+
+@font-face {
+    font-family: 'elanor';
+    src: url('./ElanorFreePersonalUse-ExtLt.otf');
+    font-weight: 'extra-light'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Bold.woff');
+    font-weight: 'bold'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-BoldItalic.woff');
+    font-weight: 'bold-italic'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Italic.woff');
+    font-weight: 'italic'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Light.woff');
+    font-weight: 'light'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-LightItalic.woff');
+    font-weight: 'light-italic'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Medium.woff');
+    font-weight: 'medium'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-MediumItalic.woff');
+    font-weight: 'medium-italic'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Regular.woff')
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Semibold.woff');
+    font-weight: 'semi-bold'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-SemiboldItalic.woff');
+    font-weight: 'semi-bold-italic'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-Variable.woff');
+    font-weight: 'variable'
+}
+
+@font-face {
+    font-family: 'gambetta';
+    src: url('./Gambetta-VariableItalic.woff');
+    font-weight: 'variable-italic'
+}
+
+
+@font-face {
+    font-family: 'harmond';
+    src: url('./Harmond-ExtBdItaExp.otf');
+    font-weight: 'extra-bold-italic'
+}
+
+@font-face {
+    font-family: 'harmond';
+    src: url('./Harmond-ExtraBoldExpanded.otf');
+    font-weight: 'extra-bold'
+}
+
+@font-face {
+    font-family: 'harmond';
+    src: url('./Harmond-SemBdItaCond.otf');
+    font-weight: 'semi-bold-italic'
+}
+
+@font-face {
+    font-family: 'harmond';
+    src: url('./Harmond-SemiBoldCondensed.otf');
+    font-weight: 'semi-bold'
+}
+
+
+
+/* */
+/* sans serif fonts */
+/* */
+/* */
+@font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Regular.woff')
+  }
+
+@font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Bold.woff');
+    font-weight: 'bold'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Extrabold.woff');
+    font-weight: 'extra-bold'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-ExtraboldItalic.woff');
+    font-weight: 'extra-bold-italic'
+  }
+
+@font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Italic.woff');
+    font-weight: 'italic'
+  }
+
+@font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Light.woff');
+    font-weight: 'light'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-LightItalic.woff');
+    font-weight: 'light-italic'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Medium.woff');
+    font-weight: 'medium'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-MediumItalic.woff');
+    font-weight: 'medium-italic'
+  }
+
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-Variable.woff');
+    font-weight: 'variable'
+  }
+  @font-face {
+    font-family: 'bespoke-stencil';
+    src: url('./BespokeStencil-VariableItalic.woff');
+    font-weight: 'variable-italic'
+  }
+
+  @font-face {
+    font-family: 'camilla-jennifer';
+    src: url('./CamillajenniferRegular-RpVOe.otf')
+}
+
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Black.woff');
+    font-weight: 'black'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-BlackItalic.woff');
+    font-weight: 'black-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Bold.woff');
+    font-weight: 'bold'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-BoldItalic.woff');
+    font-weight: 'bold-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-ExtraBold.woff');
+    font-weight: 'extra-bold'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-ExtraBoldItalic.woff');
+    font-weight: 'extra-bold-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-ExtraLight.woff');
+    font-weight: 'extra-light'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-ExtraLightItalic.woff');
+    font-weight: 'extra-light-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Italic.woff');
+    font-weight: 'italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Light.woff');
+    font-weight: 'light'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-LightItalic.woff');
+    font-weight: 'light-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Medium.woff');
+    font-weight: 'medium'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-MediumItalic.woff');
+    font-weight: 'medium-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Regular.woff')
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-SemiBold.woff');
+    font-weight: 'semi-bold'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-SemiBoldItalic.woff');
+    font-weight: 'semi-bold-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Thin.woff');
+    font-weight: 'thin'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-ThinItalic.woff');
+    font-weight: 'thin-italic'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-Variable.woff');
+    font-weight: 'variable'
+}
+
+@font-face {
+    font-family: 'epilogue';
+    src: url('./Epilogue-VariableItalic.woff');
+    font-weight: 'variable-italic'
+}
+
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Bold.woff');
+    font-weight: 'bold'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Extrabold.woff');
+    font-weight: 'extra-bold'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Extralight.woff');
+    font-weight: 'extra-light'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Light.woff');
+    font-weight: 'light'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Medium.woff');
+    font-weight: 'medium'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Regular.woff')
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Semibold.woff');
+    font-weight: 'semi-bold'
+}
+
+@font-face {
+    font-family: 'panchang';
+    src: url('./Panchang-Variable.woff');
+    font-weight: 'variable'
+}
+
+/* no numbers allowed */
+@font-face {
+    font-family: 'super-bread';
+    src: url('./Super Bread Personal Use.ttf')
+}
+
+@font-face {
+    font-family: 'varent-grotesk';
+    src: url('./VarentGrotesk-Bold.otf');
+    font-weight: 'bold'
+}
+
+@font-face {
+    font-family: 'varent-grotesk';
+    src: url('./VarentGrotesk-ExtLtIta.otf');
+    font-weight: 'extra-light-italic'
+}
+
+
+
+/* */
+/* curly fonts */
+/* */
+/* */
+@font-face {
+    font-family: 'befolk';
+    src: url('./Befolk Script.ttf')
+  }
+
+
+  /* needs reworking - letters too narrow */
+@font-face {
+    font-family: 'betwixt';
+    src: url('./Betwixt-Condensed.woff')
+  } 
+
+/* bad file */
+@font-face {
+    font-family: 'bocalupo';
+    src: url('./Bocalupo-Regular.woff.textClipping')
+}
+
+/* needs reworking */
+
+@font-face {
+    font-family: 'scalter';
+    src: url('./Scalter-SerifCondensed.otf')
+}
+
+@font-face {
+    font-family: 'scalter';
+    src: url('./Scalter-SerifCondSlant.otf');
+    font-weight: 'slant'
+}

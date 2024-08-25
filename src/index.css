@@ -1,3 +1,5 @@
+@import "./fonts/fonts.css";
+
 /* temp fonts -- BUT ALSO DONT USE @import APPARENTLY! */
 @import url("https://fonts.googleapis.com/css?family=Gentium+Book+Basic&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Heebo&display=swap");
@@ -6,6 +8,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 :root {
   /* colors i like */
@@ -20,7 +23,8 @@
 
 body {
   margin: 0;
-  font-family: "Gentium Book Basic", "Heebo", "Tenos Sans";
+ /* font-family: "Gentium Book Basic", "Heebo", "Tenos Sans"; */
+  font-family: "epilogue", "dxgaster", "panchang", "super-bread";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -127,10 +131,6 @@ body {
   color: #fff;
 }
 
-.search {
-  justify-self: center;
-  border: none;
-  padding: 1.1rem 1.6rem;
   font-size: 1.8rem;
   border-radius: 0.7rem;
   width: 40rem;

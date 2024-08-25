@@ -15,19 +15,19 @@ export const GradientComponent /* :  React.FC */ = (bgColor) => {
             ref: canvasRef.current,
             "colors": [
                 {
-                    "color": "#cdb4db",
+                    "color": "#ab094c",
                     "enabled": true
                 },
                 {
-                    "color": "#ffc8dd",
+                    "color": "#ebddcd",
                     "enabled": true
                 },
                 {
-                    "color": "#ffafcc",
+                    "color": "#e8cbc3",
                     "enabled": true
                 },
                 {
-                    "color": "#bde0fe",
+                    "color": "#100847",
                     "enabled": true
                 },
                 {
@@ -45,7 +45,7 @@ export const GradientComponent /* :  React.FC */ = (bgColor) => {
             "highlights": 2,
             "colorSaturation":  3,
             "colorBrightness":  1,
-            "wireframe": false,
+            "wireframe": true,
             "colorBlending": 5,
             "backgroundAlpha": 1,
             "resolution": 1

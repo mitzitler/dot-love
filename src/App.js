@@ -1,4 +1,5 @@
 import { RSVPPage, RSVPForm, RSVPFormSubmit } from "./components/RSVPPage";
+import { RegistryPage } from "./components/RegistryPage";
 import { InfoPage, InfoHeader, InfoBody, Schedule } from "./components/InfoPage";
 import { useState } from "react";
 
@@ -57,8 +58,11 @@ export default function App() {
 
   return (
     <div>
+      {/*
       <RSVPPage position = "absolute" height = "100">
+  */}
         {/* conditionally need to render this invisible if rsvp = true */}
+        {/*
         <Header>
         </Header>
         <Body>
@@ -69,6 +73,7 @@ export default function App() {
           <ContactRequest />
         </Footer>
       </RSVPPage>
+      */}
       {/* conditionally need to render everything below as invisible if rsvp = false */}
       {/* i should use the class name timeline for the schedule! */}
 {/*
@@ -86,9 +91,9 @@ export default function App() {
           <ContactRequest />
         </Footer>
       </InfoPage>
-
-      <RegistryPage>
-        <Header>oUr ReGiStRy, wItH lOtS oF OpTiOnS</Header>
+  */}
+      <RegistryPage />
+      {/*  <Header>oUr ReGiStRy, wItH lOtS oF OpTiOnS</Header>
         <Body>
           <Text />
           <GiftGraph />
@@ -97,8 +102,9 @@ export default function App() {
         <Footer>
           <ContactRequest />
         </Footer>
-      </RegistryPage>
-
+*/}
+    {/*  </RegistryPage> */}
+{/*
       <DataPage>
         <Header>i Am CoLlEcTiNg DaTa On AlL yAlL</Header>
         <Body>
@@ -143,10 +149,6 @@ function Footer({ children }) {
 }
 
 function ContactRequest({ children }) {
-  return <div>{children}</div>;
-}
-
-function RegistryPage({ children }) {
   return <div>{children}</div>;
 }
 
