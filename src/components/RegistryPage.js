@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LineChart, Line, ScatterChart, Scatter, CartesianGrid, XAxis, YAxis,  Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { RegistryChartVictory } from "./RegistryPageChart";
+import { RegistryChartD3 } from "./RegistryPageChart";
 import '../App.css';
 
 export function RegistryPage() {
@@ -12,11 +12,13 @@ export function RegistryPage() {
     */}
 
     return (
-        <div class="m-auto grid grid-cols-3 gap-2">
-            <RegistryChartVictory class="card" style={{width: "500px" }}/>
-            <div class="card" style={{width: "300px" }}>
-                <h1 class="card-title">This is where we see the description for the gift</h1>
-                <p class="card-body">More information</p>
+        <div class=" relative m-auto grid grid-cols-3 gap-2 border-4">
+            <div class="card col-span-2 width-500 border-2 static" style = {{position: "static"}}>
+                <RegistryChartD3 />
+            </div>
+            <div class="card col-span-1 width-200 border-2 static">
+                <h1 class="card-title border-2">This is where we see the description for the gift</h1>
+                <p class="card-body border-2">More information</p>
             </div>
         </div>
     )
