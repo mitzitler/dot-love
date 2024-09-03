@@ -3,26 +3,59 @@ import { LineChart, Line, ScatterChart, Scatter, CartesianGrid, XAxis, YAxis,  T
 import { RegistryChartD3 } from "./RegistryPageChart";
 import '../App.css';
 
-export function RegistryPage() {
+const Data = [
+    { x: 1,   y: 2,   id: 1, name: "Teapot"  },
+    { x: 2,   y: 3,   id: 2, name: "Toaster" },
+    { x: 3,   y: 5,   id: 3, name: "Towels" },
+    { x: 4,   y: 4,   id: 4, name: "Painting" },
+    { x: 5,   y: 7,   id: 5, name: "Cups" },
+    { x: -10, y: 10,  id: 6, name: "Forks" },
+    { x: 10,  y: 10,  id: 7, name: "Wine" },
+    { x: -10, y: -10, id: 8, name: "Table" },
+    { x: 10,  y: -10, id: 9, name: "Toy" },
+]
 
-{/*
-    return (
-    <RegistryChartNivo class="card" style={{width: "500px" }}/>
-    )
-    */}
+function RegistryPageChartContainer() {
+    // const [chartGift, setChartGift] = useState()
+
+    // function handleChartGiftChange(chartGift) {
+    //     setChartGift(chartGift)
+    //     console.log("i am the chart gift" + chartGift)
+    // }
+
+    // constructor(props) {
+    //     super(props);
+    //     this.ChildElement = React.createRef()
+    // }
+
 
     return (
         <div class=" relative m-auto grid grid-cols-3 gap-2 border-4">
             <div class="card col-span-2 width-500 border-2 static" style = {{position: "static"}}>
-                <RegistryChartD3 />
+                <RegistryChartD3 Data={Data}
+             //   ref={this.ChildElement} 
+                />
             </div>
             <div class="card col-span-1 width-200 border-2 static">
                 <h1 class="card-title border-2">This is where we see the description for the gift</h1>
-                <p class="card-body border-2">More information</p>
+                <p class="card-body border-2">
+                    More information, gift id is {}
+                </p>
             </div>
         </div>
     )
 }
+
+
+
+
+
+export function RegistryPage() {
+    return ( <RegistryPageChartContainer/> )
+}
+
+
+
 
 const gift_data = [
     {
@@ -56,35 +89,3 @@ const gift_data = [
         "claimed": false
     },
   ]
-
-
-// const MyLineChart = () => <Line axisLeft={{ renderTick: (value) => <text style={{ fontWeight: value === 0 ? 'bold' : 'normal'}}>{value}</text> }} />
-
-// export function RegistryPageRechart({gift_data}){
-//     //static demoUrl = 'https://codesandbox.io/p/sandbox/scatter-chart-of-three-dimensions-nqkj42';
-  
-//       return (
-//         <ResponsiveContainer width="100%" height={400}>
-//           <ScatterChart
-//             margin={{
-//               top: 20,
-//               right: 20,
-//               bottom: 20,
-//               left: 20,
-//             }}
-//           >
-//             <CartesianGrid />
-//             <XAxis type="number" dataKey="x" name="Size Score"/>
-//             <YAxis type="number" dataKey="y" name="Artsy Score "/>
-//             <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-//             <Legend />
-//             {/* 
-//             The two data sets will be if claimed is true or false
-//             <Scatter name="Available" data={gift_data} fill="#100847" shape="circle" />
-//             <Scatter name="Not available" data={gift_data} fill="#100847" shape="circle" /> 
-//             */}
-//             <Scatter name="Available" data={gift_data} fill="#100847" shape="circle" />
-//           </ScatterChart>
-//         </ResponsiveContainer>
-//       );
-// }
