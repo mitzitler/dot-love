@@ -58,12 +58,12 @@ export default function App() {
 
   return (
     <div>
-      {/*
-      <RSVPPage position = "absolute" height = "100">
-  */}
+      
+      {/* <RSVPPage position = "absolute" height = "100"> */}
+  
         {/* conditionally need to render this invisible if rsvp = true */}
-        {/*
-        <Header>
+        
+        {/* <Header>
         </Header>
         <Body>
           {" "}
@@ -73,7 +73,7 @@ export default function App() {
           <ContactRequest />
         </Footer>
       </RSVPPage>
-      */}
+       */}
       {/* conditionally need to render everything below as invisible if rsvp = false */}
       {/* i should use the class name timeline for the schedule! */}
 {/*
@@ -91,9 +91,9 @@ export default function App() {
           <ContactRequest />
         </Footer>
       </InfoPage>
-  */}
+  
       <RegistryPage />
-      {/*  <Header>oUr ReGiStRy, wItH lOtS oF OpTiOnS</Header>
+      <Header>oUr ReGiStRy, wItH lOtS oF OpTiOnS</Header>
         <Body>
           <Text />
           <GiftGraph />
@@ -103,7 +103,7 @@ export default function App() {
           <ContactRequest />
         </Footer>
 */}
-    {/*  </RegistryPage> */}
+     <RegistryPage />
 {/*
       <DataPage>
         <Header>i Am CoLlEcTiNg DaTa On AlL yAlL</Header>
