@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RegistryChartD3 } from "./RegistryPageChart";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard";
+import { GenericHeader } from "./GenericHeader";
 import '../App.css';
 
 // this is the ultimate source of all data, so the data will be read in on this page
@@ -86,6 +87,7 @@ export function RegistryPage() {
     const [displayedId, setDisplayedId] = useState(null)
     return ( 
         <div>
+            <GenericHeader />
             <p>title</p>
             <div class=" relative m-auto grid grid-cols-3 gap-2 border-4">
                 <div class="card col-span-2 width-500 border-2 static" style = {{position: "static"}}>

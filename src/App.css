@@ -1,3 +1,12 @@
+@keyframes fullrotation {
+  0% {
+  transform: rotate(0deg);
+  }
+  100% {
+  transform: rotate(360deg);
+  }
+}
+
 #gradient {
   position: relative;
   display: flex;
@@ -12,6 +21,68 @@
 
 canvas {
   border: 1px solid black;
+}
+
+/* header stuff */
+
+.header {
+  border: 4px solid indigo; 
+  justify-items: center;
+}
+
+.header-main {
+  /* height: 70px; */
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid green; 
+}
+
+.header-side {
+  height: 50px;
+  text-align: center;
+  margin: 25px 10px 25px 10px;
+  border: 4px solid blueviolet; 
+  flex: 1
+}
+
+/* make the icon not a full circle just to observe the rotate effect for now */
+.header-nav { 
+  height: 80px;
+  width: 80px;
+  justify-content: center;
+  align-items: center;
+  border: 2px; 
+  border-radius: 100%;
+  /* margin: auto; */
+  display: flex;
+  /* rotate: 60deg; */
+}
+
+/* this plus the transition arg in header-nav are vanilla css animation */
+/* more here: https://zerotomastery.io/blog/javascript-animations-beginners-guide/ */
+.header-nav:hover {
+  animation-play-state: paused;
+}
+
+.outer-circle {
+  margin: auto;
+  height: 100px;
+  width: 100px;
+  position: absolute;
+  animation: fullrotation 10s linear 0s infinite;
+}
+
+.inner-button {
+  margin: auto;
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  transition: scale 0.6s ease-in-out;
+}
+
+.inner-button:hover {
+  scale: 1.2
 }
 
 /*
