@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RegistryChartD3 } from "./RegistryPageChart";
+import { RegistryPageChart } from "./RegistryPageChart";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard";
 import { GenericHeader } from "./GenericHeader";
 import '../App.css';
@@ -64,38 +64,20 @@ const Data = [
      },
 ]
 
-// function RegistryPageChartContainer({displayedId, setDisplayedId}) {
+//  ALL of this css needs to go into the App.css file
 
-//     return (
-//         <div >
-//             <div class="card col-span-2 width-500 border-2 static" style = {{position: "static"}}>
-//                 <RegistryChartD3 Data={Data}
-//                 displayedId = {displayedId} setDisplayedId={setDisplayedId}
-//                 />
-//             </div>
-//             <div class="card col-span-1 width-200 border-2 static">
-//                 <h1 class="card-title border-2">This is where we see the description for the gift</h1>
-//                 <p class="card-body border-2">
-//                     More information, gift id is {displayedId}
-//                 </p>
-//             </div>
-//         </div>
-//     )
-// }
-
-export function RegistryPage() {
+export function RegistryPage({handleNavClick, leftSide, rightSide}) {
     const [displayedId, setDisplayedId] = useState(null)
     return ( 
         <div>
-            <GenericHeader />
-            <p>title</p>
-            <div class=" relative m-auto grid grid-cols-3 gap-2 border-4">
-                <div class="card col-span-2 width-500 border-2 static" style = {{position: "static"}}>
-                    <RegistryChartD3 Data={Data}
+            <GenericHeader handleNavClick={handleNavClick} leftSide={leftSide} rightSide={rightSide} />
+            <div class=" relative m-auto grid grid-cols-3 ">
+                <div class="card col-span-2 width-500 static" style = {{position: "static"}}>
+                    <RegistryPageChart Data={Data}
                         displayedId = {displayedId} 
                         setDisplayedId={setDisplayedId}/>
                 </div>
-                <RegistryPageExternalCard class="card col-span-1 width-200 border-2 static"
+                <RegistryPageExternalCard class="card col-span-1 width-200 static"
                 displayedId = {displayedId}
                 Data={Data}  
                 />

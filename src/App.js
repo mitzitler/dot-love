@@ -1,7 +1,11 @@
 import { RSVPPage, RSVPForm, RSVPFormSubmit } from "./components/RSVPPage";
 import { RegistryPage } from "./components/RegistryPage";
-import { InfoPage, InfoHeader, InfoBody, Schedule } from "./components/InfoPage";
+import { InfoBody } from "./components/InfoBody";
+import { ThanksBody } from "./components/ThanksBody";
+import { AboutUsBody } from "./components/AboutUsBody";
 import { useState } from "react";
+import { GenericPage } from "./components/GenericPage";
+import Info from "three/src/renderers/common/Info.js";
 
 const temp_data = [
   {
@@ -56,6 +60,20 @@ export default function App() {
   const isLocal = true;
   const code = "AXZC";
 
+  // page = 0 is rsvp. this increments
+  const [pageNum, setPageNum] = useState(1)
+  const pageMax = 4
+
+  function handleNavClick() {
+    console.log('You clicked me')
+    console.log(pageNum)
+    if (pageNum < pageMax) {
+      setPageNum(pageNum+1)
+    } else {
+      setPageNum(1)
+    };
+  }
+
   return (
     <div>
       
@@ -92,35 +110,38 @@ export default function App() {
         </Footer>
       </InfoPage>
   
-      <RegistryPage />
-      <Header>oUr ReGiStRy, wItH lOtS oF OpTiOnS</Header>
-        <Body>
-          <Text />
-          <GiftGraph />
-          <GiftSelector />
-        </Body>
-        <Footer>
-          <ContactRequest />
-        </Footer>
-*/}
-     <RegistryPage />
+*/}  
+    {pageNum === 1 && <>
+      <GenericPage id="1" 
+        handleNavClick={handleNavClick}
+        leftSide="info left"
+        rightSide="info right"
+      />
+      <InfoBody/>
+    </>}
+    {pageNum === 2 && <RegistryPage id="2" 
+      handleNavClick={handleNavClick}
+      leftSide="buy me gifts now"
+      rightSide="or you will be cursed"
+      />}
+    {pageNum === 3 && <>
+      <GenericPage id="3" 
+        handleNavClick={handleNavClick}
+        leftSide="thank you left"
+        rightSide="thank you right"
+      />
+      <ThanksBody/>
+    </>}
+    {pageNum === 4 && <>
+      <GenericPage id="4" 
+        handleNavClick={handleNavClick}
+        leftSide="about us left"
+        rightSide="about us right"
+      />
+      <AboutUsBody />
+    </>}
 {/*
-      <DataPage>
-        <Header>i Am CoLlEcTiNg DaTa On AlL yAlL</Header>
-        <Body>
-          <Text />
-          <Graphic key={1} />
-          <Graphic key={2} />
-          <Graphic key={3} />
-          <Graphic key={4} />
-          <Graphic key={5} />
-          <Graphic key={6} />
-          <Text />
-        </Body>
-        <Footer>
-          <ContactRequest />
-        </Footer>
-      </DataPage>
+
 
       <ThanksPage>
         <Header />
@@ -152,14 +173,6 @@ function ContactRequest({ children }) {
   return <div>{children}</div>;
 }
 
-function GiftGraph({ children }) {
-  return <div>{children}</div>;
-}
-
-function GiftSelector({ children }) {
-  return <div>{children}</div>;
-}
-
 function Text({ children }) {
   return <div>{children}</div>;
 }
@@ -169,9 +182,5 @@ function Graphic({ children }) {
 }
 
 function ThanksPage({ children }) {
-  return <div>{children}</div>;
-}
-
-function DataPage({ children }) {
   return <div>{children}</div>;
 }

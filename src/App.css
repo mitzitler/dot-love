@@ -31,25 +31,44 @@ canvas {
 }
 
 .header-main {
-  /* height: 70px; */
+  height: 90px;
   text-align: center;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: row;
-  border: 1px solid green; 
+  /* border: 1px solid black;  */
+}
+
+.header-main2 {
+  height: 60px;
+  width: 80%;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  border-radius: 20%;
+  /* border: 1px solid green;  */
+  background-color: lightgray;
 }
 
 .header-side {
-  height: 50px;
+  /* height: 50px; */
   text-align: center;
   margin: 25px 10px 25px 10px;
-  border: 4px solid blueviolet; 
+  font-family: Bonbance;
+  font-style: italic;
+  /* border: 4px solid blueviolet;  */
   flex: 1
 }
 
+/* the id on the header-side will dictate which color comb it */
+
 /* make the icon not a full circle just to observe the rotate effect for now */
 .header-nav { 
-  height: 80px;
-  width: 80px;
+  height: 90px;
+  width: 90px;
   justify-content: center;
   align-items: center;
   border: 2px; 
@@ -75,14 +94,45 @@ canvas {
 
 .inner-button {
   margin: auto;
-  height: 80px;
-  width: 80px;
+  height: 90px;
+  width: 90px;
+  position: absolute;
+  transition: scale 0.6s ease-in-out;
+}
+
+.inner-circle {
+  margin: auto;
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  background-color: grey;
   position: absolute;
   transition: scale 0.6s ease-in-out;
 }
 
 .inner-button:hover {
   scale: 1.2
+}
+
+.inner-circle:hover {
+  scale: 1.6
+}
+
+.generic-body {
+  margin: 20px;
+  font-family: varent-grotesk;
+  font-weight: bold
+}
+
+/* is there a way to randomize the width %, the justification and the color of several ul items? */
+
+.generic-body ul {
+  background-color: rosybrown;
+  color: black;
+  padding: 10px;
+  margin: 10px;
+  width: 90%;
+  border-radius: 20%;
 }
 
 /*

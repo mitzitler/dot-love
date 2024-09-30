@@ -4,22 +4,7 @@ import { scaleLinear } from "d3-scale";
 import { Tooltip, withTooltip } from "react-tippy";
 import 'react-tippy/dist/tippy.css'
 
-// figure out useSpring from "react-spring"
-
-// const Data = [
-//     { x: 1,   y: 2,   id: 1, name: "Teapot"  },
-//     { x: 2,   y: 3,   id: 2, name: "Toaster" },
-//     { x: 3,   y: 5,   id: 3, name: "Towels" },
-//     { x: 4,   y: 4,   id: 4, name: "Painting" },
-//     { x: 5,   y: 7,   id: 5, name: "Cups" },
-//     { x: -10, y: 10,  id: 6, name: "Forks" },
-//     { x: 10,  y: 10,  id: 7, name: "Wine" },
-//     { x: -10, y: -10, id: 8, name: "Table" },
-//     { x: 10,  y: -10, id: 9, name: "Toy" },
-// ]
-
-
-export function RegistryChartD3({Data, displayedId, setDisplayedId}) {
+export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
     //const [activeGift, setActiveGift] = useState(null)
     //const [tooltipData, setTooltipData] = useState(null)
     // const [selectedId, setSelectedId] = useState(null)
