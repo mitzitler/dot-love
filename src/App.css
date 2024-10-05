@@ -1,3 +1,9 @@
+/*  look into LESS https://lesscss.org/  
+
+@width: 10px;
+
+*/
+
 @keyframes fullrotation {
   0% {
   transform: rotate(0deg);
@@ -127,12 +133,37 @@ canvas {
 /* is there a way to randomize the width %, the justification and the color of several ul items? */
 
 .generic-body ul {
-  background-color: rosybrown;
+  /* background-color: rosybrown; */
   color: black;
   padding: 10px;
-  margin: 10px;
-  width: 90%;
+  /* margin: 10px; */
+  /* width: 90%; */
   border-radius: 20%;
+  margin-top: 10px;
+}
+
+.generic-body ul:nth-child(1) {
+  background-color: rosybrown;
+  margin-left: 25px;
+  width: 80%
+}
+
+.generic-body ul:nth-child(2) {
+  background-color: palevioletred;
+  margin-left: 10px;
+  width: 70%
+}
+
+.generic-body ul:nth-child(3) {
+  background-color: burlywood;
+  margin-left: 30px;
+  width:85%
+}
+
+.generic-body ul:nth-child(4) {
+  background-color: plum;
+  margin-left: 10px;
+  width: 75%
 }
 
 /*

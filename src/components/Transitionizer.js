@@ -1,0 +1,35 @@
+import React from 'react';
+import { SwitchTransition, Transition } from 'react-transition-group';
+import { useLocation } from 'react-router-dom';
+import gsap from 'gsap';
+
+// code from: https://stackblitz.com/edit/react-snrn5k?file=src%2FApp.js,src%2Froutes%2FRouter.js,src%2Fcomponents%2FTransition.js
+export function Transitionizer({ children }) {
+    const location = useLocation()
+
+    return (
+        <SwitchTransition>
+            <Transition
+                key={location.pathname}
+                timeout={500}
+                onEnter={(node) => {
+                    gsap.set(node, {autoAlpha: 0, scale: 0.95, yPercent: 100});
+                    gsap
+                        .timeline({paused: true})
+                        .to(node, {autoAlpha: 1, yPercent: 0, duration: 0.4})
+                        .to(node, {scale: 1, duration: 0.25})
+                        .play()
+                }}
+                onExit={(node) => {
+                    gsap
+                        .timeline({paused: true})
+                        .to(node, {scale: 0.8, duration: 0.2})
+                        .to(node, {yPercent: 0, autoAlpha: 0, duration: 0.5})
+                        .play();
+                }}
+            >
+                {children}
+            </Transition>
+        </SwitchTransition>
+    )
+}

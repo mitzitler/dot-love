@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { GenericHeader } from "./GenericHeader";
 import '../App.css';
 
 export function GenericBody({body}) {
