@@ -1,0 +1,18 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+*.egg-info
+
+# Lambda Layers
+lambda/spectaculo/layer/*
+lambda/nice_guy/layer/*
+lambda/gizmo/layer/*
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# Some other sensitive stuff
+cdk.json
