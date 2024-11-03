@@ -6,11 +6,11 @@ import '../App.css';
 
 export function RSVPPage({ children }) {
   return (
-   /* <div>{children}</div> */
-   <div id = "gradient">
-      <GradientComponent/>
-      <div id="overlay">{children}</div>
-    </div>
+    <div>{children}</div> 
+  //  <div id = "gradient">
+  //     <GradientComponent/>
+  //     <div id="overlay">{children}</div>
+  //   </div>
   );
 }
 
@@ -231,27 +231,27 @@ export function RSVPForm({ children, rsvpCode }) {
   );
 }
 
-export function RSVPFormSubmit({ handleRsvp }) {
-  return (
-    <button data-theme='light' className="btn" onClick={() => handleRsvp()}>
-        {/* if rsvp no, pop up that says would you still like to fill out information!*/}
-      Submit RSVP !
-    </button>
-  );
-}
+// export function RSVPFormSubmit({ handleRsvp }) {
+//   return (
+//     <button data-theme='light' className="btn" onClick={() => handleRsvp()}>
+//         {/* if rsvp no, pop up that says would you still like to fill out information!*/}
+//       Submit RSVP !
+//     </button>
+//   );
+// }
 
-{/* -- this is the list of state abbreviations
+// {/* -- this is the list of state abbreviations
 
-                  <li><a>AK</a></li> <li><a>AL</a></li> <li><a>AR</a></li> <li><a>AS</a></li> <li><a>AZ</a></li>
-                  <li><a>CA</a></li> <li><a>CO</a></li> <li><a>CT</a></li> <li><a>DC</a></li> <li><a>DE</a></li>
-                  <li><a>FL</a></li> <li><a>GA</a></li> <li><a>GU</a></li> <li><a>HI</a></li> <li><a>IA</a></li>
-                  <li><a>ID</a></li> <li><a>IL</a></li> <li><a>IN</a></li> <li><a>KS</a></li> <li><a>KY</a></li>
-                  <li><a>LA</a></li> <li><a>MA</a></li> <li><a>MD</a></li> <li><a>ME</a></li> <li><a>MI</a></li>
-                  <li><a>MN</a></li> <li><a>MO</a></li> <li><a>MS</a></li> <li><a>MT</a></li> <li><a>NC</a></li>
-                  <li><a>ND</a></li> <li><a>NE</a></li> <li><a>NH</a></li> <li><a>NJ</a></li> <li><a>NM</a></li>
-                  <li><a>NY</a></li> <li><a>OH</a></li> <li><a>OK</a></li> <li><a>OR</a></li> <li><a>PA</a></li>
-                  <li><a>PR</a></li> <li><a>RI</a></li> <li><a>SC</a></li> <li><a>SD</a></li> <li><a>TN</a></li>
-                  <li><a>TX</a></li> <li><a>UT</a></li> <li><a>VA</a></li> <li><a>VI</a></li> <li><a>VT</a></li>
-                  <li><a>WA</a></li> <li><a>WI</a></li> <li><a>WV</a></li> <li><a>WY</a></li> 
+//                   <li><a>AK</a></li> <li><a>AL</a></li> <li><a>AR</a></li> <li><a>AS</a></li> <li><a>AZ</a></li>
+//                   <li><a>CA</a></li> <li><a>CO</a></li> <li><a>CT</a></li> <li><a>DC</a></li> <li><a>DE</a></li>
+//                   <li><a>FL</a></li> <li><a>GA</a></li> <li><a>GU</a></li> <li><a>HI</a></li> <li><a>IA</a></li>
+//                   <li><a>ID</a></li> <li><a>IL</a></li> <li><a>IN</a></li> <li><a>KS</a></li> <li><a>KY</a></li>
+//                   <li><a>LA</a></li> <li><a>MA</a></li> <li><a>MD</a></li> <li><a>ME</a></li> <li><a>MI</a></li>
+//                   <li><a>MN</a></li> <li><a>MO</a></li> <li><a>MS</a></li> <li><a>MT</a></li> <li><a>NC</a></li>
+//                   <li><a>ND</a></li> <li><a>NE</a></li> <li><a>NH</a></li> <li><a>NJ</a></li> <li><a>NM</a></li>
+//                   <li><a>NY</a></li> <li><a>OH</a></li> <li><a>OK</a></li> <li><a>OR</a></li> <li><a>PA</a></li>
+//                   <li><a>PR</a></li> <li><a>RI</a></li> <li><a>SC</a></li> <li><a>SD</a></li> <li><a>TN</a></li>
+//                   <li><a>TX</a></li> <li><a>UT</a></li> <li><a>VA</a></li> <li><a>VI</a></li> <li><a>VT</a></li>
+//                   <li><a>WA</a></li> <li><a>WI</a></li> <li><a>WV</a></li> <li><a>WY</a></li> 
 
-*/}
+// */}

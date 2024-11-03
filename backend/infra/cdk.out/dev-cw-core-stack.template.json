@@ -1,0 +1,2308 @@
+{
+ "Resources": {
+  "devusersF8C2F700": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "username",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "referral",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "username-lookup-index",
+      "KeySchema": [
+       {
+        "AttributeName": "username",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "referral-lookup-index",
+      "KeySchema": [
+       {
+        "AttributeName": "referral",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-users/Resource"
+   }
+  },
+  "devtransactions66C53A89": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "state",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "account_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "transaction-state-index",
+      "KeySchema": [
+       {
+        "AttributeName": "state",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "transaction-account-index",
+      "KeySchema": [
+       {
+        "AttributeName": "account_id",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-transactions/Resource"
+   }
+  },
+  "devcommodities9E8C4FC8": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "product_name",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "product_name",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "product_type",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "commodity-type-index",
+      "KeySchema": [
+       {
+        "AttributeName": "product_type",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-commodities/Resource"
+   }
+  },
+  "devinvalidtokensECAA4347": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "jti",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "jti",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "SSESpecification": {
+     "SSEEnabled": true
+    },
+    "TimeToLiveSpecification": {
+     "AttributeName": "ttl",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-invalid_tokens/Resource"
+   }
+  },
+  "devidempotency5E2F1C3F": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "SSESpecification": {
+     "SSEEnabled": true
+    },
+    "TimeToLiveSpecification": {
+     "AttributeName": "expiration",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-idempotency/Resource"
+   }
+  },
+  "devcwauthapi1581EC63": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "*"
+     ],
+     "AllowMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+      "POST"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 864000
+    },
+    "Description": "CarWorld API Gateway",
+    "Name": "dev-cw-auth-api",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/Resource"
+   }
+  },
+  "devcwauthapiDefaultStage3F9913D9": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "StageName": "$default",
+    "AutoDeploy": true
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/DefaultStage/Resource"
+   }
+  },
+  "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "devcwauthregistrationlambda6F341C31",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/dev-cw-auth-controller/Resource"
+   }
+  },
+  "devcwauthapiPOSTauthlogindevcwauthcontrollerPermission3EF2BC34": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwauthregistrationlambda6F341C31",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/auth/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/dev-cw-auth-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTauthloginCDF03C05": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /auth/login",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/Resource"
+   }
+  },
+  "devcwauthapiPOSTauthregisterdevcwauthcontrollerPermissionA6236BF8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwauthregistrationlambda6F341C31",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/auth/register"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--register/dev-cw-auth-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTauthregisterE9D2B494": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /auth/register",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--register/Resource"
+   }
+  },
+  "devcwauthapiPOSTauthrefreshdevcwauthcontrollerPermissionF71A86DA": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwauthregistrationlambda6F341C31",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/auth/refresh"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--refresh/dev-cw-auth-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTauthrefresh678E92AC": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /auth/refresh",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--auth--refresh/Resource"
+   }
+  },
+  "devcwauthapiGETauthguestdevcwauthcontrollerPermission27EFFF4B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwauthregistrationlambda6F341C31",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/auth/guest"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--auth--guest/dev-cw-auth-controller-Permission"
+   }
+  },
+  "devcwauthapiGETauthguest365E97F7": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "GET /auth/guest",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--auth--guest/Resource"
+   }
+  },
+  "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "devcwcommercelambda5A5513E6",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/dev-cw-commerce-controller/Resource"
+   }
+  },
+  "devcwauthapiPOSTcommercesecretdevcwcommercecontrollerPermission470ACFC1": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwcommercelambda5A5513E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/commerce/secret"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/dev-cw-commerce-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTcommercesecretC8545081": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /commerce/secret",
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "devcwauthapidevCWCommerceRequestValidator85A08671"
+    },
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/Resource"
+   }
+  },
+  "devcwauthapidevCWCommerceRequestValidator85A08671": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "AuthorizerType": "REQUEST",
+    "Name": "dev-CWCommerceRequestValidator",
+    "AuthorizerPayloadFormatVersion": "2.0",
+    "AuthorizerResultTtlInSeconds": 300,
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "devcwvalidatorlambda70557A7B",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "EnableSimpleResponses": true,
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/dev-CWCommerceRequestValidator/Resource"
+   }
+  },
+  "devcwauthapidevcwcorestackdevcwauthapidevCWCommerceRequestValidatorADBD816DPermissionF684EA9F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwvalidatorlambda70557A7B",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/authorizers/",
+       {
+        "Ref": "devcwauthapidevCWCommerceRequestValidator85A08671"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/devcwcorestackdevcwauthapidevCWCommerceRequestValidatorADBD816D-Permission"
+   }
+  },
+  "devcwauthapiPOSTcommercecacheemaildevcwcommercecontrollerPermissionADB7AA29": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwcommercelambda5A5513E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/commerce/cache_email"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--cache_email/dev-cw-commerce-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTcommercecacheemail4011B432": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /commerce/cache_email",
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "devcwauthapidevCWCommerceRequestValidator85A08671"
+    },
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--cache_email/Resource"
+   }
+  },
+  "devcwauthapiPOSTcommercewebhookdevcwcommercecontrollerPermission67797DF6": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwcommercelambda5A5513E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/commerce/webhook"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--webhook/dev-cw-commerce-controller-Permission"
+   }
+  },
+  "devcwauthapiPOSTcommercewebhook56ADCF76": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "POST /commerce/webhook",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/POST--commerce--webhook/Resource"
+   }
+  },
+  "devcwauthapiGETcommercecommoditiesdevcwcommercecontrollerPermission7A5C99B3": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwcommercelambda5A5513E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/commerce/commodities"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--commerce--commodities/dev-cw-commerce-controller-Permission"
+   }
+  },
+  "devcwauthapiGETcommercecommodities80BCFD41": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "GET /commerce/commodities",
+    "AuthorizationType": "NONE",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--commerce--commodities/Resource"
+   }
+  },
+  "devcwauthapiGETprofileddprankdevcwprofilecontroller9DBF3FF5": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "devcwprofilelambdaCCBB7F11",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/dev-cw-profile-controller/Resource"
+   }
+  },
+  "devcwauthapiGETprofileddprankdevcwprofilecontrollerPermission096A5EF9": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwprofilelambdaCCBB7F11",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/*/*/profile/ddp_rank"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/dev-cw-profile-controller-Permission"
+   }
+  },
+  "devcwauthapiGETprofileddprankA83D614E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "RouteKey": "GET /profile/ddp_rank",
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "devcwauthapidevCWProfileRequestValidatorE1F7015E"
+    },
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devcwauthapiGETprofileddprankdevcwprofilecontroller9DBF3FF5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/Resource"
+   }
+  },
+  "devcwauthapidevCWProfileRequestValidatorE1F7015E": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devcwauthapi1581EC63"
+    },
+    "AuthorizerType": "REQUEST",
+    "Name": "dev-CWProfileRequestValidator",
+    "AuthorizerPayloadFormatVersion": "2.0",
+    "AuthorizerResultTtlInSeconds": 300,
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "devcwvalidatorlambda70557A7B",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "EnableSimpleResponses": true,
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/dev-CWProfileRequestValidator/Resource"
+   }
+  },
+  "devcwauthapidevcwcorestackdevcwauthapidevCWProfileRequestValidator2B09FA80Permission3C3FFEEE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwvalidatorlambda70557A7B",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devcwauthapi1581EC63"
+       },
+       "/authorizers/",
+       {
+        "Ref": "devcwauthapidevCWProfileRequestValidatorE1F7015E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-api/devcwcorestackdevcwauthapidevCWProfileRequestValidator2B09FA80-Permission"
+   }
+  },
+  "devcwvalidatorlambdarole1F031610": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Validator Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-validator-lambda-role/Resource"
+   }
+  },
+  "devjwtlambdalayerDC9442C8": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "e1c9f542fc6d87b7337b1ce9eded0dfc97ca092475aabba589e9677bdf5e297f.zip"
+    },
+    "CompatibleRuntimes": [
+     "python3.7"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-jwt-lambda-layer/Resource",
+    "aws:asset:path": "asset.e1c9f542fc6d87b7337b1ce9eded0dfc97ca092475aabba589e9677bdf5e297f",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "devjwtdependencylambdalayer04BEFA21": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "cf110f7eb2fb2b25b7b8da27194129f3e9bcd21134ad94f590adfc1f0c062130.zip"
+    },
+    "CompatibleRuntimes": [
+     "python3.7"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-jwt-dependency-lambda-layer/Resource",
+    "aws:asset:path": "asset.cf110f7eb2fb2b25b7b8da27194129f3e9bcd21134ad94f590adfc1f0c062130",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "devcwvalidatorlambda70557A7B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "409b7eee35246093a9e68b83c49ae34b9edf848e31b1c51f33eee6dee5c239e9.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwvalidatorlambdarole1F031610",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld Validator Lambda, to authenticate API requests",
+    "Environment": {
+     "Variables": {
+      "jwtSecret": "d9d229cbefa9cd74ce15329abdc3825f624eecbfc67a5553673dde15d010fffe",
+      "jwtExpMinutes": "1440"
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "devjwtdependencylambdalayer04BEFA21"
+     },
+     {
+      "Ref": "devjwtlambdalayerDC9442C8"
+     }
+    ],
+    "MemorySize": 512,
+    "Runtime": "python3.7",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwvalidatorlambdarole1F031610"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-validator-lambda/Resource",
+    "aws:asset:path": "asset.409b7eee35246093a9e68b83c49ae34b9edf848e31b1c51f33eee6dee5c239e9",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwauthlambdaroleBD75F02F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Lambda Role with access to Auth table",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-lambda-role/Resource"
+   }
+  },
+  "devcwauthlambdaroleDefaultPolicyA9994D66": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devinvalidtokensECAA4347",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devusersF8C2F700",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devusersF8C2F700",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devcwauthlambdaroleDefaultPolicyA9994D66",
+    "Roles": [
+     {
+      "Ref": "devcwauthlambdaroleBD75F02F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devcwauthregistrationlambda6F341C31": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "f3ccb557ea61200550ea0fd6ca3c0111d34a05e01893cbdfc4c7685daca814ef.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwauthlambdaroleBD75F02F",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld AuthController",
+    "Environment": {
+     "Variables": {
+      "jwtSecret": "d9d229cbefa9cd74ce15329abdc3825f624eecbfc67a5553673dde15d010fffe",
+      "jwtExpMinutes": "1440",
+      "userTableName": {
+       "Ref": "devusersF8C2F700"
+      },
+      "invalidTokenTableName": {
+       "Ref": "devinvalidtokensECAA4347"
+      }
+     }
+    },
+    "Handler": "function/index.handler",
+    "MemorySize": 512,
+    "Runtime": "nodejs18.x",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwauthlambdaroleDefaultPolicyA9994D66",
+    "devcwauthlambdaroleBD75F02F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-auth-registration-lambda/Resource",
+    "aws:asset:path": "asset.f3ccb557ea61200550ea0fd6ca3c0111d34a05e01893cbdfc4c7685daca814ef",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwtransactionemailcaches3D1084718": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "ExpirationInDays": 1,
+       "Id": "dev-email_cache_expiry_rule",
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-transaction-email-cache-s3/Resource"
+   }
+  },
+  "devcwtransactionemailcaches3PolicyBE2A4415": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "devcwtransactionemailcaches3D1084718"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcwtransactionemailcaches3D1084718",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcwtransactionemailcaches3D1084718",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-transaction-email-cache-s3/Policy/Resource"
+   }
+  },
+  "devcwtransactionemailcaches3AutoDeleteObjectsCustomResource72D7C7EE": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "devcwtransactionemailcaches3D1084718"
+    }
+   },
+   "DependsOn": [
+    "devcwtransactionemailcaches3PolicyBE2A4415"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-transaction-email-cache-s3/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "2332a8953f2d92ebffdc01cf20d5a2fb5bf2ef29764cda4186f01c55edee8c73.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs14.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "devcwtransactionemailcaches3D1084718"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.2332a8953f2d92ebffdc01cf20d5a2fb5bf2ef29764cda4186f01c55edee8c73",
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwcommercelambdaroleE3069963": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Commerce Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-commerce-lambda-role/Resource"
+   }
+  },
+  "devcwcommercelambdaroleDefaultPolicy10B31444": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcommodities9E8C4FC8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "devidempotency5E2F1C3F",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "devtransactions66C53A89",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "devusersF8C2F700",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcommodities9E8C4FC8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devtransactions66C53A89",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devusersF8C2F700",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcwtransactionemailcaches3D1084718",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcwtransactionemailcaches3D1084718",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devcwcommercelambdaroleDefaultPolicy10B31444",
+    "Roles": [
+     {
+      "Ref": "devcwcommercelambdaroleE3069963"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-commerce-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devstripelayer4E10854E": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "1cc3cb9afe3e86481060b3b17b3ae6541b3af414e0ff55814b190017dd0d58ee.zip"
+    },
+    "CompatibleRuntimes": [
+     "python3.7"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-stripe-layer/Resource",
+    "aws:asset:path": "asset.1cc3cb9afe3e86481060b3b17b3ae6541b3af414e0ff55814b190017dd0d58ee",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "devpowertoolslayer46C5FF74": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "bc71d0f958e41a40f6a15cd00942fcd01be269bee055345f32c38b89b597be2c.zip"
+    },
+    "CompatibleRuntimes": [
+     "python3.7"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-powertools-layer/Resource",
+    "aws:asset:path": "asset.bc71d0f958e41a40f6a15cd00942fcd01be269bee055345f32c38b89b597be2c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "devcwcommercelambda5A5513E6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "a51861e3cfaf85f0724a16914c0a627fcbc66eae4e08723023b604b67f068678.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwcommercelambdaroleE3069963",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld Commerce Lambda, to handle purchases",
+    "Environment": {
+     "Variables": {
+      "stripe_secret": "sk_test_51MVNG0Edd7yLru5yAwryAPzyLfbAoKql1yclFiHiidc7iK9NEla8P9WtNhrtdN8minXow0XGQpeNlBBL8JF1NBsK00QzQj6bdw",
+      "POWERTOOLS_SERVICE_NAME": "commerce-lambda",
+      "POWERTOOLS_LOG_LEVEL": "INFO",
+      "TZ": "US/Eastern",
+      "user_table_name": {
+       "Ref": "devusersF8C2F700"
+      },
+      "commodity_table_name": {
+       "Ref": "devcommodities9E8C4FC8"
+      },
+      "transaction_table_name": {
+       "Ref": "devtransactions66C53A89"
+      },
+      "transaction_email_cache_s3_name": {
+       "Ref": "devcwtransactionemailcaches3D1084718"
+      },
+      "ses_sender_email": "merch@carworld.love",
+      "ses_admin_list": "themattsaucedo@gmail.com",
+      "ses_config_id": {
+       "Ref": "devcwcommercesesconfigurationset2477E3BB"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "devpowertoolslayer46C5FF74"
+     },
+     {
+      "Ref": "devstripelayer4E10854E"
+     }
+    ],
+    "MemorySize": 512,
+    "Runtime": "python3.7",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwcommercelambdaroleDefaultPolicy10B31444",
+    "devcwcommercelambdaroleE3069963"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-commerce-lambda/Resource",
+    "aws:asset:path": "asset.a51861e3cfaf85f0724a16914c0a627fcbc66eae4e08723023b604b67f068678",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwprofilelambdarole1BE748A7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Profile Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-profile-lambda-role/Resource"
+   }
+  },
+  "devcwprofilelambdaroleDefaultPolicyFB138105": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devusersF8C2F700",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devusersF8C2F700",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devcwprofilelambdaroleDefaultPolicyFB138105",
+    "Roles": [
+     {
+      "Ref": "devcwprofilelambdarole1BE748A7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-profile-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devcwprofilelambdaCCBB7F11": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "0415cc47b949e0915676e7564794f6b940306623a69fffce0224c669f1ce6dd7.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwprofilelambdarole1BE748A7",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld Profile Lambda, to handle Profile-related actions",
+    "Environment": {
+     "Variables": {
+      "user_table_name": {
+       "Ref": "devusersF8C2F700"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Runtime": "python3.7",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwprofilelambdaroleDefaultPolicyFB138105",
+    "devcwprofilelambdarole1BE748A7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-profile-lambda/Resource",
+    "aws:asset:path": "asset.0415cc47b949e0915676e7564794f6b940306623a69fffce0224c669f1ce6dd7",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwsesnotifs36066743B": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "ExpirationInDays": 30,
+       "Id": "dev-ses-notif-rule",
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-s3/Resource"
+   }
+  },
+  "devcwsesnotifs3Policy40DF3A3B": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "devcwsesnotifs36066743B"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcwsesnotifs36066743B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcwsesnotifs36066743B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-s3/Policy/Resource"
+   }
+  },
+  "devcwsesnotifs3AutoDeleteObjectsCustomResource33061DC3": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "devcwsesnotifs36066743B"
+    }
+   },
+   "DependsOn": [
+    "devcwsesnotifs3Policy40DF3A3B"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-s3/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "devcwsesnotiflambdarole41E188F7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "SES Notification Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-lambda-role/Resource"
+   }
+  },
+  "devcwsesnotiflambdaroleDefaultPolicy1C46626E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcwsesnotifs36066743B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcwsesnotifs36066743B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devcwsesnotiflambdaroleDefaultPolicy1C46626E",
+    "Roles": [
+     {
+      "Ref": "devcwsesnotiflambdarole41E188F7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devcwsesnotiflambda6B158328": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "436c2f9cac47329cbb00d171d47aab60101c0c8415498c3cdf5aaa99a43b068e.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwsesnotiflambdarole41E188F7",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld SES Notification Lambda, to handle: Bounce, Received, and Compliant notifications",
+    "Environment": {
+     "Variables": {
+      "ses_s3_bucket_name": {
+       "Ref": "devcwsesnotifs36066743B"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "Runtime": "python3.7",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwsesnotiflambdaroleDefaultPolicy1C46626E",
+    "devcwsesnotiflambdarole41E188F7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-lambda/Resource",
+    "aws:asset:path": "asset.436c2f9cac47329cbb00d171d47aab60101c0c8415498c3cdf5aaa99a43b068e",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devcwsesnotiflambdaAllowInvokedevcwcorestackcarworldsesnotifsns9BF2C3108C509A1F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devcwsesnotiflambda6B158328",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-lambda/AllowInvoke:devcwcorestackcarworldsesnotifsns9BF2C310"
+   }
+  },
+  "devcwsesnotiflambdacarworldsesnotifsnsEC94E2BF": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Protocol": "lambda",
+    "TopicArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns",
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "devcwsesnotiflambda6B158328",
+      "Arn"
+     ]
+    },
+    "Region": "us-east-1"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-ses-notif-lambda/carworld-ses-notif-sns/Resource"
+   }
+  },
+  "devcwcommercesesconfigurationset2477E3BB": {
+   "Type": "AWS::SES::ConfigurationSet",
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-commerce-ses-configuration-set/Resource"
+   }
+  },
+  "devsespolicyF03432D9": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ses:SendBulkTemplatedEmail",
+        "ses:SendEmail",
+        "ses:SendRawEmail",
+        "ses:SendTemplatedEmail"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devsespolicyF03432D9",
+    "Roles": [
+     {
+      "Ref": "devcwcommercelambdaroleE3069963"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-ses-policy/Resource"
+   }
+  },
+  "devcwbatchwritestoreitemslambdaroleC75CBAF4": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Lambda Role to populate CW Store Items in CWCommodity Table",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-batch-write-store-items-lambda-role/Resource"
+   }
+  },
+  "devcwbatchwritestoreitemslambdaroleDefaultPolicy1FF7168A": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devcommodities9E8C4FC8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devcommodities9E8C4FC8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devcwbatchwritestoreitemslambdaroleDefaultPolicy1FF7168A",
+    "Roles": [
+     {
+      "Ref": "devcwbatchwritestoreitemslambdaroleC75CBAF4"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-batch-write-store-items-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devcwbatchwritestoreitemslambda3175152A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "bd5059bb23d2b2d0014e563d5e5c6c95465ba4e9b51fcb49a8a21e773972b491.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "devcwbatchwritestoreitemslambdaroleC75CBAF4",
+      "Arn"
+     ]
+    },
+    "Description": "CarWorld Batch Commodity Writer",
+    "Environment": {
+     "Variables": {
+      "commodity_table_name": {
+       "Ref": "devcommodities9E8C4FC8"
+      }
+     }
+    },
+    "Handler": "batch_write_store_items.handler",
+    "Runtime": "python3.7",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devcwbatchwritestoreitemslambdaroleDefaultPolicy1FF7168A",
+    "devcwbatchwritestoreitemslambdaroleC75CBAF4"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/dev-cw-batch-write-store-items-lambda/Resource",
+    "aws:asset:path": "asset.bd5059bb23d2b2d0014e563d5e5c6c95465ba4e9b51fcb49a8a21e773972b491",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11Ry27CMBD8Fu6OoaCWaylS1Uo9RAH1ijaOCVsSO/IDlEb593rj8OppZtazm83OnL888242gbNNRHFMKsx5t3EgjiyUdl3RKqh1EYpbyCvJ1ns1kJ5BgyU4eYb2NOddqK8apOfQXA6+T+VkacChViQz7d1QX3l30AZ/pelZBXVewNCeSlOjteT+glaab2ns2Pqg370Sl5kX3jOEmneZjhsOmOoKRUsysp7ZxQ6slc7yFUHQvHvz4ijdG1jJIqWGkUW4zbnXYZqy4VI+t8Jgc1noQW91g4JGB7MM5rVWeyx9PMkmfup/re9ZJq32Rkg2bEnnRFWytbdO19c3+ssrf3hKjT5hQcedJVA1B+CzyesY75TwPrjR0X0411B+hDFAYjEyYvdZDt5bhj1L2yDUdMGX/Gk5+bGIifHKYS15FvEPjk8BYGYCAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-cw-core-stack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

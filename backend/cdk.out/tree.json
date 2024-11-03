@@ -1,0 +1,2338 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "dev-dot-love-stack": {
+        "id": "dev-dot-love-stack",
+        "path": "dev-dot-love-stack",
+        "children": {
+          "dev-users": {
+            "id": "dev-users",
+            "path": "dev-dot-love-stack/dev-users",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-users/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                  "aws:cdk:cloudformation:props": {
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "id",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "first",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "last",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "globalSecondaryIndexes": [
+                      {
+                        "indexName": "full-name-lookup-index",
+                        "keySchema": [
+                          {
+                            "attributeName": "first",
+                            "keyType": "HASH"
+                          },
+                          {
+                            "attributeName": "last",
+                            "keyType": "RANGE"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      }
+                    ],
+                    "keySchema": [
+                      {
+                        "attributeName": "id",
+                        "keyType": "HASH"
+                      }
+                    ],
+                    "sseSpecification": {
+                      "sseEnabled": true
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                  "version": "2.134.0"
+                }
+              },
+              "ScalingRole": {
+                "id": "ScalingRole",
+                "path": "dev-dot-love-stack/dev-users/ScalingRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+              "version": "2.134.0"
+            }
+          },
+          "dev-registry_items": {
+            "id": "dev-registry_items",
+            "path": "dev-dot-love-stack/dev-registry_items",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-registry_items/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                  "aws:cdk:cloudformation:props": {
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "id",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "state",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "globalSecondaryIndexes": [
+                      {
+                        "indexName": "state-lookup-index",
+                        "keySchema": [
+                          {
+                            "attributeName": "state",
+                            "keyType": "HASH"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      }
+                    ],
+                    "keySchema": [
+                      {
+                        "attributeName": "id",
+                        "keyType": "HASH"
+                      }
+                    ],
+                    "sseSpecification": {
+                      "sseEnabled": true
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                  "version": "2.134.0"
+                }
+              },
+              "ScalingRole": {
+                "id": "ScalingRole",
+                "path": "dev-dot-love-stack/dev-registry_items/ScalingRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+              "version": "2.134.0"
+            }
+          },
+          "dev-registry_claims": {
+            "id": "dev-registry_claims",
+            "path": "dev-dot-love-stack/dev-registry_claims",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-registry_claims/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                  "aws:cdk:cloudformation:props": {
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "registry_item_id",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "user_id",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "state",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "globalSecondaryIndexes": [
+                      {
+                        "indexName": "state-lookup-index",
+                        "keySchema": [
+                          {
+                            "attributeName": "state",
+                            "keyType": "HASH"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      }
+                    ],
+                    "keySchema": [
+                      {
+                        "attributeName": "registry_item_id",
+                        "keyType": "HASH"
+                      },
+                      {
+                        "attributeName": "user_id",
+                        "keyType": "RANGE"
+                      }
+                    ],
+                    "sseSpecification": {
+                      "sseEnabled": true
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                  "version": "2.134.0"
+                }
+              },
+              "ScalingRole": {
+                "id": "ScalingRole",
+                "path": "dev-dot-love-stack/dev-registry_claims/ScalingRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+              "version": "2.134.0"
+            }
+          },
+          "dev-global-layer": {
+            "id": "dev-global-layer",
+            "path": "dev-dot-love-stack/dev-global-layer",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "dev-dot-love-stack/dev-global-layer/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "dev-dot-love-stack/dev-global-layer/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "dev-dot-love-stack/dev-global-layer/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-global-layer/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::LayerVersion",
+                  "aws:cdk:cloudformation:props": {
+                    "compatibleRuntimes": [
+                      "python3.11"
+                    ],
+                    "content": {
+                      "s3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+                      "s3Key": "2d927a77a5f6230ee1acd4bfaca9eaaa064a6cc31a45a9e54b1ae1ccb11f0118.zip"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnLayerVersion",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.LayerVersion",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-nice-guy-lambda-role": {
+            "id": "dev-dot-love-nice-guy-lambda-role",
+            "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda-role",
+            "children": {
+              "Importdev-dot-love-nice-guy-lambda-role": {
+                "id": "Importdev-dot-love-nice-guy-lambda-role",
+                "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda-role/Importdev-dot-love-nice-guy-lambda-role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda-role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "NiceGuy Lambda Role",
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-nice-guy-lambda": {
+            "id": "dev-dot-love-nice-guy-lambda",
+            "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+                      "s3Key": "6f8cb9cb46bd0969998eb129f0a97ff8697a3d0a9dbd89e81320e25f982d7c7b.zip"
+                    },
+                    "description": "dot-love NiceGuy message parsing Lambda, to parse API requests",
+                    "environment": {
+                      "variables": {
+                        "POWERTOOLS_SERVICE_NAME": "nice-guy",
+                        "POWERTOOLS_LOG_LEVEL": "INFO",
+                        "TZ": "US/Eastern"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "layers": [
+                      {
+                        "Ref": "devgloballayerCC983376"
+                      }
+                    ],
+                    "memorySize": 512,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "devdotloveniceguylambdaroleCE94AF04",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 15
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-api": {
+            "id": "dev-dot-love-api",
+            "path": "dev-dot-love-stack/dev-dot-love-api",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-api/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Api",
+                  "aws:cdk:cloudformation:props": {
+                    "corsConfiguration": {
+                      "allowHeaders": [
+                        "*"
+                      ],
+                      "allowMethods": [
+                        "GET",
+                        "HEAD",
+                        "OPTIONS",
+                        "POST"
+                      ],
+                      "allowOrigins": [
+                        "*"
+                      ],
+                      "maxAge": 864000
+                    },
+                    "description": "DotLove API Gateway",
+                    "name": "dev-dot-love-api",
+                    "protocolType": "HTTP"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnApi",
+                  "version": "2.134.0"
+                }
+              },
+              "DefaultStage": {
+                "id": "DefaultStage",
+                "path": "dev-dot-love-stack/dev-dot-love-api/DefaultStage",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/DefaultStage/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Stage",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "autoDeploy": true,
+                        "stageName": "$default"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnStage",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpStage",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "GET--gizmo--login": {
+                "id": "GET--gizmo--login",
+                "path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login",
+                "children": {
+                  "dev-dot-love-gizmo-service": {
+                    "id": "dev-dot-love-gizmo-service",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "devdotloveapi55DE5DF6"
+                            },
+                            "integrationType": "AWS_PROXY",
+                            "integrationUri": {
+                              "Fn::GetAtt": [
+                                "devdotlovegizmoservice0C23C488",
+                                "Arn"
+                              ]
+                            },
+                            "payloadFormatVersion": "2.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.134.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpIntegration",
+                      "version": "2.65.0-alpha.0"
+                    }
+                  },
+                  "dev-dot-love-gizmo-service-Permission": {
+                    "id": "dev-dot-love-gizmo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovegizmoservice0C23C488",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/gizmo/login"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "GET /gizmo/login",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "POST--gizmo--register": {
+                "id": "POST--gizmo--register",
+                "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register",
+                "children": {
+                  "dev-dot-love-gizmo-service-Permission": {
+                    "id": "dev-dot-love-gizmo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/dev-dot-love-gizmo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovegizmoservice0C23C488",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/gizmo/register"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "POST /gizmo/register",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "PATCH--gizmo--update": {
+                "id": "PATCH--gizmo--update",
+                "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update",
+                "children": {
+                  "dev-dot-love-gizmo-service-Permission": {
+                    "id": "dev-dot-love-gizmo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/dev-dot-love-gizmo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovegizmoservice0C23C488",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/gizmo/update"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "PATCH /gizmo/update",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "POST--gizmo--email": {
+                "id": "POST--gizmo--email",
+                "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email",
+                "children": {
+                  "dev-dot-love-gizmo-service-Permission": {
+                    "id": "dev-dot-love-gizmo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/dev-dot-love-gizmo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovegizmoservice0C23C488",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/gizmo/email"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "POST /gizmo/email",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "POST--gizmo--text": {
+                "id": "POST--gizmo--text",
+                "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text",
+                "children": {
+                  "dev-dot-love-gizmo-service-Permission": {
+                    "id": "dev-dot-love-gizmo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/dev-dot-love-gizmo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovegizmoservice0C23C488",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/gizmo/text"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "POST /gizmo/text",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "POST--spectaculo--claim--create": {
+                "id": "POST--spectaculo--claim--create",
+                "path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create",
+                "children": {
+                  "dev-dot-love-spectaculo-service": {
+                    "id": "dev-dot-love-spectaculo-service",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "devdotloveapi55DE5DF6"
+                            },
+                            "integrationType": "AWS_PROXY",
+                            "integrationUri": {
+                              "Fn::GetAtt": [
+                                "devdotlovespectaculoservice5C5C40A9",
+                                "Arn"
+                              ]
+                            },
+                            "payloadFormatVersion": "2.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.134.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpIntegration",
+                      "version": "2.65.0-alpha.0"
+                    }
+                  },
+                  "dev-dot-love-spectaculo-service-Permission": {
+                    "id": "dev-dot-love-spectaculo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovespectaculoservice5C5C40A9",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/spectaculo/claim/create"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "POST /spectaculo/claim/create",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              },
+              "PATCH--spectaculo--claim--update": {
+                "id": "PATCH--spectaculo--claim--update",
+                "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update",
+                "children": {
+                  "dev-dot-love-spectaculo-service-Permission": {
+                    "id": "dev-dot-love-spectaculo-service-Permission",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/dev-dot-love-spectaculo-service-Permission",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                      "aws:cdk:cloudformation:props": {
+                        "action": "lambda:InvokeFunction",
+                        "functionName": {
+                          "Fn::GetAtt": [
+                            "devdotlovespectaculoservice5C5C40A9",
+                            "Arn"
+                          ]
+                        },
+                        "principal": "apigateway.amazonaws.com",
+                        "sourceArn": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "arn:aws:execute-api:us-east-1:832303862315:",
+                              {
+                                "Ref": "devdotloveapi55DE5DF6"
+                              },
+                              "/*/*/spectaculo/claim/update"
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "devdotloveapi55DE5DF6"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "PATCH /spectaculo/claim/update",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpRoute",
+                  "version": "2.65.0-alpha.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-apigatewayv2-alpha.HttpApi",
+              "version": "2.65.0-alpha.0"
+            }
+          },
+          "dev-dot-love-gizmo-service-role": {
+            "id": "dev-dot-love-gizmo-service-role",
+            "path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role",
+            "children": {
+              "Importdev-dot-love-gizmo-service-role": {
+                "id": "Importdev-dot-love-gizmo-service-role",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/Importdev-dot-love-gizmo-service-role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "Lambda Role with access to User table",
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.134.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "dynamodb:BatchGetItem",
+                                "dynamodb:BatchWriteItem",
+                                "dynamodb:ConditionCheckItem",
+                                "dynamodb:DeleteItem",
+                                "dynamodb:DescribeTable",
+                                "dynamodb:GetItem",
+                                "dynamodb:GetRecords",
+                                "dynamodb:GetShardIterator",
+                                "dynamodb:PutItem",
+                                "dynamodb:Query",
+                                "dynamodb:Scan",
+                                "dynamodb:UpdateItem"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devusersF8C2F700",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devusersF8C2F700",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/index/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "devdotlovegizmoserviceroleDefaultPolicyA41827B4",
+                        "roles": [
+                          {
+                            "Ref": "devdotlovegizmoservicerole08DB6E01"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-gizmo-service": {
+            "id": "dev-dot-love-gizmo-service",
+            "path": "dev-dot-love-stack/dev-dot-love-gizmo-service",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-service/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "dev-dot-love-stack/dev-dot-love-gizmo-service/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "dev-dot-love-stack/dev-dot-love-gizmo-service/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-service/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+                      "s3Key": "06575cd7d7a01b8177bee3f688435380d80beb37b0c92562d44107357457dbef.zip"
+                    },
+                    "description": "DotLove Gizmo Service, to handle user actions",
+                    "environment": {
+                      "variables": {
+                        "userTableName": {
+                          "Ref": "devusersF8C2F700"
+                        },
+                        "POWERTOOLS_SERVICE_NAME": "gizmo",
+                        "POWERTOOLS_LOG_LEVEL": "INFO",
+                        "TZ": "US/Eastern",
+                        "user_table_name": {
+                          "Ref": "devusersF8C2F700"
+                        },
+                        "ses_sender_email": "no-reply@mitzimatthew.love",
+                        "ses_admin_list": "themattsaucedo@gmail.com,mitzitler@gmail.com",
+                        "twilio_auth_token": "5c454dfd28d6b3d50e51db390856a3fa",
+                        "twilio_account_sid": "ACd52e4c69e255e3803d42927990c7b78a",
+                        "ses_config_id": {
+                          "Ref": "devdotlovegizmosesconfigurationset80E5BA84"
+                        }
+                      }
+                    },
+                    "handler": "index.handler",
+                    "layers": [
+                      {
+                        "Ref": "devgloballayerCC983376"
+                      }
+                    ],
+                    "memorySize": 512,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "devdotlovegizmoservicerole08DB6E01",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 15
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-spectaculo-service-role": {
+            "id": "dev-dot-love-spectaculo-service-role",
+            "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role",
+            "children": {
+              "Importdev-dot-love-spectaculo-service-role": {
+                "id": "Importdev-dot-love-spectaculo-service-role",
+                "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/Importdev-dot-love-spectaculo-service-role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "Lambda Role with access to User table",
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.134.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "dynamodb:BatchGetItem",
+                                "dynamodb:BatchWriteItem",
+                                "dynamodb:ConditionCheckItem",
+                                "dynamodb:DeleteItem",
+                                "dynamodb:DescribeTable",
+                                "dynamodb:GetItem",
+                                "dynamodb:GetRecords",
+                                "dynamodb:GetShardIterator",
+                                "dynamodb:PutItem",
+                                "dynamodb:Query",
+                                "dynamodb:Scan",
+                                "dynamodb:UpdateItem"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devregistryclaimsB95E40BD",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::GetAtt": [
+                                    "devregistryitemsFBEA57E1",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devregistryclaimsB95E40BD",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/index/*"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devregistryitemsFBEA57E1",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/index/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "devdotlovespectaculoserviceroleDefaultPolicyE872C3BE",
+                        "roles": [
+                          {
+                            "Ref": "devdotlovespectaculoservicerole0EA9F1C4"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-spectaculo-service": {
+            "id": "dev-dot-love-spectaculo-service",
+            "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-spectaculo-service/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+                      "s3Key": "66f1f3bdffd24932a3150efbed210e6ae83ef21373f3ec7a4f2bf2cb9a76c46b.zip"
+                    },
+                    "description": "DotLove Spectaculo Service, to handle the registry",
+                    "environment": {
+                      "variables": {
+                        "registryItemTableName": {
+                          "Ref": "devregistryitemsFBEA57E1"
+                        },
+                        "registryClaimTableName": {
+                          "Ref": "devregistryclaimsB95E40BD"
+                        },
+                        "POWERTOOLS_SERVICE_NAME": "spectaculo",
+                        "POWERTOOLS_LOG_LEVEL": "INFO",
+                        "TZ": "US/Eastern"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "layers": [
+                      {
+                        "Ref": "devgloballayerCC983376"
+                      }
+                    ],
+                    "memorySize": 512,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "devdotlovespectaculoservicerole0EA9F1C4",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 15
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-registry-item-img-s3": {
+            "id": "dev-dot-love-registry-item-img-s3",
+            "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketEncryption": {
+                      "serverSideEncryptionConfiguration": [
+                        {
+                          "serverSideEncryptionByDefault": {
+                            "sseAlgorithm": "AES256"
+                          }
+                        }
+                      ]
+                    },
+                    "publicAccessBlockConfiguration": {
+                      "blockPublicAcls": true,
+                      "blockPublicPolicy": true,
+                      "ignorePublicAcls": true,
+                      "restrictPublicBuckets": true
+                    },
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.134.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "devdotloveregistryitemimgs3BDAB4A1A"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:PutBucketPolicy"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devdotloveregistryitemimgs3BDAB4A1A",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devdotloveregistryitemimgs3BDAB4A1A",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.134.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.134.0"
+            }
+          },
+          "Custom::S3AutoDeleteObjectsCustomResourceProvider": {
+            "id": "Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "children": {
+              "Staging": {
+                "id": "Staging",
+                "path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Staging",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.AssetStaging",
+                  "version": "2.134.0"
+                }
+              },
+              "Role": {
+                "id": "Role",
+                "path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.134.0"
+                }
+              },
+              "Handler": {
+                "id": "Handler",
+                "path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CustomResourceProviderBase",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-ses-notif-s3": {
+            "id": "dev-dot-love-ses-notif-s3",
+            "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketEncryption": {
+                      "serverSideEncryptionConfiguration": [
+                        {
+                          "serverSideEncryptionByDefault": {
+                            "sseAlgorithm": "AES256"
+                          }
+                        }
+                      ]
+                    },
+                    "lifecycleConfiguration": {
+                      "rules": [
+                        {
+                          "expirationInDays": 30,
+                          "id": "dev-ses-notif-rule",
+                          "status": "Enabled"
+                        }
+                      ]
+                    },
+                    "publicAccessBlockConfiguration": {
+                      "blockPublicAcls": true,
+                      "blockPublicPolicy": true,
+                      "ignorePublicAcls": true,
+                      "restrictPublicBuckets": true
+                    },
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.134.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "devdotlovesesnotifs32F92B441"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:PutBucketPolicy"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devdotlovesesnotifs32F92B441",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devdotlovesesnotifs32F92B441",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.134.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-ses-notif-lambda-role": {
+            "id": "dev-dot-love-ses-notif-lambda-role",
+            "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role",
+            "children": {
+              "Importdev-dot-love-ses-notif-lambda-role": {
+                "id": "Importdev-dot-love-ses-notif-lambda-role",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/Importdev-dot-love-ses-notif-lambda-role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "SES Notification Lambda Role",
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.134.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:Abort*",
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*",
+                                "s3:PutObject",
+                                "s3:PutObjectLegalHold",
+                                "s3:PutObjectRetention",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devdotlovesesnotifs32F92B441",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devdotlovesesnotifs32F92B441",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "devdotlovesesnotiflambdaroleDefaultPolicyE4DC4A56",
+                        "roles": [
+                          {
+                            "Ref": "devdotlovesesnotiflambdarole4AE17B5A"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-ses-notif-lambda": {
+            "id": "dev-dot-love-ses-notif-lambda",
+            "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.134.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.134.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+                      "s3Key": "436c2f9cac47329cbb00d171d47aab60101c0c8415498c3cdf5aaa99a43b068e.zip"
+                    },
+                    "description": "DotLove SES Notification Lambda, to handle: Bounce, Received, and Compliant notifications",
+                    "environment": {
+                      "variables": {
+                        "ses_s3_bucket_name": {
+                          "Ref": "devdotlovesesnotifs32F92B441"
+                        }
+                      }
+                    },
+                    "handler": "index.handler",
+                    "role": {
+                      "Fn::GetAtt": [
+                        "devdotlovesesnotiflambdarole4AE17B5A",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 15
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.134.0"
+                }
+              },
+              "AllowInvoke:devdotlovestackdotlovesesnotifsnsA19BE7DF": {
+                "id": "AllowInvoke:devdotlovestackdotlovesesnotifsnsA19BE7DF",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/AllowInvoke:devdotlovestackdotlovesesnotifsnsA19BE7DF",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "devdotlovesesnotiflambdaFC81DEC1",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "sns.amazonaws.com",
+                    "sourceArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.134.0"
+                }
+              },
+              "dot-love-ses-notif-sns": {
+                "id": "dot-love-ses-notif-sns",
+                "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/dot-love-ses-notif-sns",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/dot-love-ses-notif-sns/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SNS::Subscription",
+                      "aws:cdk:cloudformation:props": {
+                        "endpoint": {
+                          "Fn::GetAtt": [
+                            "devdotlovesesnotiflambdaFC81DEC1",
+                            "Arn"
+                          ]
+                        },
+                        "protocol": "lambda",
+                        "region": "us-east-1",
+                        "topicArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sns.CfnSubscription",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.Subscription",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.134.0"
+            }
+          },
+          "dot-love-ses-notif-sns": {
+            "id": "dot-love-ses-notif-sns",
+            "path": "dev-dot-love-stack/dot-love-ses-notif-sns",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sns.TopicBase",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-gizmo-ses-configuration-set": {
+            "id": "dev-dot-love-gizmo-ses-configuration-set",
+            "path": "dev-dot-love-stack/dev-dot-love-gizmo-ses-configuration-set",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-gizmo-ses-configuration-set/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SES::ConfigurationSet",
+                  "aws:cdk:cloudformation:props": {}
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ses.CfnConfigurationSet",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ses.ConfigurationSet",
+              "version": "2.134.0"
+            }
+          },
+          "dev-ses-policy": {
+            "id": "dev-ses-policy",
+            "path": "dev-dot-love-stack/dev-ses-policy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-ses-policy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": [
+                            "ses:SendBulkTemplatedEmail",
+                            "ses:SendEmail",
+                            "ses:SendRawEmail",
+                            "ses:SendTemplatedEmail"
+                          ],
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "devsespolicyF03432D9",
+                    "roles": [
+                      {
+                        "Ref": "devdotlovegizmoservicerole08DB6E01"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.134.0"
+            }
+          },
+          "dev-dot-love-website-media-etc-s3": {
+            "id": "dev-dot-love-website-media-etc-s3",
+            "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketEncryption": {
+                      "serverSideEncryptionConfiguration": [
+                        {
+                          "serverSideEncryptionByDefault": {
+                            "sseAlgorithm": "AES256"
+                          }
+                        }
+                      ]
+                    },
+                    "publicAccessBlockConfiguration": {
+                      "blockPublicAcls": true,
+                      "blockPublicPolicy": true,
+                      "ignorePublicAcls": true,
+                      "restrictPublicBuckets": true
+                    },
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.134.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "devdotlovewebsitemediaetcs3F30EA9E5"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:PutBucketPolicy"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "devdotlovewebsitemediaetcs3F30EA9E5",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "devdotlovewebsitemediaetcs3F30EA9E5",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.134.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.134.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.134.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "dev-dot-love-stack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "dev-dot-love-stack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.134.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.2"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "dev-dot-love-stack/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.134.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "dev-dot-love-stack/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.134.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.134.0"
+        }
+      },
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "constructs.Construct",
+          "version": "10.4.2"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "aws-cdk-lib.App",
+      "version": "2.134.0"
+    }
+  }
+}

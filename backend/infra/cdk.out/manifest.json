@@ -1,0 +1,454 @@
+{
+  "version": "30.0.0",
+  "artifacts": {
+    "dev-cw-core-stack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "dev-cw-core-stack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "dev-cw-core-stack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://832303862315/us-east-1",
+      "properties": {
+        "templateFile": "dev-cw-core-stack.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-deploy-role-832303862315-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-cfn-exec-role-832303862315-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-832303862315-us-east-1/bfeae496a6f17aa896916aa3581cd7bebe4c99154687f9b185390d17db66c6a0.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "dev-cw-core-stack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-lookup-role-832303862315-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "dev-cw-core-stack.assets"
+      ],
+      "metadata": {
+        "/dev-cw-core-stack/dev-users/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devusersF8C2F700"
+          }
+        ],
+        "/dev-cw-core-stack/dev-transactions/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devtransactions66C53A89"
+          }
+        ],
+        "/dev-cw-core-stack/dev-commodities/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcommodities9E8C4FC8"
+          }
+        ],
+        "/dev-cw-core-stack/dev-invalid_tokens/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devinvalidtokensECAA4347"
+          }
+        ],
+        "/dev-cw-core-stack/dev-idempotency/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devidempotency5E2F1C3F"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapi1581EC63"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiDefaultStage3F9913D9"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/dev-cw-auth-controller/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthlogindevcwauthcontrollerEA3C4A7E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/dev-cw-auth-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthlogindevcwauthcontrollerPermission3EF2BC34"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--login/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthloginCDF03C05"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--register/dev-cw-auth-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthregisterdevcwauthcontrollerPermissionA6236BF8"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--register/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthregisterE9D2B494"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--refresh/dev-cw-auth-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthrefreshdevcwauthcontrollerPermissionF71A86DA"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--auth--refresh/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTauthrefresh678E92AC"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--auth--guest/dev-cw-auth-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETauthguestdevcwauthcontrollerPermission27EFFF4B"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--auth--guest/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETauthguest365E97F7"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/dev-cw-commerce-controller/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercesecretdevcwcommercecontroller359D3D3E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/dev-cw-commerce-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercesecretdevcwcommercecontrollerPermission470ACFC1"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--secret/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercesecretC8545081"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/dev-CWCommerceRequestValidator/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapidevCWCommerceRequestValidator85A08671"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/devcwcorestackdevcwauthapidevCWCommerceRequestValidatorADBD816D-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapidevcwcorestackdevcwauthapidevCWCommerceRequestValidatorADBD816DPermissionF684EA9F"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--cache_email/dev-cw-commerce-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercecacheemaildevcwcommercecontrollerPermissionADB7AA29"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--cache_email/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercecacheemail4011B432"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--webhook/dev-cw-commerce-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercewebhookdevcwcommercecontrollerPermission67797DF6"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/POST--commerce--webhook/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiPOSTcommercewebhook56ADCF76"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--commerce--commodities/dev-cw-commerce-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETcommercecommoditiesdevcwcommercecontrollerPermission7A5C99B3"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--commerce--commodities/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETcommercecommodities80BCFD41"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/dev-cw-profile-controller/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETprofileddprankdevcwprofilecontroller9DBF3FF5"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/dev-cw-profile-controller-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETprofileddprankdevcwprofilecontrollerPermission096A5EF9"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/GET--profile--ddp_rank/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapiGETprofileddprankA83D614E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/dev-CWProfileRequestValidator/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapidevCWProfileRequestValidatorE1F7015E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-api/devcwcorestackdevcwauthapidevCWProfileRequestValidator2B09FA80-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthapidevcwcorestackdevcwauthapidevCWProfileRequestValidator2B09FA80Permission3C3FFEEE"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-validator-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwvalidatorlambdarole1F031610"
+          }
+        ],
+        "/dev-cw-core-stack/dev-jwt-lambda-layer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devjwtlambdalayerDC9442C8"
+          }
+        ],
+        "/dev-cw-core-stack/dev-jwt-dependency-lambda-layer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devjwtdependencylambdalayer04BEFA21"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-validator-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwvalidatorlambda70557A7B"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthlambdaroleBD75F02F"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthlambdaroleDefaultPolicyA9994D66"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-auth-registration-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwauthregistrationlambda6F341C31"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-transaction-email-cache-s3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwtransactionemailcaches3D1084718"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-transaction-email-cache-s3/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwtransactionemailcaches3PolicyBE2A4415"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-transaction-email-cache-s3/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwtransactionemailcaches3AutoDeleteObjectsCustomResource72D7C7EE"
+          }
+        ],
+        "/dev-cw-core-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/dev-cw-core-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-commerce-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwcommercelambdaroleE3069963"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-commerce-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwcommercelambdaroleDefaultPolicy10B31444"
+          }
+        ],
+        "/dev-cw-core-stack/dev-stripe-layer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devstripelayer4E10854E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-powertools-layer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devpowertoolslayer46C5FF74"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-commerce-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwcommercelambda5A5513E6"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-profile-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwprofilelambdarole1BE748A7"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-profile-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwprofilelambdaroleDefaultPolicyFB138105"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-profile-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwprofilelambdaCCBB7F11"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-s3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotifs36066743B"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-s3/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotifs3Policy40DF3A3B"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-s3/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotifs3AutoDeleteObjectsCustomResource33061DC3"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotiflambdarole41E188F7"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotiflambdaroleDefaultPolicy1C46626E"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotiflambda6B158328"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-lambda/AllowInvoke:devcwcorestackcarworldsesnotifsns9BF2C310": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotiflambdaAllowInvokedevcwcorestackcarworldsesnotifsns9BF2C3108C509A1F"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-ses-notif-lambda/carworld-ses-notif-sns/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwsesnotiflambdacarworldsesnotifsnsEC94E2BF"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-commerce-ses-configuration-set/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwcommercesesconfigurationset2477E3BB"
+          }
+        ],
+        "/dev-cw-core-stack/dev-ses-policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devsespolicyF03432D9"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-batch-write-store-items-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwbatchwritestoreitemslambdaroleC75CBAF4"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-batch-write-store-items-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwbatchwritestoreitemslambdaroleDefaultPolicy1FF7168A"
+          }
+        ],
+        "/dev-cw-core-stack/dev-cw-batch-write-store-items-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devcwbatchwritestoreitemslambda3175152A"
+          }
+        ],
+        "/dev-cw-core-stack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/dev-cw-core-stack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/dev-cw-core-stack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "dev-cw-core-stack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

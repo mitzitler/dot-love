@@ -1,0 +1,1644 @@
+{
+ "Resources": {
+  "devusersF8C2F700": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "first",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "last",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "full-name-lookup-index",
+      "KeySchema": [
+       {
+        "AttributeName": "first",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "last",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-users/Resource"
+   }
+  },
+  "devregistryitemsFBEA57E1": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "state",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "state-lookup-index",
+      "KeySchema": [
+       {
+        "AttributeName": "state",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-registry_items/Resource"
+   }
+  },
+  "devregistryclaimsB95E40BD": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "registry_item_id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "user_id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "state",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "state-lookup-index",
+      "KeySchema": [
+       {
+        "AttributeName": "state",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "registry_item_id",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "user_id",
+      "KeyType": "RANGE"
+     }
+    ],
+    "SSESpecification": {
+     "SSEEnabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-registry_claims/Resource"
+   }
+  },
+  "devgloballayerCC983376": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "CompatibleRuntimes": [
+     "python3.11"
+    ],
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "2d927a77a5f6230ee1acd4bfaca9eaaa064a6cc31a45a9e54b1ae1ccb11f0118.zip"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-global-layer/Resource",
+    "aws:asset:path": "asset.2d927a77a5f6230ee1acd4bfaca9eaaa064a6cc31a45a9e54b1ae1ccb11f0118",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "devdotloveniceguylambdaroleCE94AF04": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "NiceGuy Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda-role/Resource"
+   }
+  },
+  "devdotloveniceguylambda49521BED": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "6f8cb9cb46bd0969998eb129f0a97ff8697a3d0a9dbd89e81320e25f982d7c7b.zip"
+    },
+    "Description": "dot-love NiceGuy message parsing Lambda, to parse API requests",
+    "Environment": {
+     "Variables": {
+      "POWERTOOLS_SERVICE_NAME": "nice-guy",
+      "POWERTOOLS_LOG_LEVEL": "INFO",
+      "TZ": "US/Eastern"
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "devgloballayerCC983376"
+     }
+    ],
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "devdotloveniceguylambdaroleCE94AF04",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devdotloveniceguylambdaroleCE94AF04"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Resource",
+    "aws:asset:path": "asset.6f8cb9cb46bd0969998eb129f0a97ff8697a3d0a9dbd89e81320e25f982d7c7b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devdotloveapi55DE5DF6": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "*"
+     ],
+     "AllowMethods": [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+      "POST"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 864000
+    },
+    "Description": "DotLove API Gateway",
+    "Name": "dev-dot-love-api",
+    "ProtocolType": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/Resource"
+   }
+  },
+  "devdotloveapiDefaultStageF60A8F58": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/DefaultStage/Resource"
+   }
+  },
+  "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service/Resource"
+   }
+  },
+  "devdotloveapiGETgizmologindevdotlovegizmoservicePermission8F06AD28": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/gizmo/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service-Permission"
+   }
+  },
+  "devdotloveapiGETgizmologinE0A3744D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /gizmo/login",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/Resource"
+   }
+  },
+  "devdotloveapiPOSTgizmoregisterdevdotlovegizmoservicePermission12AFB1BB": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/gizmo/register"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/dev-dot-love-gizmo-service-Permission"
+   }
+  },
+  "devdotloveapiPOSTgizmoregisterA94DC177": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /gizmo/register",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/Resource"
+   }
+  },
+  "devdotloveapiPATCHgizmoupdatedevdotlovegizmoservicePermissionE23DEDA5": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/gizmo/update"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/dev-dot-love-gizmo-service-Permission"
+   }
+  },
+  "devdotloveapiPATCHgizmoupdate2850602F": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "PATCH /gizmo/update",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/Resource"
+   }
+  },
+  "devdotloveapiPOSTgizmoemaildevdotlovegizmoservicePermissionE7A1FF2B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/gizmo/email"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/dev-dot-love-gizmo-service-Permission"
+   }
+  },
+  "devdotloveapiPOSTgizmoemail612CD322": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /gizmo/email",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/Resource"
+   }
+  },
+  "devdotloveapiPOSTgizmotextdevdotlovegizmoservicePermission3FB44B6E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservice0C23C488",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/gizmo/text"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/dev-dot-love-gizmo-service-Permission"
+   }
+  },
+  "devdotloveapiPOSTgizmotext4A649EED": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /gizmo/text",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/Resource"
+   }
+  },
+  "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::GetAtt": [
+      "devdotlovespectaculoservice5C5C40A9",
+      "Arn"
+     ]
+    },
+    "PayloadFormatVersion": "2.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service/Resource"
+   }
+  },
+  "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoservicePermission818F9A2D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovespectaculoservice5C5C40A9",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/spectaculo/claim/create"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service-Permission"
+   }
+  },
+  "devdotloveapiPOSTspectaculoclaimcreateE362A0F7": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "POST /spectaculo/claim/create",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/Resource"
+   }
+  },
+  "devdotloveapiPATCHspectaculoclaimupdatedevdotlovespectaculoservicePermission7076339B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovespectaculoservice5C5C40A9",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:832303862315:",
+       {
+        "Ref": "devdotloveapi55DE5DF6"
+       },
+       "/*/*/spectaculo/claim/update"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/dev-dot-love-spectaculo-service-Permission"
+   }
+  },
+  "devdotloveapiPATCHspectaculoclaimupdate480CB5AE": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "devdotloveapi55DE5DF6"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "PATCH /spectaculo/claim/update",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/Resource"
+   }
+  },
+  "devdotlovegizmoservicerole08DB6E01": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Lambda Role with access to User table",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/Resource"
+   }
+  },
+  "devdotlovegizmoserviceroleDefaultPolicyA41827B4": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devusersF8C2F700",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devusersF8C2F700",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devdotlovegizmoserviceroleDefaultPolicyA41827B4",
+    "Roles": [
+     {
+      "Ref": "devdotlovegizmoservicerole08DB6E01"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-gizmo-service-role/DefaultPolicy/Resource"
+   }
+  },
+  "devdotlovegizmoservice0C23C488": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "06575cd7d7a01b8177bee3f688435380d80beb37b0c92562d44107357457dbef.zip"
+    },
+    "Description": "DotLove Gizmo Service, to handle user actions",
+    "Environment": {
+     "Variables": {
+      "userTableName": {
+       "Ref": "devusersF8C2F700"
+      },
+      "POWERTOOLS_SERVICE_NAME": "gizmo",
+      "POWERTOOLS_LOG_LEVEL": "INFO",
+      "TZ": "US/Eastern",
+      "user_table_name": {
+       "Ref": "devusersF8C2F700"
+      },
+      "ses_sender_email": "no-reply@mitzimatthew.love",
+      "ses_admin_list": "themattsaucedo@gmail.com,mitzitler@gmail.com",
+      "twilio_auth_token": "5c454dfd28d6b3d50e51db390856a3fa",
+      "twilio_account_sid": "ACd52e4c69e255e3803d42927990c7b78a",
+      "ses_config_id": {
+       "Ref": "devdotlovegizmosesconfigurationset80E5BA84"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "devgloballayerCC983376"
+     }
+    ],
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "devdotlovegizmoservicerole08DB6E01",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devdotlovegizmoserviceroleDefaultPolicyA41827B4",
+    "devdotlovegizmoservicerole08DB6E01"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-gizmo-service/Resource",
+    "aws:asset:path": "asset.06575cd7d7a01b8177bee3f688435380d80beb37b0c92562d44107357457dbef",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devdotlovespectaculoservicerole0EA9F1C4": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Lambda Role with access to User table",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/Resource"
+   }
+  },
+  "devdotlovespectaculoserviceroleDefaultPolicyE872C3BE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devregistryclaimsB95E40BD",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "devregistryitemsFBEA57E1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devregistryclaimsB95E40BD",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devregistryitemsFBEA57E1",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devdotlovespectaculoserviceroleDefaultPolicyE872C3BE",
+    "Roles": [
+     {
+      "Ref": "devdotlovespectaculoservicerole0EA9F1C4"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-spectaculo-service-role/DefaultPolicy/Resource"
+   }
+  },
+  "devdotlovespectaculoservice5C5C40A9": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "66f1f3bdffd24932a3150efbed210e6ae83ef21373f3ec7a4f2bf2cb9a76c46b.zip"
+    },
+    "Description": "DotLove Spectaculo Service, to handle the registry",
+    "Environment": {
+     "Variables": {
+      "registryItemTableName": {
+       "Ref": "devregistryitemsFBEA57E1"
+      },
+      "registryClaimTableName": {
+       "Ref": "devregistryclaimsB95E40BD"
+      },
+      "POWERTOOLS_SERVICE_NAME": "spectaculo",
+      "POWERTOOLS_LOG_LEVEL": "INFO",
+      "TZ": "US/Eastern"
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "devgloballayerCC983376"
+     }
+    ],
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "devdotlovespectaculoservicerole0EA9F1C4",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devdotlovespectaculoserviceroleDefaultPolicyE872C3BE",
+    "devdotlovespectaculoservicerole0EA9F1C4"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-spectaculo-service/Resource",
+    "aws:asset:path": "asset.66f1f3bdffd24932a3150efbed210e6ae83ef21373f3ec7a4f2bf2cb9a76c46b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devdotloveregistryitemimgs3BDAB4A1A": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Resource"
+   }
+  },
+  "devdotloveregistryitemimgs3PolicyA72EABDE": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "devdotloveregistryitemimgs3BDAB4A1A"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devdotloveregistryitemimgs3BDAB4A1A",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devdotloveregistryitemimgs3BDAB4A1A",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Policy/Resource"
+   }
+  },
+  "devdotloveregistryitemimgs3AutoDeleteObjectsCustomResourceF04B526A": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "devdotloveregistryitemimgs3BDAB4A1A"
+    }
+   },
+   "DependsOn": [
+    "devdotloveregistryitemimgs3PolicyA72EABDE"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-registry-item-img-s3/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "6c1e9b465fa4b2d651dbc9ce3e732d8702a7b19137327684a71d89f1d355f1a2.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "devdotloveregistryitemimgs3BDAB4A1A"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.6c1e9b465fa4b2d651dbc9ce3e732d8702a7b19137327684a71d89f1d355f1a2",
+    "aws:asset:property": "Code"
+   }
+  },
+  "devdotlovesesnotifs32F92B441": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "ExpirationInDays": 30,
+       "Id": "dev-ses-notif-rule",
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/Resource"
+   }
+  },
+  "devdotlovesesnotifs3Policy941151A5": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "devdotlovesesnotifs32F92B441"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devdotlovesesnotifs32F92B441",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devdotlovesesnotifs32F92B441",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/Policy/Resource"
+   }
+  },
+  "devdotlovesesnotifs3AutoDeleteObjectsCustomResource7E99B4D9": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "devdotlovesesnotifs32F92B441"
+    }
+   },
+   "DependsOn": [
+    "devdotlovesesnotifs3Policy941151A5"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-s3/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "devdotlovesesnotiflambdarole4AE17B5A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "SES Notification Lambda Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/Resource"
+   }
+  },
+  "devdotlovesesnotiflambdaroleDefaultPolicyE4DC4A56": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devdotlovesesnotifs32F92B441",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devdotlovesesnotifs32F92B441",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devdotlovesesnotiflambdaroleDefaultPolicyE4DC4A56",
+    "Roles": [
+     {
+      "Ref": "devdotlovesesnotiflambdarole4AE17B5A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/DefaultPolicy/Resource"
+   }
+  },
+  "devdotlovesesnotiflambdaFC81DEC1": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-832303862315-us-east-1",
+     "S3Key": "436c2f9cac47329cbb00d171d47aab60101c0c8415498c3cdf5aaa99a43b068e.zip"
+    },
+    "Description": "DotLove SES Notification Lambda, to handle: Bounce, Received, and Compliant notifications",
+    "Environment": {
+     "Variables": {
+      "ses_s3_bucket_name": {
+       "Ref": "devdotlovesesnotifs32F92B441"
+      }
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "devdotlovesesnotiflambdarole4AE17B5A",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "devdotlovesesnotiflambdaroleDefaultPolicyE4DC4A56",
+    "devdotlovesesnotiflambdarole4AE17B5A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Resource",
+    "aws:asset:path": "asset.436c2f9cac47329cbb00d171d47aab60101c0c8415498c3cdf5aaa99a43b068e",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "devdotlovesesnotiflambdaAllowInvokedevdotlovestackdotlovesesnotifsnsA19BE7DF2F8FB6B4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "devdotlovesesnotiflambdaFC81DEC1",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/AllowInvoke:devdotlovestackdotlovesesnotifsnsA19BE7DF"
+   }
+  },
+  "devdotlovesesnotiflambdadotlovesesnotifsnsD1BB53C9": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "devdotlovesesnotiflambdaFC81DEC1",
+      "Arn"
+     ]
+    },
+    "Protocol": "lambda",
+    "Region": "us-east-1",
+    "TopicArn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns"
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-ses-notif-lambda/dot-love-ses-notif-sns/Resource"
+   }
+  },
+  "devdotlovegizmosesconfigurationset80E5BA84": {
+   "Type": "AWS::SES::ConfigurationSet",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-gizmo-ses-configuration-set/Resource"
+   }
+  },
+  "devsespolicyF03432D9": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ses:SendBulkTemplatedEmail",
+        "ses:SendEmail",
+        "ses:SendRawEmail",
+        "ses:SendTemplatedEmail"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "devsespolicyF03432D9",
+    "Roles": [
+     {
+      "Ref": "devdotlovegizmoservicerole08DB6E01"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-ses-policy/Resource"
+   }
+  },
+  "devdotlovewebsitemediaetcs3F30EA9E5": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Resource"
+   }
+  },
+  "devdotlovewebsitemediaetcs3Policy5DBDA566": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "devdotlovewebsitemediaetcs3F30EA9E5"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "devdotlovewebsitemediaetcs3F30EA9E5",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "devdotlovewebsitemediaetcs3F30EA9E5",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Policy/Resource"
+   }
+  },
+  "devdotlovewebsitemediaetcs3AutoDeleteObjectsCustomResource2A600B6D": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "devdotlovewebsitemediaetcs3F30EA9E5"
+    }
+   },
+   "DependsOn": [
+    "devdotlovewebsitemediaetcs3Policy5DBDA566"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/dev-dot-love-website-media-etc-s3/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11Ry27CMBD8Fu5moaTlXIhUtVIPUYJ6RZvEBJfEjrw2KLL875Xj8OppZnfW9sx6Be4leYXlDC80r+rTvBUluMJgdWJ4ob2rB4mdqktwOyxbztKDHIlnLXZljeC+ceD6h2sSSgb5qf6wsjKT8MgzrjtBYcQzSvZIxA3BJgCjBNzWVidutkicRRoOTSxCplpRDfd2rD0T2IHLVbQ64n3yOoO9aNDwCw7nFbj0IDe9CHphsBnPfUnDG41Xt7myhntGksAVtqRKi/6qPdU71YsquPaMOIFLlTyIxsabipjif897lnNSVlecjQsILoRsWGrJqO6mBR83/iRlWp1FzXV8eP0Gyzm2/RFhOXuf/nUR8DH2NOE+jelD+oAxfmBj4JE9bMJ7lg3mqOQigZcVrGe/JMRcW2lExyGP+AfxXK3KUQIAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "dev-dot-love-stack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

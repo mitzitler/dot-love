@@ -1,0 +1,337 @@
+Metadata-Version: 2.1
+Name: aws-cdk.aws-apigatewayv2-authorizers-alpha
+Version: 2.65.0a0
+Summary: Authorizers for AWS APIGateway V2
+Home-page: https://github.com/aws/aws-cdk
+Author: Amazon Web Services
+License: Apache-2.0
+Project-URL: Source, https://github.com/aws/aws-cdk.git
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: JavaScript
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Typing :: Typed
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved
+Classifier: Framework :: AWS CDK
+Classifier: Framework :: AWS CDK :: 2
+Requires-Python: ~=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+Requires-Dist: aws-cdk-lib (<3.0.0,>=2.65.0)
+Requires-Dist: aws-cdk.aws-apigatewayv2-alpha (==2.65.0.a0)
+Requires-Dist: constructs (<11.0.0,>=10.0.0)
+Requires-Dist: jsii (<2.0.0,>=1.74.0)
+Requires-Dist: publication (>=0.0.3)
+Requires-Dist: typeguard (~=2.13.3)
+
+# AWS APIGatewayv2 Authorizers
+
+<!--BEGIN STABILITY BANNER-->---
+
+
+![cdk-constructs: Experimental](https://img.shields.io/badge/cdk--constructs-experimental-important.svg?style=for-the-badge)
+
+> The APIs of higher level constructs in this module are experimental and under active development.
+> They are subject to non-backward compatible changes or removal in any future version. These are
+> not subject to the [Semantic Versioning](https://semver.org/) model and breaking changes will be
+> announced in the release notes. This means that while you may use them, you may need to update
+> your source code when upgrading to a newer version of this package.
+
+---
+<!--END STABILITY BANNER-->
+
+## Table of Contents
+
+* [Introduction](#introduction)
+* [HTTP APIs](#http-apis)
+
+  * [Default Authorization](#default-authorization)
+  * [Route Authorization](#route-authorization)
+  * [JWT Authorizers](#jwt-authorizers)
+
+    * [User Pool Authorizer](#user-pool-authorizer)
+  * [Lambda Authorizers](#lambda-authorizers)
+  * [IAM Authorizers](#iam-authorizers)
+* [WebSocket APIs](#websocket-apis)
+
+  * [Lambda Authorizer](#lambda-authorizer)
+  * [IAM Authorizers](#iam-authorizer)
+
+## Introduction
+
+API Gateway supports multiple mechanisms for controlling and managing access to your HTTP API. They are mainly
+classified into Lambda Authorizers, JWT authorizers and standard AWS IAM roles and policies. More information is
+available at [Controlling and managing access to an HTTP
+API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-access-control.html).
+
+## HTTP APIs
+
+Access control for Http Apis is managed by restricting which routes can be invoked via.
+
+Authorizers and scopes can either be applied to the api, or specifically for each route.
+
+### Default Authorization
+
+When using default authorization, all routes of the api will inherit the configuration.
+
+In the example below, all routes will require the `manage:books` scope present in order to invoke the integration.
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpJwtAuthorizer
+
+
+issuer = "https://test.us.auth0.com"
+authorizer = HttpJwtAuthorizer("DefaultAuthorizer", issuer,
+    jwt_audience=["3131231"]
+)
+
+api = apigwv2.HttpApi(self, "HttpApi",
+    default_authorizer=authorizer,
+    default_authorization_scopes=["manage:books"]
+)
+```
+
+### Route Authorization
+
+Authorization can also configured for each Route. When a route authorization is configured, it takes precedence over default authorization.
+
+The example below showcases default authorization, along with route authorization. It also shows how to remove authorization entirely for a route.
+
+* `GET /books` and `GET /books/{id}` use the default authorizer settings on the api
+* `POST /books` will require the [write:books] scope
+* `POST /login` removes the default authorizer (unauthenticated route)
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpJwtAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpUrlIntegration
+
+
+issuer = "https://test.us.auth0.com"
+authorizer = HttpJwtAuthorizer("DefaultAuthorizer", issuer,
+    jwt_audience=["3131231"]
+)
+
+api = apigwv2.HttpApi(self, "HttpApi",
+    default_authorizer=authorizer,
+    default_authorization_scopes=["read:books"]
+)
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books",
+    methods=[apigwv2.HttpMethod.GET]
+)
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIdIntegration", "https://get-books-proxy.example.com"),
+    path="/books/{id}",
+    methods=[apigwv2.HttpMethod.GET]
+)
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books",
+    methods=[apigwv2.HttpMethod.POST],
+    authorization_scopes=["write:books"]
+)
+
+api.add_routes(
+    integration=HttpUrlIntegration("LoginIntegration", "https://get-books-proxy.example.com"),
+    path="/login",
+    methods=[apigwv2.HttpMethod.POST],
+    authorizer=apigwv2.HttpNoneAuthorizer()
+)
+```
+
+### JWT Authorizers
+
+JWT authorizers allow the use of JSON Web Tokens (JWTs) as part of [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) and [OAuth 2.0](https://oauth.net/2/) frameworks to allow and restrict clients from accessing HTTP APIs.
+
+When configured, API Gateway validates the JWT submitted by the client, and allows or denies access based on its content.
+
+The location of the token is defined by the `identitySource` which defaults to the http `Authorization` header. However it also
+[supports a number of other options](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.identity-sources).
+It then decodes the JWT and validates the signature and claims, against the options defined in the authorizer and route (scopes).
+For more information check the [JWT Authorizer documentation](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html).
+
+Clients that fail authorization are presented with either 2 responses:
+
+* `401 - Unauthorized` - When the JWT validation fails
+* `403 - Forbidden` - When the JWT validation is successful but the required scopes are not met
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpJwtAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpUrlIntegration
+
+
+issuer = "https://test.us.auth0.com"
+authorizer = HttpJwtAuthorizer("BooksAuthorizer", issuer,
+    jwt_audience=["3131231"]
+)
+
+api = apigwv2.HttpApi(self, "HttpApi")
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books",
+    authorizer=authorizer
+)
+```
+
+#### User Pool Authorizer
+
+User Pool Authorizer is a type of JWT Authorizer that uses a Cognito user pool and app client to control who can access your Api. After a successful authorization from the app client, the generated access token will be used as the JWT.
+
+Clients accessing an API that uses a user pool authorizer must first sign in to a user pool and obtain an identity or access token.
+They must then use this token in the specified `identitySource` for the API call. More information is available at [using Amazon Cognito user
+pools as authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html).
+
+```python
+import aws_cdk.aws_cognito as cognito
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpUserPoolAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpUrlIntegration
+
+
+user_pool = cognito.UserPool(self, "UserPool")
+
+authorizer = HttpUserPoolAuthorizer("BooksAuthorizer", user_pool)
+
+api = apigwv2.HttpApi(self, "HttpApi")
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books",
+    authorizer=authorizer
+)
+```
+
+### Lambda Authorizers
+
+Lambda authorizers use a Lambda function to control access to your HTTP API. When a client calls your API, API Gateway invokes your Lambda function and uses the response to determine whether the client can access your API.
+
+Lambda authorizers depending on their response, fall into either two types - Simple or IAM. You can learn about differences [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.payload-format-response).
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpLambdaAuthorizer, HttpLambdaResponseType
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpUrlIntegration
+
+# This function handles your auth logic
+# auth_handler: lambda.Function
+
+
+authorizer = HttpLambdaAuthorizer("BooksAuthorizer", auth_handler,
+    response_types=[HttpLambdaResponseType.SIMPLE]
+)
+
+api = apigwv2.HttpApi(self, "HttpApi")
+
+api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books",
+    authorizer=authorizer
+)
+```
+
+### IAM Authorizers
+
+API Gateway supports IAM via the included `HttpIamAuthorizer` and grant syntax:
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import HttpIamAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpUrlIntegration
+
+# principal: iam.AnyPrincipal
+
+
+authorizer = HttpIamAuthorizer()
+
+http_api = apigwv2.HttpApi(self, "HttpApi",
+    default_authorizer=authorizer
+)
+
+routes = http_api.add_routes(
+    integration=HttpUrlIntegration("BooksIntegration", "https://get-books-proxy.example.com"),
+    path="/books/{book}"
+)
+
+routes[0].grant_invoke(principal)
+```
+
+## WebSocket APIs
+
+You can set an authorizer to your WebSocket API's `$connect` route to control access to your API.
+
+### Lambda Authorizer
+
+Lambda authorizers use a Lambda function to control access to your WebSocket API. When a client connects to your API, API Gateway invokes your Lambda function and uses the response to determine whether the client can access your API.
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import WebSocketLambdaAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import WebSocketLambdaIntegration
+
+# This function handles your auth logic
+# auth_handler: lambda.Function
+
+# This function handles your WebSocket requests
+# handler: lambda.Function
+
+
+authorizer = WebSocketLambdaAuthorizer("Authorizer", auth_handler)
+
+integration = WebSocketLambdaIntegration("Integration", handler)
+
+apigwv2.WebSocketApi(self, "WebSocketApi",
+    connect_route_options=apigwv2.WebSocketRouteOptions(
+        integration=integration,
+        authorizer=authorizer
+    )
+)
+```
+
+### IAM Authorizer
+
+IAM authorizers can be used to allow identity-based access to your WebSocket API.
+
+```python
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import WebSocketIamAuthorizer
+from aws_cdk.aws_apigatewayv2_integrations_alpha import WebSocketLambdaIntegration
+
+# This function handles your connect route
+# connect_handler: lambda.Function
+
+
+web_socket_api = apigwv2.WebSocketApi(self, "WebSocketApi")
+
+web_socket_api.add_route("$connect",
+    integration=WebSocketLambdaIntegration("Integration", connect_handler),
+    authorizer=WebSocketIamAuthorizer()
+)
+
+# Create an IAM user (identity)
+user = iam.User(self, "User")
+
+web_socket_arn = Stack.of(self).format_arn(
+    service="execute-api",
+    resource=web_socket_api.api_id
+)
+
+# Grant access to the IAM user
+user.attach_inline_policy(iam.Policy(self, "AllowInvoke",
+    statements=[
+        iam.PolicyStatement(
+            actions=["execute-api:Invoke"],
+            effect=iam.Effect.ALLOW,
+            resources=[web_socket_arn]
+        )
+    ]
+))
+```
+
+

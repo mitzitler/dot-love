@@ -1,0 +1,353 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "dev-dot-love-stack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "dev-dot-love-stack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "dev-dot-love-stack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://832303862315/us-east-1",
+      "properties": {
+        "templateFile": "dev-dot-love-stack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-deploy-role-832303862315-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-cfn-exec-role-832303862315-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-832303862315-us-east-1/91f803d5dd7bcc1ba861e600ac5a694831f03b643bb64995e926a97d0014c85e.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "dev-dot-love-stack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::832303862315:role/cdk-hnb659fds-lookup-role-832303862315-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "dev-dot-love-stack.assets"
+      ],
+      "metadata": {
+        "/dev-dot-love-stack/dev-users/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devusersF8C2F700"
+          }
+        ],
+        "/dev-dot-love-stack/dev-registry_items/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devregistryitemsFBEA57E1"
+          }
+        ],
+        "/dev-dot-love-stack/dev-registry_claims/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devregistryclaimsB95E40BD"
+          }
+        ],
+        "/dev-dot-love-stack/dev-global-layer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devgloballayerCC983376"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-nice-guy-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveniceguylambdaroleCE94AF04"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-nice-guy-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveniceguylambda49521BED"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapi55DE5DF6"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiDefaultStageF60A8F58"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiGETgizmologindevdotlovegizmoservice758D449E"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/dev-dot-love-gizmo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiGETgizmologindevdotlovegizmoservicePermission8F06AD28"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/GET--gizmo--login/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiGETgizmologinE0A3744D"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/dev-dot-love-gizmo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmoregisterdevdotlovegizmoservicePermission12AFB1BB"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--register/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmoregisterA94DC177"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/dev-dot-love-gizmo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPATCHgizmoupdatedevdotlovegizmoservicePermissionE23DEDA5"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/PATCH--gizmo--update/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPATCHgizmoupdate2850602F"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/dev-dot-love-gizmo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmoemaildevdotlovegizmoservicePermissionE7A1FF2B"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--email/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmoemail612CD322"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/dev-dot-love-gizmo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmotextdevdotlovegizmoservicePermission3FB44B6E"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--gizmo--text/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTgizmotext4A649EED"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoserviceE3D7B641"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/dev-dot-love-spectaculo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTspectaculoclaimcreatedevdotlovespectaculoservicePermission818F9A2D"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/POST--spectaculo--claim--create/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPOSTspectaculoclaimcreateE362A0F7"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/dev-dot-love-spectaculo-service-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPATCHspectaculoclaimupdatedevdotlovespectaculoservicePermission7076339B"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-api/PATCH--spectaculo--claim--update/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveapiPATCHspectaculoclaimupdate480CB5AE"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-gizmo-service-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovegizmoservicerole08DB6E01"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-gizmo-service-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovegizmoserviceroleDefaultPolicyA41827B4"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-gizmo-service/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovegizmoservice0C23C488"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-spectaculo-service-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovespectaculoservicerole0EA9F1C4"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-spectaculo-service-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovespectaculoserviceroleDefaultPolicyE872C3BE"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-spectaculo-service/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovespectaculoservice5C5C40A9"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveregistryitemimgs3BDAB4A1A"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-registry-item-img-s3/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveregistryitemimgs3PolicyA72EABDE"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-registry-item-img-s3/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotloveregistryitemimgs3AutoDeleteObjectsCustomResourceF04B526A"
+          }
+        ],
+        "/dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/dev-dot-love-stack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-s3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotifs32F92B441"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-s3/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotifs3Policy941151A5"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-s3/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotifs3AutoDeleteObjectsCustomResource7E99B4D9"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotiflambdarole4AE17B5A"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-lambda-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotiflambdaroleDefaultPolicyE4DC4A56"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotiflambdaFC81DEC1"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-lambda/AllowInvoke:devdotlovestackdotlovesesnotifsnsA19BE7DF": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotiflambdaAllowInvokedevdotlovestackdotlovesesnotifsnsA19BE7DF2F8FB6B4"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-ses-notif-lambda/dot-love-ses-notif-sns/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovesesnotiflambdadotlovesesnotifsnsD1BB53C9"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-gizmo-ses-configuration-set/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovegizmosesconfigurationset80E5BA84"
+          }
+        ],
+        "/dev-dot-love-stack/dev-ses-policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devsespolicyF03432D9"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovewebsitemediaetcs3F30EA9E5"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-website-media-etc-s3/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovewebsitemediaetcs3Policy5DBDA566"
+          }
+        ],
+        "/dev-dot-love-stack/dev-dot-love-website-media-etc-s3/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "devdotlovewebsitemediaetcs3AutoDeleteObjectsCustomResource2A600B6D"
+          }
+        ],
+        "/dev-dot-love-stack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/dev-dot-love-stack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/dev-dot-love-stack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "dev-dot-love-stack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}
