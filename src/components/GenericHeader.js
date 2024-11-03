@@ -31,8 +31,8 @@ export function GenericHeader() {
     
     return (
         <div class = "header-main">
-            <div class = "header-main2">
-                <NavLink // isActive is not useful here
+                <NavIcon />
+                {/* <NavLink // isActive is not useful here
                     className='px-4 block pt-3 pb-1 hover:bg-teal-600'
                       to={router_order[pageNum]}
                       onClick={
@@ -41,8 +41,7 @@ export function GenericHeader() {
                     }
                       end>
                     Next
-                </NavLink> 
-            </div>
+                </NavLink>  */}
         </div>
     )
 

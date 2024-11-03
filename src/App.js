@@ -1,14 +1,134 @@
-import React from 'react';
-import Router from './routes/Router';
+import React, {useRef} from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { GenericHeader } from './components/GenericHeader';
+import { Info } from './pages/Info'
+import { About } from './pages/About'
+import { Registry } from './pages/Registry'
+import { Data } from './pages/Data'
+import { RSVP } from './pages/RSVP'
+// moved video out because it was 1.3 GB lol
+import { LightShow } from './components/LightShowVideo'
 
-export default function App() {
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother )
+
+export default function Scroll() {
+  const main = useRef();
+
+  // ScrollTrigger.normalizeScroll(true)
+  
+  ScrollSmoother.create({
+    smooth: 2,               
+    effects: true,          
+    smoothTouch: 0.1,        
+  });
+
+  gsap.utils.toArray("section").forEach((panel, i) => {
+    ScrollTrigger.create({
+      trigger: panel,
+      start: "top top", 
+      pin: true, 
+      pinSpacing: false 
+    });
+  });
+
+  let headerTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: document.body,
+      start: 0,
+        end: () => window.innerHeight * 1.2,
+        scrub: 0.6
+    }
+  })
+  headerTl.fromTo('.icon', {
+    top: '20vw',
+    yPercent:-50,
+    scale: 5,
+  }, {
+    top: '2vw',
+    yPercent: 0,
+    scale: 1,
+    duration: 1.2
+  }, {
+    xPercent: 50,
+    duration: 0.8
+  })
+
+
   return (
-    <div className="w-full min-h-screen flex flex-col overflow-hidden">
-      <GenericHeader />
-      <Router />
-      {/* <GenericFooter if i want this /> */}
+    <div id = "root">
+      <LightShow/>
+
+      {/* <div classname="icon h-screen flex m-auto"> */}
+              <GenericHeader classname="h-screen transfom-scale-5" />
+            {/* </div> */}
+
+      <div class="container">
+
+
+
+           
+        
+        <div class="smooth-wrapper" ref={main}>
+
+          <div class="smooth-content">
+
+            <section className="h-screen flex backdrop-blur-md"
+            data-speed="clamp(0.5)">
+              <RSVP id="container" className="height-600 w-full" />
+            </section>
+
+            {/* <section className="h-screen flex backdrop-blur-md"
+            data-speed="clamp(0.5)">
+              <Info id="container" className="height-600 w-full" />
+            </section>  */}
+
+            {/* <section className="h-screen flex backdrop-blur-md"
+            data-speed="clamp(0.5)">
+              <Registry id="container" className="h-screen w-full" />
+            </section> */}
+
+            {/* <section className="about h-screen flex backdrop-blur-md"
+            data-speed="clamp(0.5)">
+              <About id="container" className="h-screen w-full"/>
+            </section> */}
+
+            {/* <section className="h-screen flex backdrop-blur-md"
+            data-speed="clamp(0.5)">
+              <Data id="container" className="h-screen w-full" />
+            </section> */}
+
+          </div>
+        </div>
+
+        <div class="footer"></div>
+
+      </div>
+
     </div>
   );
 }
 
+
+// to do
+// make width width-screen!!
+// look into voodoo for swiping
+// roll back temp formatting
+// redux: design rsvp element
+// redux: file structure
+// redux: roll back state stuff on every file
+// gsap: animate red X on dietary
+
+// later
+// flow out rsvp vs normal site
+// update graph page
+// figure out ACTUAL schedule info
+// add copy
+// make dietary restrictions more 3d and professional
+
+// zustand
+// github pages
+
+// good practice:
+// roll stuff yourself

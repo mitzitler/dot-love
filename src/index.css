@@ -1,42 +1,42 @@
 @import "./fonts/fonts.css";
 
 /* temp fonts -- BUT ALSO DONT USE @import APPARENTLY! */
-@import url("https://fonts.googleapis.com/css?family=Gentium+Book+Basic&display=swap");
+/* @import url("https://fonts.googleapis.com/css?family=Gentium+Book+Basic&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Heebo&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Tenor+Sans&display=swap");
-
+*/
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; 
 
 
-:root {
+/* :root { */
   /* colors i like */
-  --color-red: #ab094c; /* amaranth purple */
-  --color-light-1: #e4b9b9; /* tea rose */
-  --color-light-2: #e8cbc3; /* pale dogwood */
-  --color-light-3: #ebddcd; /* almond */
-  --color-pink: #df7a97; /* rose pompadour */
-  --color-indigo: #78416f; /* plum */
-  --color-blue: #100847; /* federal blue */
-}
+  /* --color-red: #ab094c;  amaranth purple */
+  /* --color-light-1: #e4b9b9;  tea rose */
+  /* --color-light-2: #e8cbc3;  pale dogwood */
+  /* --color-light-3: #ebddcd;  almond */
+  /* --color-pink: #df7a97;  rose pompadour */
+  /* --color-indigo: #78416f;  plum */
+  /* --color-blue: #100847;  federal blue */
+/* } */
 
-body {
-  margin: 0;
+/* body {
+  margin: 0; */
  /* font-family: "Gentium Book Basic", "Heebo", "Tenos Sans"; */
-  font-family: "epilogue", "dxgaster", "panchang", "super-bread";
+  /* font-family: "epilogue", "dxgaster", "panchang", "super-bread";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+} */
 
-* {
-  margin-top: 0.5rem;
+/* * {
+  margin-top: 0.5rem; */
 /*  margin-left: 0.5rem;
   margin-right: 0.5rem
   okay these are not even on either side it looks like - 
   i will do padding within the containers for now
   */
-}
+/* } */
 
 /* rsvp stuff */
 

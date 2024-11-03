@@ -3,6 +3,8 @@ import { RegistryPageChart } from "./RegistryPageChart";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard";
 import '../App.css';
 
+// NOTE: LINK TO BUY OBJECTS NEEDS TO CREATE A NEW TAB
+
 // this is the ultimate source of all data, so the data will be read in on this page
 const Data = [
     { x: 1,   y: 2,   id: 1, name: "Teapot", 

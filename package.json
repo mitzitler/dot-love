@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@firecms/neat": "^0.2.2",
+    "@gsap/react": "^2.1.1",
     "@nivo/core": "^0.87.0",
     "@nivo/scatterplot": "^0.87.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -12,7 +13,7 @@
     "bootstrap": "^5.3.3",
     "d2": "^31.10.2",
     "d3": "^7.9.0",
-    "gsap": "^3.12.5",
+    "gsap": "file:gsap-bonus.tgz",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-native": "^0.75.3",

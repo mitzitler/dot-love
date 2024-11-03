@@ -21,3 +21,16 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# more misc
+/src/App gsap useffect.js
+/src/App last good versions.js
+/src/App navlink.js 
+/src/App.less
+/gsap-bonus.tgz
+/src/routes
+/public
+
+
+# video
+/src/assets/video

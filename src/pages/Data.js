@@ -3,7 +3,7 @@ import { DataBody } from '../components/DataBody';
 
 export function Data() {
   return (
-    <main className="w-full flex-grow bg-lavender-400">
+    <main className="section-content w-full flex-grow bg-teal-400/75 border-teal-500/50 border-2">
       <DataBody />
     </main> 
   )
