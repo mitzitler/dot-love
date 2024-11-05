@@ -43,6 +43,9 @@ export function RSVPFormDiet({
   function handleEatPeanuts(eatPeanuts) {setEatPeanuts(eatPeanuts)} 
   function handleMoreRestrictions(moreRestrictions) {setMoreRestrictions(moreRestrictions)} 
 
+  // put a little text that tells ppl to press the button
+  // keep more of an eye towards color contrast
+
   return(
     <div class="rsvp">            
       <h2>... and any dietary restrictions, please!</h2> 

@@ -1,11 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
+import { Draggable } from 'gsap/all';
 // import { RSVPForm } from '../components/RSVPPage'
 import { RSVPFormTop } from '../components/RSVPFormTop'
 import { RSVPFormMiddle } from '../components/RSVPFormMiddle'
 import { RSVPFormDiet } from '../components/RSVPFormDiet'
 // import { RSVPFormSubmit } from '../components/RSVPFormSubmit'
-import { count } from 'd3';
+// import { count } from 'd3';
 // this should contain both RSVP flows
 // so it starts with a modal prompting either a log in or registration
 // and then it contains either
@@ -47,13 +48,45 @@ export function RSVP() {
 
     console.log("alcohol:", drinkAlcohol, " zipcode: ", zipcode, firstName)
 
+    // draggable to trigger swipe animation? https://gsap.com/community/forums/topic/18846-swipe-cards-using-greensock/
+    // var lastX = 0;
+    // var direction;
+    // var animDirection;
+    // Draggable.create(document.createElement("section"), {
+    // trigger: "#swipe-card",
+    // type: "x",
+    // minimumMovement: 10,
+    // onDragStart: function() {
+    //     if (inAnimation && inAnimation.isActive()) {
+    //     // inAnimation.timeScale(10);
+    //     // outAnimation.timeScale(10);
+    //     TweenMax.to([inAnimation, outAnimation], 0.3, {timeScale: 10})
+        
+    //     if (this.getDirection() === "left") {
+    //         nextSlide = slides[currentSlide.index - 1] || slides[slides.length - 1];
+    //     } else {
+    //         nextSlide = slides[currentSlide.index + 1] || slides[0];
+    //     }
+    //     } else if (this.getDirection() === "left") {
+    //     setSlide(slides[currentSlide.index - 1] || slides[slides.length - 1]);
+    //     } else {
+    //     setSlide(slides[currentSlide.index + 1] || slides[0]);
+    //     }
+    // }
+    // });
+
+
+    // var inAnimation = null;
+    // var outAnimation = null;
+    // var nextSlide = null;
+
     return (
-        <main>
+        <main className="card-stack" >
             {/* can i do height: 80% ? */}
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
                 <RSVPFormTop rsvp={rsvp} setRsvp={setRsvp} RsvpOptions={RsvpOptions} />
-            </main>
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
+            </section>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
                 <RSVPFormMiddle
                 firstName={firstName} setFirstName={setFirstName}
                 lastName={lastName} setLastName={setLastName}
@@ -66,8 +99,8 @@ export function RSVP() {
                 city={city} setCity={setCity}
                 country={country} setCountry={setCountry}
                 stateProvince={stateProvince} setStateProvince={setStateProvince} />
-            </main>
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
+            </section>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
                 <RSVPFormDiet
                   drinkAlcohol={drinkAlcohol} setDrinkAlcohol={setDrinkAlcohol}
                   eatMeat={eatMeat} setEatMeat={setEatMeat}
@@ -78,10 +111,22 @@ export function RSVP() {
                   eatGluten={eatGluten} setEatGluten={setEatGluten}
                   eatPeanuts={eatPeanuts} setEatPeanuts={setEatPeanuts}
                   moreRestrictions={moreRestrictions} setMoreRestrictions={setMoreRestrictions} />
-            </main>
-            {/* <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
+            </section>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
+                <RSVPFormDiet
+                  drinkAlcohol={drinkAlcohol} setDrinkAlcohol={setDrinkAlcohol}
+                  eatMeat={eatMeat} setEatMeat={setEatMeat}
+                  eatDairy={eatDairy} setEatDairy={setEatDairy}
+                  eatFish={eatFish} setEatFish={setEatFish}
+                  eatShellfish={eatShellfish} setEatShellfish={setEatShellfish}
+                  eatEggs={eatEggs} setEatEggs={setEatEggs}
+                  eatGluten={eatGluten} setEatGluten={setEatGluten}
+                  eatPeanuts={eatPeanuts} setEatPeanuts={setEatPeanuts}
+                  moreRestrictions={moreRestrictions} setMoreRestrictions={setMoreRestrictions} />
+            </section>
+            {/* <section className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
                 <RSVPFormSubmit />
-            </main> */}
+            </section> */}
         </main>
     )
 }

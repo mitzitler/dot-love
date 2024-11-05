@@ -8,12 +8,14 @@ import { About } from './pages/About'
 import { Registry } from './pages/Registry'
 import { Data } from './pages/Data'
 import { RSVP } from './pages/RSVP'
+import store from './store'
+import { Provider, useDispatch } from 'react-redux';
 // moved video out because it was 1.3 GB lol
 import { LightShow } from './components/LightShowVideo'
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother )
 
-export default function Scroll() {
+export default function App() {
   const main = useRef();
 
   // ScrollTrigger.normalizeScroll(true)
@@ -57,56 +59,58 @@ export default function Scroll() {
 
 
   return (
-    <div id = "root">
-      <LightShow/>
+    <Provider store={store}>
+      <div id = "root" >
+        <LightShow />
 
-      {/* <div classname="icon h-screen flex m-auto"> */}
-              <GenericHeader classname="h-screen transfom-scale-5" />
-            {/* </div> */}
+        {/* <div classname="icon h-screen flex m-auto"> */}
+                <GenericHeader classname="h-screen transfom-scale-5" />
+              {/* </div> */}
 
-      <div class="container">
+        <div class="container w-screen">
 
 
 
-           
-        
-        <div class="smooth-wrapper" ref={main}>
+            
+          
+          <div class="smooth-wrapper" ref={main}>
 
-          <div class="smooth-content">
+            <div class="smooth-content">
 
-            <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <RSVP id="container" className="height-600 w-full" />
-            </section>
+              <div className="h-600 flex "
+              data-speed="clamp(0.5)">
+                <RSVP id="container" className="h-screen w-full" />
+              </div>
 
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Info id="container" className="height-600 w-full" />
-            </section>  */}
+              {/* <section className="h-screen flex backdrop-blur-md"
+              data-speed="clamp(0.5)">
+                <Info id="container" className="height-600 w-full" />
+              </section>  */}
 
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Registry id="container" className="h-screen w-full" />
-            </section> */}
+              {/* <section className="h-screen flex backdrop-blur-md"
+              data-speed="clamp(0.5)">
+                <Registry id="container" className="h-screen w-full" />
+              </section> */}
 
-            {/* <section className="about h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <About id="container" className="h-screen w-full"/>
-            </section> */}
+              {/* <section className="about h-screen flex backdrop-blur-md"
+              data-speed="clamp(0.5)">
+                <About id="container" className="h-screen w-full"/>
+              </section> */}
 
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Data id="container" className="h-screen w-full" />
-            </section> */}
+              {/* <section className="h-screen flex backdrop-blur-md"
+              data-speed="clamp(0.5)">
+                <Data id="container" className="h-screen w-full" />
+              </section> */}
 
+            </div>
           </div>
+
+          <div class="footer"></div>
+
         </div>
 
-        <div class="footer"></div>
-
       </div>
-
-    </div>
+    </Provider>
   );
 }
 

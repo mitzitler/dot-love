@@ -42,22 +42,6 @@
   background-color: #dfdfdf;
 }
 
-#gradient {
-  position: relative;
-  display: flex;
-  flex-direction: column
-}
-
-#gradient canvas, #overlay {
-  position: absolute;
-  width: 100%;
-  flex-grow: 1
-} 
-
-canvas {
-  border: 1px solid black;
-}
-
 .bg-vid {
   position: fixed;
   width: 100%;
@@ -197,10 +181,12 @@ section, header {
 }
 
 section {
-  height: screen;
+  height: 600px;
   width: 75%;
   margin-bottom: 40px;
-  border-radius: 15px 50px;
+  border-radius: 15px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 header {
@@ -213,7 +199,8 @@ header {
 }
 
 .section-content {
-  border-radius: 15px 50px
+  border-radius: 15px; 
+  height: 600px
 }
 
 .header-content {
@@ -381,57 +368,40 @@ header {
   filter: saturate(0%)
 }
 
-/*
-#canvas-gradient {
-  position: absolute;
-  height: 100;
-  width: 100% 
-}
-
-.top-elements {
-  position: absolute;
-  height: 100px;
-  width: 100%
-}
-*/
-
-/*
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.card-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.swipe-card {
+  position: relative;
+  margin: auto;
+  height: 600px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.swipe-card top {
+  z-index: 4
 }
-*/
+
+.swipe-card:nth-child(1) {
+  z-index: 4
+}
+
+.swipe-card:nth-child(2) {
+  z-index: 3;
+  filter: brightness(0.95);
+  transform: translate(20px, -580px);
+}
+
+.swipe-card:nth-child(3) {
+  z-index: 2;
+  filter: brightness(0.9);
+  transform: translate(40px, -1160px);
+}
+
+.swipe-card:nth-child(4) {
+  z-index: 1;
+  filter: brightness(0.85);
+  transform: translate(60px, -1740px);
+}
