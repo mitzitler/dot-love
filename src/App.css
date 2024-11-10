@@ -280,15 +280,15 @@ header {
 }
 
 .rsvp #rsvp-radio {
-  background-color: bisque;
+  /* background-color: bisque; */
   display: flex;
   flex-direction: column;
   align-items: left;
 }
 
 .rsvp #radio-item {
-  color: indigo;
-  background-color: pink;
+  color: rgba(0, 0, 0, 0.566);
+  /* background-color: pink; */
   font-size: medium;
   font-family: gambetta;
   margin-bottom: 5%;
@@ -301,21 +301,21 @@ header {
 .rsvp h1 {
   font-size: x-large;
   font-family: Bonbance;
-  color: red;
-  background-color: aqua;
+  color: rgb(85, 7, 7);
+  /* background-color: aqua; */
   margin-bottom: 10%
 }
 
 .rsvp h2 {
   font-size: large;
   font-family: gambetta;
-  color: whitesmoke;
+  color: rgba(0, 0, 0, 0.566);
   margin-bottom: 5%
 }
 
 .rsvp p {
   margin: auto;
-  color: black;
+  color: rgba(0, 0, 0, 0.566);
   font-size: medium;
   font-family: elanor;
   margin-bottom: 10%;
@@ -374,10 +374,26 @@ header {
   align-items: center;
 }
 
+button {
+  border-radius: 27px;
+  /* background-color: #ffd700; */
+  font-family: Bonbance;
+  border: 1px solid #b79c05;
+  color: maroon;
+  width: 200px;
+  padding: 2px 20px;
+  margin-bottom: 8px;
+  opacity: 60%
+}
+
+button:hover {
+  background-color: #ffd700;
+}
+
 .swipe-card {
   position: relative;
   margin: auto;
-  height: 600px;
+  height: 650px;
 }
 
 .swipe-card top {
@@ -391,17 +407,17 @@ header {
 .swipe-card:nth-child(2) {
   z-index: 3;
   filter: brightness(0.95);
-  transform: translate(20px, -580px);
+  transform: translate(20px, -630px);
 }
 
 .swipe-card:nth-child(3) {
   z-index: 2;
   filter: brightness(0.9);
-  transform: translate(40px, -1160px);
+  transform: translate(40px, -1260px);
 }
 
 .swipe-card:nth-child(4) {
   z-index: 1;
   filter: brightness(0.85);
-  transform: translate(60px, -1740px);
+  transform: translate(60px, -1890px);
 }

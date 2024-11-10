@@ -14,8 +14,6 @@ import { RSVPFormDiet } from '../components/RSVPFormDiet'
 //// logs in the user 
 //// ????????
 
-import { Router, NavLink } from 'react-router-dom';
-
 const RsvpOptions = Object.freeze({
     ATTENDING: "ATTENDING",
     NOT_ATTENDING: "NOT_ATTENDING",
@@ -47,6 +45,40 @@ export function RSVP() {
     const [eatGluten, setEatGluten] = useState(true)
     const [eatPeanuts, setEatPeanuts] = useState(true)
     const [moreRestrictions, setMoreRestrictions] = useState('')
+
+    console.log("alcohol:", drinkAlcohol, " zipcode: ", zipcode, firstName)
+
+    // draggable to trigger swipe animation? https://gsap.com/community/forums/topic/18846-swipe-cards-using-greensock/
+    // var lastX = 0;
+    // var direction;
+    // var animDirection;
+    // Draggable.create(document.createElement("section"), {
+    // trigger: "#swipe-card",
+    // type: "x",
+    // minimumMovement: 10,
+    // onDragStart: function() {
+    //     if (inAnimation && inAnimation.isActive()) {
+    //     // inAnimation.timeScale(10);
+    //     // outAnimation.timeScale(10);
+    //     TweenMax.to([inAnimation, outAnimation], 0.3, {timeScale: 10})
+        
+    //     if (this.getDirection() === "left") {
+    //         nextSlide = slides[currentSlide.index - 1] || slides[slides.length - 1];
+    //     } else {
+    //         nextSlide = slides[currentSlide.index + 1] || slides[0];
+    //     }
+    //     } else if (this.getDirection() === "left") {
+    //     setSlide(slides[currentSlide.index - 1] || slides[slides.length - 1]);
+    //     } else {
+    //     setSlide(slides[currentSlide.index + 1] || slides[0]);
+    //     }
+    // }
+    // });
+
+
+    // var inAnimation = null;
+    // var outAnimation = null;
+    // var nextSlide = null;
 
     return (
         <main className="card-stack" >

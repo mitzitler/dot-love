@@ -61,6 +61,7 @@ export function RSVPFormTop({ children, rsvpCode, RsvpOptions, rsvp, setRsvp }) 
             : ( guestType === 2.0 
               ? <p>After the first guest fills out and submits this form, <b>please continue to swipe for the next guest's form.</b></p> 
               : <></> )}
+        <button className="next-btn">Continue...</button>
       </div>
     </div>
   );
