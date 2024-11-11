@@ -13,7 +13,7 @@ import { LightShow } from './components/LightShowVideo'
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother )
 
-export default function Scroll() {
+export default function App() {
   const main = useRef();
 
   // ScrollTrigger.normalizeScroll(true)
@@ -73,30 +73,10 @@ export default function Scroll() {
         <div class="smooth-wrapper" ref={main}>
 
           <div class="smooth-content">
-
-            <section className="h-screen flex backdrop-blur-md"
+            <RSVP />
+            {/* <section className="h-screen flex backdrop-blur-md"
             data-speed="clamp(0.5)">
               <RSVP id="container" className="height-600 w-full" />
-            </section>
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Info id="container" className="height-600 w-full" />
-            </section>  */}
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Registry id="container" className="h-screen w-full" />
-            </section> */}
-
-            {/* <section className="about h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <About id="container" className="h-screen w-full"/>
-            </section> */}
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Data id="container" className="h-screen w-full" />
             </section> */}
 
           </div>

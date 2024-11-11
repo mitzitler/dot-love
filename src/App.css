@@ -18,6 +18,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .dropdown {
   position: relative;
   display: inline-block;
@@ -40,22 +45,6 @@
 
 .dropdown-content li:hover {
   background-color: #dfdfdf;
-}
-
-#gradient {
-  position: relative;
-  display: flex;
-  flex-direction: column
-}
-
-#gradient canvas, #overlay {
-  position: absolute;
-  width: 100%;
-  flex-grow: 1
-} 
-
-canvas {
-  border: 1px solid black;
 }
 
 .bg-vid {
@@ -197,10 +186,12 @@ section, header {
 }
 
 section {
-  height: screen;
+  height: 600px;
   width: 75%;
   margin-bottom: 40px;
-  border-radius: 15px 50px;
+  border-radius: 15px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 header {
@@ -213,7 +204,8 @@ header {
 }
 
 .section-content {
-  border-radius: 15px 50px
+  border-radius: 15px; 
+  height: 600px
 }
 
 .header-content {
@@ -293,15 +285,15 @@ header {
 }
 
 .rsvp #rsvp-radio {
-  background-color: bisque;
+  /* background-color: bisque; */
   display: flex;
   flex-direction: column;
   align-items: left;
 }
 
 .rsvp #radio-item {
-  color: indigo;
-  background-color: pink;
+  color: rgba(0, 0, 0, 0.566);
+  /* background-color: pink; */
   font-size: medium;
   font-family: gambetta;
   margin-bottom: 5%;
@@ -314,21 +306,21 @@ header {
 .rsvp h1 {
   font-size: x-large;
   font-family: Bonbance;
-  color: red;
-  background-color: aqua;
+  color: rgb(85, 7, 7);
+  /* background-color: aqua; */
   margin-bottom: 10%
 }
 
 .rsvp h2 {
   font-size: large;
   font-family: gambetta;
-  color: whitesmoke;
+  color: rgba(0, 0, 0, 0.566);
   margin-bottom: 5%
 }
 
 .rsvp p {
   margin: auto;
-  color: black;
+  color: rgba(0, 0, 0, 0.566);
   font-size: medium;
   font-family: elanor;
   margin-bottom: 10%;
@@ -381,57 +373,74 @@ header {
   filter: saturate(0%)
 }
 
-/*
-#canvas-gradient {
-  position: absolute;
-  height: 100;
-  width: 100% 
-}
-
-.top-elements {
-  position: absolute;
-  height: 100px;
-  width: 100%
-}
-*/
-
-/*
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.card-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+button {
+  border-radius: 27px;
+  /* background-color: #ffd700; */
+  font-family: Bonbance;
+  border: 1px solid #b79c05;
+  color: maroon;
+  width: 200px;
+  padding: 2px 20px;
+  margin-bottom: 8px;
+  opacity: 60%
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button:hover {
+  background-color: #ffd700;
 }
-*/
+
+.swipe-card {
+  position: relative;
+  margin: auto;
+  height: 650px;
+  width: 90%
+}
+
+.swipe-card top {
+  z-index: 4
+}
+
+.swipe-card:nth-child(1) {
+  z-index: 4
+}
+
+.swipe-card:nth-child(2) {
+  z-index: 3;
+  filter: brightness(0.95);
+  transform: translate(20px, -630px);
+}
+
+.swipe-card:nth-child(3) {
+  z-index: 2;
+  filter: brightness(0.9);
+  transform: translate(40px, -1260px);
+}
+
+.swipe-card:nth-child(4) {
+  z-index: 1;
+  filter: brightness(0.85);
+  transform: translate(60px, -1890px);
+}
+
+.next-btn {
+  border-radius: 27px;
+  /* background-color: #ffd700; */
+  font-family: Bonbance;
+  border: 1px solid #b79c05;
+  color: maroon;
+  width: 240px;
+  height: 80px;
+  padding: 8px 20px;
+  margin: 0px 10px 8px;
+  opacity: 60%
+}
+
+.next-btn:hover {
+  background-color: #ee7fdb;
+}
