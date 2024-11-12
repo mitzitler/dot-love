@@ -85,7 +85,7 @@ export function RSVP() {
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
 
     const contactString = "Hi " + firstName + " " + lastName + " (" + pronouns + "), " +
-        "we can reach you at " + phoneNumber + " or " + email + " and you can find me at " + 
+        "we can reach you at " + phoneNumber + " or " + email + " and your mailing address is " + 
         streetAddress + " " + secondAddress + ", in " + city + ", " + zipcode + " - " + 
         stateProvince + ", " + country 
     
@@ -97,7 +97,7 @@ export function RSVP() {
     function moreRestrictionsToWords(moreRestrictions) {
         if (moreRestrictions.length === 0) 
             return("")
-        else return "; and I have other restrictions, " + moreRestrictions
+        else return "; and I have other restrictions, such as " + moreRestrictions
     }
 
     const dietaryString = dietaryToWords(drinkAlcohol, "drink alcohol") + "; " +

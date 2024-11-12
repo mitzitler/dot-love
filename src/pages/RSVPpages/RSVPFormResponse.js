@@ -46,15 +46,18 @@ export function RSVPFormResponse({rsvp, dispatch}) {
                             : ( guestType === 2.0 
                             ? <p>After the first guest fills out and submits this form, <b>please continue to swipe for the next guest's form.</b></p> 
                             : <></> )}
-                        <span>
-                            <NavLink className='next-btn' to='/contact' end>Continue...</NavLink> 
-                        </span>
 
                     </div>
                 </div>
 
             </section>
             <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
+                <span className='button-container'>
+                    <NavLink className='next-btn' to='/contact' end>Continue...</NavLink> 
+                </span>
+            </section>
         </>
     )
 }

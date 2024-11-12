@@ -423,9 +423,16 @@ button:hover {
 }
 
 .swipe-card:nth-child(4) {
-  z-index: 1;
-  filter: brightness(0.85);
-  transform: translate(60px, -1890px);
+  z-index: 4;
+  height: 80px;
+  transform: translateY(-1220px);
+}
+
+.button-container {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .next-btn {
@@ -435,10 +442,10 @@ button:hover {
   border: 1px solid #b79c05;
   color: maroon;
   width: 240px;
-  height: 80px;
+  /* height: 80px; */
   padding: 8px 20px;
-  margin: 0px 10px 8px;
-  opacity: 60%
+  margin: 15px 8px;
+  opacity: 60%;
 }
 
 .next-btn:hover {

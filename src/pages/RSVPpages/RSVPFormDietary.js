@@ -75,17 +75,19 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
                     <input label="other-restrictions" type="text" 
                     id="other-restrictions" 
                     placeholder="Other restrictions?" 
-                    value={moreRestrictions} 
-                    onChange={()=>dispatch({type: "moreRestrictionsInput", payload: moreRestrictions})}/>
+                    onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
                 </div>
-
-                <NavLink className='next-btn' to='/submit' end>
-                    Continue...
-                </NavLink> 
 
             </div>
         </section>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
+            <span className='button-container'>
+                <NavLink className='next-btn' to='/contact' end>Go back?</NavLink> 
+                <NavLink className='next-btn' to='/submit' end>Continue...</NavLink> 
+            </span>
+        </section>
     </>
     )
 }

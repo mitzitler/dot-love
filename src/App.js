@@ -59,26 +59,14 @@ export default function App() {
   return (
     <div id = "root">
       <LightShow/>
-
-      {/* <div classname="icon h-screen flex m-auto"> */}
-              <GenericHeader classname="h-screen transfom-scale-5" />
-            {/* </div> */}
+      <GenericHeader classname="h-screen transfom-scale-5" />
 
       <div class="container">
-
-
-
-           
-        
+  
         <div class="smooth-wrapper" ref={main}>
 
           <div class="smooth-content">
             <RSVP />
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <RSVP id="container" className="height-600 w-full" />
-            </section> */}
-
           </div>
         </div>
 
