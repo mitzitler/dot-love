@@ -52,9 +52,12 @@ def handler(event, context):
     api_action = request["action"]
     log.append_keys(action=api_action, trace_id=trace_id, first_last=first_last)
 
-    # Direct to proper controller action
+    # direct to proper controller action
     log.info(f"handling request")
     try:
+        # make sure first_last was included in header
+        assert first_last
+
         if api_action == "login":
             res = login(
                 first_last=first_last,
@@ -120,7 +123,7 @@ def handler(event, context):
 def login(first_last, dynamo_client):
     # fetch user from db
     try:
-        user = User.from_first_last_db(first_last)
+        user = User.from_first_last_db(first_last, dynamo_client)
     except Exception as e:
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
@@ -151,7 +154,7 @@ def register(first_last, registration_fields, dynamo_client):
     # register the user
     err = None
     try:
-        err = user.register_db()
+        err = user.register_db(dynamo_client)
     except Exception as e:
         # damn
         err_msg = "failed to register user in db"
@@ -164,7 +167,9 @@ def register(first_last, registration_fields, dynamo_client):
 
     # womp womp
     if err:
-        return {"code": 400, "message": err["msg"]}
+        log.error(f"encountered error registering user in dynamo err={err}")
+        return {"code": 400, "message": err}
+    log.info("succeeded registering user in db")
 
     # send text and email to let the user know their registration succeeded
     try:
@@ -178,9 +183,31 @@ def register(first_last, registration_fields, dynamo_client):
     return {"code": 200, "message": f"{first_last} registration success"}
 
 
-# TODO
 def update(first_last, dynamo_client):
-    pass
+    # format user
+    user = User.from_first_last_registration_fields(first_last, registration_fields)
+
+    # update in db
+    try:
+        user.update_db(dynamo_client)
+    except Exception as e:
+        # damn
+        err_msg = "failed to update user in db"
+        log.exception(err_msg)
+        return {
+            "code": 500,
+            "message": err_msg,
+            "error": e,
+        }
+
+    # womp womp
+    if err:
+        log.append_keys(dynamo_err=err)
+        log.error(f"encountered error registering user in dynamo")
+        return {"code": 400, "message": err}
+    log.info("succeeded updating user in db")
+
+    return {"code": 200, "message": f"{first_last} registration success"}
 
 
 # TODO
@@ -262,9 +289,9 @@ def text_registration_success(user):
 # Class Defs
 ########################################################
 class UserAddress:
-    def __init__(self, street, second, city, zipcode, country, state, phone):
+    def __init__(self, street, second_line, city, zipcode, country, state, phone):
         self.street = street
-        self.second = second
+        self.second_line = second_line
         self.city = city
         self.zipcode = zipcode
         self.country = country
@@ -315,8 +342,8 @@ class User:
         rsvp_code,
         rsvp_status,
         pronouns,
-        user_address,
-        user_diet,
+        address,
+        diet,
         guest_details=None,
     ):
         self.first = first
@@ -324,15 +351,45 @@ class User:
         self.rsvp_code = rsvp_code
         self.rsvp_status = rsvp_status
         self.pronouns = pronouns
-        self.address = user_address
-        self.user_diet = user_diet
+        self.address = address
+        self.diet = diet
         self.guest_details = guest_details
 
     @staticmethod
-    def from_first_last_db(first_last):
-        first = first_last.split("_")[0]
-        last = first_last.split("_")[1]
-        pass
+    def from_first_last_db(first_last, dynamo_client):
+        key_expression = {"first_last": {"S": first_last}}
+        db_user = dynamo_client.get(USER_TABLE_NAME, key_expression)
+        return User(
+            first=first_last.split("_")[0],
+            last=first_last.split("_")[1],
+            rsvp_code=db_user["rsvp_code"]["S"],
+            rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
+            pronouns=Pronouns[db_user["pronouns"]["S"]],
+            address=UserAddress(
+                street=db_user["street"]["S"],
+                second_line=db_user["second_line"]["S"],
+                city=db_user["city"]["S"],
+                zipcode=db_user["zipcode"]["S"],
+                country=db_user["country"]["S"],
+                state=db_user["state"]["S"],
+                phone=db_user["phone"]["S"],
+            ),
+            diet=UserDiet(
+                alcohol=db_user["alcohol"]["BOOL"],
+                meat=db_user["meat"]["BOOL"],
+                dairy=db_user["dairy"]["BOOL"],
+                fish=db_user["fish"]["BOOL"],
+                shellfish=db_user["shellfish"]["BOOL"],
+                eggs=db_user["eggs"]["BOOL"],
+                gluten=db_user["gluten"]["BOOL"],
+                peanuts=db_user["peanuts"]["BOOL"],
+                restrictions=db_user["restrictions"]["BOOL"],
+            ),
+            guest_details=GuestDetails(
+                link=db_user["guest_link"]["S"],
+                pair_first_last=db_user["guest_pair_first_last"]["S"],
+            ),
+        )
 
     @staticmethod
     def from_first_last_registration_fields(first_last, registration_fields):
@@ -343,7 +400,7 @@ class User:
         pronouns = Pronouns(registration_fields["pronouns"])
         address = UserAddress(
             registration_fields["street"],
-            registration_fields["second"],
+            registration_fields["second_line"],
             registration_fields["city"],
             registration_fields["zipcode"],
             registration_fields["country"],
@@ -371,10 +428,88 @@ class User:
             rsvp_code=registration_fields["rsvp_code"],
             rsvp_status=rsvp_status,
             pronouns=pronouns,
-            user_address=address,
-            user_diet=diet,
+            address=address,
+            diet=diet,
             guest_details=guest_details,
         )
+
+    def register_db(self, dynamo_client):
+        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        field_value_map = {
+            # basic details
+            "rsvp_code": self.rsvp_code,
+            "rsvp_status": self.rsvp_status.name,
+            "pronouns": self.pronouns.name,
+            # diet
+            "alcohol": self.diet.alcohol,
+            "meat": self.diet.meat,
+            "dairy": self.diet.dairy,
+            "fish": self.diet.fish,
+            "shellfish": self.diet.shellfish,
+            "eggs": self.diet.eggs,
+            "gluten": self.diet.gluten,
+            "peanuts": self.diet.peanuts,
+            "restrictions": self.diet.restrictions,
+            # guest info
+            "guest_link": self.guest_details.link,
+            "guest_pair_first_last": self.guest_details.pair_first_last,
+            # address
+            "street": self.address.street,
+            "second_line": self.address.second_line,
+            "city": self.address.city,
+            "zipcode": self.address.zipcode,
+            "country": self.address.country,
+            "state": self.address.state,
+            "phone": self.address.phone,
+        }
+
+        res = dynamo_client.create(
+            USER_TABLE_NAME,
+            key_expression,
+            field_value_map,
+        )
+
+        # TODO: Parse res for errors as str
+        return None
+
+    def update_db(self, dynamo_client):
+        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        field_value_map = {
+            # basic details
+            "rsvp_code": self.rsvp_code,
+            "rsvp_status": self.rsvp_status.name,
+            "pronouns": self.pronouns.name,
+            # diet
+            "alcohol": self.diet.alcohol,
+            "meat": self.diet.meat,
+            "dairy": self.diet.dairy,
+            "fish": self.diet.fish,
+            "shellfish": self.diet.shellfish,
+            "eggs": self.diet.eggs,
+            "gluten": self.diet.gluten,
+            "peanuts": self.diet.peanuts,
+            "restrictions": self.diet.restrictions,
+            # guest info
+            "guest_link": self.guest_details.link,
+            "guest_pair_first_last": self.guest_details.pair_first_last,
+            # address
+            "street": self.address.street,
+            "second_line": self.address.second_line,
+            "city": self.address.city,
+            "zipcode": self.address.zipcode,
+            "country": self.address.country,
+            "state": self.address.state,
+            "phone": self.address.phone,
+        }
+
+        res = dynamo_client.update(
+            USER_TABLE_NAME,
+            key_expression,
+            field_value_map,
+        )
+
+        # TODO: Parse res for errors as str
+        return None
 
 
 ########################################################

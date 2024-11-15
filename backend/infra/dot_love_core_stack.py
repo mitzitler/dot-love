@@ -144,27 +144,14 @@ class DotLoveCoreStack(Stack):
         user_table = dynamodb.Table(
             scope=self,
             id=f"{self.stack_env}-users",
-            # PK: id, a guid
+            # PK: composite first_last
             partition_key=dynamodb.Attribute(
-                name="id",
+                name="first_last",
                 type=dynamodb.AttributeType.STRING,
             ),
             removal_policy=RemovalPolicy.DESTROY,
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
             encryption=dynamodb.TableEncryption.AWS_MANAGED,
-        )
-
-        # Search user by full-name
-        user_table.add_global_secondary_index(
-            index_name="full-name-lookup-index",
-            partition_key=dynamodb.Attribute(
-                name="first",
-                type=dynamodb.AttributeType.STRING,
-            ),
-            sort_key=dynamodb.Attribute(
-                name="last",
-                type=dynamodb.AttributeType.STRING,
-            ),
         )
 
         return user_table
@@ -183,29 +170,15 @@ class DotLoveCoreStack(Stack):
             encryption=dynamodb.TableEncryption.AWS_MANAGED,
         )
 
-        # Search registry item by state
-        registry_item_table.add_global_secondary_index(
-            index_name="state-lookup-index",
-            partition_key=dynamodb.Attribute(
-                name="state",
-                type=dynamodb.AttributeType.STRING,
-            ),
-        )
-
         return registry_item_table
 
     def create_dot_love_registry_claim_table(self):
         registry_claim_table = dynamodb.Table(
             scope=self,
             id=f"{self.stack_env}-registry_claims",
-            # PK: registry_item_id, a guid
+            # PK: id, a guid
             partition_key=dynamodb.Attribute(
-                name="registry_item_id",
-                type=dynamodb.AttributeType.STRING,
-            ),
-            # SK: user_id, a guid
-            sort_key=dynamodb.Attribute(
-                name="user_id",
+                name="id",
                 type=dynamodb.AttributeType.STRING,
             ),
             removal_policy=RemovalPolicy.DESTROY,
@@ -213,11 +186,11 @@ class DotLoveCoreStack(Stack):
             encryption=dynamodb.TableEncryption.AWS_MANAGED,
         )
 
-        # Search registry claim by state
+        # Search registry claim by claimant (composite first_last)
         registry_claim_table.add_global_secondary_index(
-            index_name="state-lookup-index",
+            index_name="claimant-lookup-index",
             partition_key=dynamodb.Attribute(
-                name="state",
+                name="first_last",
                 type=dynamodb.AttributeType.STRING,
             ),
         )
