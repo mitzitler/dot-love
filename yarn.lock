@@ -12463,6 +12463,11 @@ webidl-conversions@^6.1.0:
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-6.1.0.tgz"
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
+webkit@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.npmjs.org/webkit/-/webkit-0.0.0.tgz"
+  integrity sha512-YVSDLyRsq0oQkIDHMTV6HbZOjq691WIQGQZPOsyptx85DDJN4cnqYWWSaQQjLwniVMdAfgfFrcgezdJdHmvcDQ==
+
 webpack-dev-middleware@^5.3.4:
   version "5.3.4"
   resolved "https://registry.npmjs.org/webpack-dev-middleware/-/webpack-dev-middleware-5.3.4.tgz"

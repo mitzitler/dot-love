@@ -2,10 +2,8 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
 
-export function RSVPFormResponse({rsvp, dispatch}) {
-
-    const guestType = 1.5
-
+export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
+    console.log(rsvp)
     return (
         <>
             <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
@@ -24,7 +22,6 @@ export function RSVPFormResponse({rsvp, dispatch}) {
                         <div id="rsvp-radio">
                             <div id="radio-item">
                             <input id="rsvp-yes" name="rsvp" type="radio"
-                            value={rsvp} 
                             onClick={()=>dispatch({type: "rsvpInput", payload: "attending" })}></input>
                             <label for="rsvp-yes">
                                 I will be in attendance
@@ -32,7 +29,6 @@ export function RSVPFormResponse({rsvp, dispatch}) {
                             </div>
                             <div id="radio-item">
                             <input id="rsvp-no" name="rsvp" type="radio"
-                            value={rsvp} 
                             onClick={()=>dispatch({type: "rsvpInput", payload: "notattending" })}></input>
                             <label for="rsvp-no">
                                 Unfortunately I cannot attend
@@ -41,9 +37,9 @@ export function RSVPFormResponse({rsvp, dispatch}) {
                         </div>
                         <h2> Please swipe or use the arrow keys to continue through this form! </h2>
 
-                        { guestType === 1.5 
+                        { rsvpCode === 'DEF' 
                             ? <p><b>Are you bringing a plus one?</b> We will text you a unique link for your invitee.</p>
-                            : ( guestType === 2.0 
+                            : ( rsvpCode === 'GHI'
                             ? <p>After the first guest fills out and submits this form, <b>please continue to swipe for the next guest's form.</b></p> 
                             : <></> )}
 
@@ -55,9 +51,16 @@ export function RSVPFormResponse({rsvp, dispatch}) {
             <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
             <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
                 <span className='button-container'>
-                    <NavLink className='next-btn' to='/contact' end>Continue...</NavLink> 
+                    <NavLink className='btn-23' 
+                        disabled={rsvp === 'undecided' ? true : false} 
+                        to={rsvp === 'undecided' ? '/rsvp' : '/rsvp/contact'} 
+                        end><marquee>Continue</marquee></NavLink>
+
+                        {/* and there needs to be an error message too */}
                 </span>
             </section>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+            <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
         </>
     )
 }

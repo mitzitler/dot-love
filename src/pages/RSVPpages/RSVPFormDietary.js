@@ -30,8 +30,10 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
     <>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
             <div class="rsvp">            
-                <h1 class="pt-16">... and any dietary restrictions, please!</h1> 
-                <div className="m-auto grid grid-cols-4 gap-6 px-2">
+                <h1 class="pt-10 my-0">... and any dietary restrictions, please!</h1> 
+                <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
+                    dietary restrictions</h2>
+                <div className="mx-auto mt-0 grid grid-cols-2 px-2">
 
                     {/* gsap animate big red X on click */}
 
@@ -84,10 +86,17 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
             <span className='button-container'>
-                <NavLink className='next-btn' to='/contact' end>Go back?</NavLink> 
-                <NavLink className='next-btn' to='/submit' end>Continue...</NavLink> 
+                <NavLink className='btn-23' to='/rsvp/contact' end>
+                    <marquee>Return</marquee>
+                </NavLink> 
+                {/* disable this for the first 5 seconds after render */}
+                <NavLink className='btn-23' to='/rsvp/submit' end>
+                    <marquee>Continue</marquee>
+                </NavLink> 
             </span>
         </section>
+        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+        {/* <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/> */}
     </>
     )
 }

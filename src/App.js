@@ -10,11 +10,12 @@ import { Data } from './pages/Data'
 import { RSVP } from './pages/RSVP'
 // moved video out because it was 1.3 GB lol
 import { LightShow } from './components/LightShowVideo'
+import { Routes, Route } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother )
 
 export default function App() {
-  const main = useRef();
+  // const main = useRef();
 
   // ScrollTrigger.normalizeScroll(true)
   
@@ -59,20 +60,25 @@ export default function App() {
   return (
     <div id = "root">
       <LightShow/>
-      <GenericHeader classname="h-screen transfom-scale-5" />
+      {/* <GenericHeader classname="h-screen transfom-scale-5" /> */}
 
-      <div class="container">
+      {/* <div class="container"> */}
   
-        <div class="smooth-wrapper" ref={main}>
+        {/* <div class="smooth-wrapper" ref={main}> */}
 
-          <div class="smooth-content">
-            <RSVP />
-          </div>
-        </div>
+          {/* <div class="smooth-content"> */}
+            <Routes>
+              {/* add an all page element here */}
+              {/* this will have its own version of generic header, which asks for name instead */}
+                <Route path="*" element={<h1>Oops!</h1>} /> 
+                <Route path="rsvp/*" element={<RSVP/>} />
+            </Routes>
+          {/* </div> */}
+        {/* </div> */}
 
-        <div class="footer"></div>
+        {/* <div class="footer"></div> */}
 
-      </div>
+      {/* </div> */}
 
     </div>
   );
