@@ -1,0 +1,2 @@
+aws-lambda-powertools==2.33.0
+twilio==9.3.3
