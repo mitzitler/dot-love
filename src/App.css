@@ -368,7 +368,8 @@ header {
   color: greenyellow;
   font-size: large;
   font-family: gambetta;
-  margin-bottom: 10%
+  /* margin-bottom: 10% */
+  /* this was super frustrating ^ where else will it effect? */
 }
 
 .rsvp #rsvp-radio {
@@ -486,7 +487,7 @@ header {
   background-color: #ffd700;
 } */
 
-.submit-card {
+.submit-card-left, .submit-card-right {
   /* background-color: rgb(178, 155, 53); */
   border-radius: 15px;
   margin: 10px;
@@ -498,8 +499,57 @@ header {
   /* backdrop-filter: blur(500px); */
 }
 
+.submit-card-left {
+  background-image: linear-gradient(to bottom right, #e0b002, 
+  #db568f
+  );
+  border: 0px;
+  margin-bottom: 0%;
+}
+
+.submit-card-right  {
+  background-image: linear-gradient(to bottom left, #e0b002, 
+  #db568f
+  );
+  border: 0px;
+  margin-bottom: 0%;
+}
+
 .submit-text-overlay {
   color: maroon
+}
+
+.conditional-plusone {
+  align-items: center;
+  justify-content: center;
+}
+
+.conditional-plusone h2 {
+  margin-top: 10%
+}
+
+.conditional-plusone p {
+  font-size: 36px;
+  font-family: futura;
+  margin: 2% 0% 0% 50%;
+  height: 40px;
+  border: 3px solid brown;
+  border-radius: 100%;
+}
+
+.conditional-checked {
+  border-width: 0;
+  background-image: linear-gradient(to bottom left, #b1f04d, 
+  #5aed69
+  );
+  /* background-color: #7ef04d; */
+  
+}
+
+
+.conditional-plusone h3 {
+  color: brown;
+  font-size: 18px;
 }
 
 .card-stack {
@@ -585,6 +635,24 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#submit-header1, #submit-header2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#submit-header1 {
+  /* padding: 30px 0px 0px 10px  */
+  margin-top: 5%;
+  margin-bottom: 0%;
+}
+
+#submit-header2 {
+  padding-top: 0%;
+  margin-top: 0%;
+  margin-bottom: 5%
 }
 
 .next-btn {

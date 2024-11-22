@@ -33,7 +33,7 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
                 <h1 class="pt-10 my-0">... and any dietary restrictions, please!</h1> 
                 <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
                     dietary restrictions</h2>
-                <div className="mx-auto mt-0 grid grid-cols-2 px-2">
+                <div className="mx-auto mt-0 mb-5 grid grid-cols-2 px-2">
 
                     {/* gsap animate big red X on click */}
 

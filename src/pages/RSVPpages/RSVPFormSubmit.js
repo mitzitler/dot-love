@@ -1,34 +1,38 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
 
-export function RSVPFormSubmit({rsvpCode, 
-    // contactString, dietaryString, 
-    // firstName, lastName, pronouns,
-    // phoneNumber,email, streetAddress, secondAddress, zipcode, city, country, stateProvince, 
+export function RSVPFormSubmit({ // rsvpCode, 
+    contactString, dietaryString, 
+    firstName, lastName, pronouns,
+    phoneNumber,email, streetAddress, secondAddress, zipcode, city, country, stateProvince, 
+    drinkAlcohol, eatMeat, eatDairy, eatFish, eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions,
     dispatch}) {
 
-    const firstName = "Pritham"
-    const lastName = "Swaminathan"
-    const pronouns = "he/him"
-    const phoneNumber = "352 352 3522"
-    const email = "pritham@pritham.com"
-    const streetAddress = "221 S 3rd St"
-    const secondAddress = "6A"
-    const zipcode = "11211"
-    const city = "Brooklyn"
-    const country = "United States"
-    const stateProvince = "New York"
+    // const firstName = "Pritham"
+    // const lastName = "Swaminathan"
+    // const pronouns = "he/him"
+    // const phoneNumber = "352 352 3522"
+    // const email = "pritham@pritham.com"
+    // const streetAddress = "221 S 3rd St"
+    // const secondAddress = "6A"
+    // const zipcode = "11211"
+    // const city = "Brooklyn"
+    // const country = "United States"
+    // const stateProvince = "New York"
+
+    const countryNew = country === "United States" ? "the US" : country
 
 
-    const drinkAlcohol = false 
-    const eatMeat = false
-    const eatDairy = false
-    const eatFish = false
-    const eatShellfish = false 
-    const eatEggs = false
-    const eatGluten = true
-    const eatPeanuts = true 
-    const moreRestrictions = ""
+    // const drinkAlcohol = false 
+    // const eatMeat = false
+    // const eatDairy = false
+    // const eatFish = false
+    // const eatShellfish = false 
+    // const eatEggs = false
+    // const eatGluten = true
+    // const eatPeanuts = true 
+    // const moreRestrictions = ""
 
     const dietaryDict = {
         drinkAlcohol: "drink alcohol",
@@ -76,21 +80,33 @@ export function RSVPFormSubmit({rsvpCode,
         return `You can ${allButLast} and ${lastItem}.`;
     }
 
+    const rsvpCode = "DEF"
+
+    const [clicked, setClicked] = useState(false)
+
+    function handleClicked() {
+        setClicked(!clicked);
+        console.log(clicked)
+    }
+
   return(
     <>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
             <div class="rsvp">    
 
-            <h1 class="pt-20">Does this all look right?</h1> 
+            <h1 id="submit-header1">Does this all look right, {firstName} {lastName}?</h1>
+            <p id="submit-header2">({pronouns})</p>
             <div className="grid col-2">
-                <h2>Hi {firstName} {lastName}, ({pronouns})</h2>
                 
-                <div className="mx-auto mt-0 grid grid-cols-2 px-2">
+                <div className="submit-div mx-auto my-0 grid grid-cols-2 px-2">
                     <div>
-                        <div className="submit-card bg-rose-400/75 border-rose-400/75 border-2 backdrop-blur-md">
+                        <div className="submit-card-left"
+                        // className="submit-card bg-rose-400/75 border-rose-400/75 border-2 
+                        // backdrop-blur-md"
+                        >
                             {/* i hate this styling so much */}
                             <h3 className="submit-text-overlay ">
-                            Your mailing address is: {streetAddress} {city}, {stateProvince} {zipcode} - in  {country}
+                            Your mailing address is: {streetAddress} {city}, {stateProvince} {zipcode} - in  {countryNew}
                             </h3>
                             <p></p>
                             <h3 className="submit-text-overlay">
@@ -99,7 +115,7 @@ export function RSVPFormSubmit({rsvpCode,
                         </div>
                     </div>
                     <div>
-                        <div className="submit-card bg-indigo-400/75 border-indigo-400/75 border-2 backdrop-blur-md">
+                        <div className="submit-card-right">
                             <h3 className="submit-text-overlay">
                                 {createRestrictionsString(dietaryRestrictions)}
                             </h3>
@@ -108,17 +124,28 @@ export function RSVPFormSubmit({rsvpCode,
                                 {createInclusionsString(dietaryInclusions)}
                             </h3>
                         </div>
-                    
-                
-                {/* <p className='p-5'>{contactString}</p> */}
-                {/* <p className='p-5'>{dietaryString}</p> */}
+
+                    </div>
+                </div>
+
             </div>
             
-            {/* if guest code is 1.5, then quick radio for are you taking a guest or not
-            when they submit, they will be texted the guest code */}
-            {}
+            {rsvpCode === 'DEF' 
+            ? 
+            <div class="conditional-plusone">
+                <h2>Are you planning on bringing a guest?</h2>
+                <div class="grid grid-cols-8">
+                    <p 
+                    className={!clicked ? "col-span-1" :
+                    "conditional-checked col-span-1"}
+                    onClick={()=>handleClicked()}
+                    ></p>
+                    <h3 class="col-span-7">
+                        Click 'yes' to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
+                    </h3>
+                </div>
             </div>
-            </div>
+            :<></>}
             </div>
         </section>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>

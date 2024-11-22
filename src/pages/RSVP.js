@@ -173,7 +173,7 @@ export function RSVP() {
                         zipcode={zipcode} city={city} country={country} stateProvince={stateProvince} 
                         canContinueDietary={canContinueDietary} dispatch={dispatch} />} />
                 <Route path="/dietary" element={
-                    <RSVPFormDietary drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                    <RSVPFormDietary rsvpCode={rsvpCode} drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
                         eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
                         eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
                         moreRestrictions={moreRestrictions} dispatch={dispatch} />} />
@@ -183,7 +183,10 @@ export function RSVP() {
                         phoneNumber={phoneNumber} 
                         email={email} streetAddress={streetAddress} secondAddress={secondAddress}
                         zipcode={zipcode} city={city} country={country} stateProvince={stateProvince}
-                        rsvpString={rsvpString} 
+                        drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                        eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
+                        eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
+                        moreRestrictions={moreRestrictions} 
                         dietaryString={dietaryString} dispatch={dispatch} />} />
             </Routes>
 

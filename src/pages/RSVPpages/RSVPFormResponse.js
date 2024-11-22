@@ -35,7 +35,7 @@ export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
                             </label>
                             </div>
                         </div>
-                        <h2> Please swipe or use the arrow keys to continue through this form! </h2>
+                        {/* <h2> Please swipe or use the arrow keys to continue through this form! </h2> */}
 
                         { rsvpCode === 'DEF' 
                             ? <p><b>Are you bringing a plus one?</b> We will text you a unique link for your invitee.</p>
