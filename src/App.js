@@ -10,11 +10,12 @@ import { Data } from './pages/Data'
 import { RSVP } from './pages/RSVP'
 // moved video out because it was 1.3 GB lol
 import { LightShow } from './components/LightShowVideo'
+import { Routes, Route } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother )
 
-export default function Scroll() {
-  const main = useRef();
+export default function App() {
+  // const main = useRef();
 
   // ScrollTrigger.normalizeScroll(true)
   
@@ -59,52 +60,25 @@ export default function Scroll() {
   return (
     <div id = "root">
       <LightShow/>
+      {/* <GenericHeader classname="h-screen transfom-scale-5" /> */}
 
-      {/* <div classname="icon h-screen flex m-auto"> */}
-              <GenericHeader classname="h-screen transfom-scale-5" />
-            {/* </div> */}
+      {/* <div class="container"> */}
+  
+        {/* <div class="smooth-wrapper" ref={main}> */}
 
-      <div class="container">
+          {/* <div class="smooth-content"> */}
+            <Routes>
+              {/* add an all page element here */}
+              {/* this will have its own version of generic header, which asks for name instead */}
+                <Route path="*" element={<h1>Oops!</h1>} /> 
+                <Route path="rsvp/*" element={<RSVP/>} />
+            </Routes>
+          {/* </div> */}
+        {/* </div> */}
 
+        {/* <div class="footer"></div> */}
 
-
-           
-        
-        <div class="smooth-wrapper" ref={main}>
-
-          <div class="smooth-content">
-
-            <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <RSVP id="container" className="height-600 w-full" />
-            </section>
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Info id="container" className="height-600 w-full" />
-            </section>  */}
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Registry id="container" className="h-screen w-full" />
-            </section> */}
-
-            {/* <section className="about h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <About id="container" className="h-screen w-full"/>
-            </section> */}
-
-            {/* <section className="h-screen flex backdrop-blur-md"
-            data-speed="clamp(0.5)">
-              <Data id="container" className="h-screen w-full" />
-            </section> */}
-
-          </div>
-        </div>
-
-        <div class="footer"></div>
-
-      </div>
+      {/* </div> */}
 
     </div>
   );

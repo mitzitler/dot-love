@@ -1,87 +1,216 @@
-import React from 'react';
-import { useState } from 'react';
-// import { RSVPForm } from '../components/RSVPPage'
-import { RSVPFormTop } from '../components/RSVPFormTop'
-import { RSVPFormMiddle } from '../components/RSVPFormMiddle'
-import { RSVPFormDiet } from '../components/RSVPFormDiet'
-// import { RSVPFormSubmit } from '../components/RSVPFormSubmit'
-import { count } from 'd3';
-// this should contain both RSVP flows
-// so it starts with a modal prompting either a log in or registration
-// and then it contains either
-//// starts the rsvp flow
-//// logs in the user 
-//// ????????
+import React, { useEffect, useReducer } from 'react';
+import { GenericHeader } from '../components/GenericHeader';
+import { RSVPFormResponse } from './RSVPpages/RSVPFormResponse'
+import { RSVPFormContact } from './RSVPpages/RSVPFormContact'
+import { RSVPFormDietary } from './RSVPpages/RSVPFormDietary'
+import { RSVPFormSubmit } from './RSVPpages/RSVPFormSubmit'
+import { Routes, Route } from 'react-router-dom';
+import '../App.css';
 
-const RsvpOptions = Object.freeze({
-    ATTENDING: "ATTENDING",
-    NOT_ATTENDING: "NOT_ATTENDING",
-    UNDECIDED: "UNDECIDED"
-  });
+// to do:
+
+// change padding and margin amounts to being % or em, not px
+// add back in dispatches into RSVPFormContact
+// formatting for RSVPFormResponse radio labels
+// formatting for RSVPFormSubmit CHECKBOX (dont reinvent the wheel!)
+// animate on click dietary
+// update copy 
+// update dietary sprites
+// better formatting for dropdowns
+
+// create store
+// create blinking eye animation
+// move assets to s3 bucket
+
+// create homepage flow
+
+
+const initalState = {
+    // could be 'ABC', 'DEF', 'GHI'
+    // rsvpCode: localStorage.getItem("rsvpCode") || "", 
+    rsvpCode: '',
+    // 'undecided', 'attending', 'notattenting'
+    rsvp: 'undecided', 
+    firstName: "", 
+    lastName: "", 
+    pronouns: "", 
+    phoneNumber: "", 
+    email: "", 
+    streetAddress: "", 
+    secondAddress: "", 
+    city: "", 
+    zipcode: "",    
+    country: "", 
+    stateProvince: "", 
+    canContinueDietary: false,
+    drinkAlcohol: true, 
+    eatMeat: true, 
+    eatDairy: true,
+    eatFish: true, 
+    eatShellfish: true, 
+    eatEggs: true, 
+    eatGluten: true, 
+    eatPeanuts: true, 
+    moreRestrictions: "",
+    submitted: null
+}
+
+// addtl items: plusOneLink
+
+function reducer(state, action) {
+    switch (action.type) {
+        case "rsvpCodeInput": 
+            localStorage.setItem("rsvpCode", action.payload);
+            return {
+                ...state, 
+                rsvpCode: action.payload
+            }
+        case "rsvpInput": 
+            return {
+                ...state, 
+                rsvp: action.payload
+            };
+
+        // case "continueContact": // this one isnt necessary
+        //     return { // only allow this action if the items on the page are ready
+        //     };
+        
+        case "firstNameInput": return {...state, firstName: action.payload};
+        case "lastNameInput": return {...state, lastName: action.payload};
+        case "pronounsInput": return {...state, pronouns: action.payload};
+        case "phoneNumberInput": return {...state, phoneNumber: action.payload};
+        case "emailInput": return {...state, email: action.payload};
+        case "streetAddressInput": return {...state, streetAddress: action.payload};
+        case "secondAddressInput": return {...state, secondAddress: action.payload};
+        case "cityInput": return {...state, city: action.payload};
+        case "zipcodeInput": return {...state, zipcode: action.payload};
+        case "countryInput": return {...state, country: action.payload};
+        case "stateProvinceInput": return {...state, stateProvince: action.payload};
+
+        case "continueDietary": // but im not going to check for secondaddress
+            { 
+                console.log("can i continue? ", state.canContinueDietary);
+                if (!state.firstName || !state.lastName || !state.pronouns || 
+                  !state.phoneNumber || !state.email || !state.streetAddress || 
+                  !state.city || !state.zipcode || !state.country || !state.stateProvince)
+              return {...state, canContinueDietary: false} 
+              else return {...state, canContinueDietary: true}
+             // only allow this action if the items on the page are ready
+            };
+        
+        case "drinkAlcoholToggle": return {...state, drinkAlcohol: !state.drinkAlcohol};
+        case "eatMeatToggle": return {...state, eatMeat: !state.eatMeat};
+        case "eatDairyToggle": return {...state, eatDairy: !state.eatDairy};
+        case "eatFishToggle": return {...state, eatFish: !state.eatFish};
+        case "eatShellfishToggle": return {...state, eatShellfish: !state.eatShellfish};
+        case "eatEggsToggle": return {...state, eatEggs: !state.eatEggs};
+        case "eatGlutenToggle": return {...state, eatGluten: !state.eatGluten};
+        case "eatPeanutsToggle": return {...state, eatPeanuts: !state.eatPeanuts};
+        case "moreRestrictionsInput": return {...state, moreRestrictions: action.payload};
+
+        case "submitFormGC1": return {...state, submitted: action.payload};
+        case "submitFormGC1.5": return {...state, submitted: action.payload};
+        case "submitFormGC2": return {...state, submitted: action.payload, rsvpCode: 'ABC' }
+        
+        default: throw new Error("what did you do????")
+    }
+}
 
 export function RSVP() {
 
-    const [rsvp, setRsvp] = useState(RsvpOptions.UNDECIDED);
+    const [{rsvpCode, rsvp, firstName, lastName, pronouns, phoneNumber, 
+        email, streetAddress, secondAddress, city, zipcode,
+        country, stateProvince, canContinueDietary, drinkAlcohol, eatMeat, eatDairy,
+        eatFish, eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions
+    }, dispatch] = useReducer(reducer, initalState)
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [pronouns, setPronouns] = useState("")
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [email, setEmail] = useState("");
-    const [streetAddress, setStreetAddress] = useState('')
-    const [secondAddress, setSecondAddress] = useState('')
-    const [city, setCity] = useState('')
-    const [zipcode, setZipcode] = useState('')
-    const [country, setCountry] = useState('')
-    const [stateProvince, setStateProvince] = useState('')
+    const acceptableCodes = ['ABC', 'DEF', 'GHI']
 
-    const [drinkAlcohol, setDrinkAlcohol] = useState(true);
-    const [eatMeat, setEatMeat] = useState(true);
-    const [eatDairy, setEatDairy] = useState(true);
-    const [eatFish, setEatFish] = useState(true)
-    const [eatShellfish, setEatShellfish] = useState(true)
-    const [eatEggs, setEatEggs] = useState(true)
-    const [eatGluten, setEatGluten] = useState(true)
-    const [eatPeanuts, setEatPeanuts] = useState(true)
-    const [moreRestrictions, setMoreRestrictions] = useState('')
+    useEffect(() => {
+        if (acceptableCodes.includes(rsvpCode.toUpperCase())) {
+        document.body.style.overflowY = 'auto';
+        } else {
+        document.body.style.overflowY = 'hidden';
+        }
+    }, [rsvpCode]);
 
-    console.log("alcohol:", drinkAlcohol, " zipcode: ", zipcode, firstName)
+    const rsvpString = rsvp === "attending" ? "We are excited you are coming!" :
+        "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
+
+    const contactString = "Hi " + firstName + " " + lastName + " (" + pronouns + "), " +
+        "we can reach you at " + phoneNumber + " or " + email + " and your mailing address is " + 
+        streetAddress + " " + secondAddress + ", in " + city + ", " + zipcode + " - " + 
+        stateProvince + ", " + country 
+    
+    function dietaryToWords(dietaryState, dietaryName) {
+        const verb = dietaryState ? "do" : "don't"
+        return "I " + verb + " " + dietaryName
+    }
+
+    function moreRestrictionsToWords(moreRestrictions) {
+        if (moreRestrictions.length === 0) 
+            return("")
+        else return "; and I have other restrictions, such as " + moreRestrictions
+    }
+
+    const dietaryString = dietaryToWords(drinkAlcohol, "drink alcohol") + "; " +
+        dietaryToWords(eatMeat, "eat meat") + "; " +
+        dietaryToWords(eatDairy, "have dairy") + "; " +
+        dietaryToWords(eatFish, "eat fish") + "; " +
+        dietaryToWords(eatShellfish, "eat shellfish") + "; " +
+        dietaryToWords(eatEggs, "eat eggs") + "; " +
+        dietaryToWords(eatGluten, "eat gluten products") + "; " +
+        dietaryToWords(eatPeanuts, "eat peanuts and legumes") +
+        moreRestrictionsToWords(moreRestrictions)
 
     return (
-        <main>
-            {/* can i do height: 80% ? */}
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
-                <RSVPFormTop rsvp={rsvp} setRsvp={setRsvp} RsvpOptions={RsvpOptions} />
+
+        <>
+        <GenericHeader classname="h-screen transfom-scale-5">
+
+            <div class= "egg backdrop-blur-xl" />
+            <input placeholder="RSVP code?"
+                onInput={(e)=>dispatch({type: "rsvpCodeInput", payload: e.target.value})}/>
+
+            {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
+        </GenericHeader>
+        <div classname="container">
+            <main className="card-stack">
+
+                <Routes>
+                    <Route path="/" element={
+                        <RSVPFormResponse rsvp={rsvp} dispatch={dispatch} />} />
+                    <Route path="/contact" element={
+                        <RSVPFormContact rsvpCode={rsvpCode} firstName={firstName} lastName={lastName} 
+                            pronouns={pronouns} phoneNumber={phoneNumber} 
+                            email={email} streetAddress={streetAddress} secondAddress={secondAddress}
+                            zipcode={zipcode} city={city} country={country} stateProvince={stateProvince} 
+                            canContinueDietary={canContinueDietary} dispatch={dispatch} />} />
+                    <Route path="/dietary" element={
+                        <RSVPFormDietary rsvpCode={rsvpCode} drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                            eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
+                            eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
+                            moreRestrictions={moreRestrictions} dispatch={dispatch} />} />
+                    <Route path="/submit" element={
+                        <RSVPFormSubmit rsvpCode={rsvpCode} contactString={contactString} 
+                            firstName={firstName} lastName={lastName} pronouns={pronouns}
+                            phoneNumber={phoneNumber} 
+                            email={email} streetAddress={streetAddress} secondAddress={secondAddress}
+                            zipcode={zipcode} city={city} country={country} stateProvince={stateProvince}
+                            drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                            eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
+                            eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
+                            moreRestrictions={moreRestrictions} 
+                            dietaryString={dietaryString} dispatch={dispatch} />} />
+                </Routes>
+
             </main>
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
-                <RSVPFormMiddle
-                firstName={firstName} setFirstName={setFirstName}
-                lastName={lastName} setLastName={setLastName}
-                pronouns={pronouns} setPronouns={setPronouns}
-                phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber}
-                email={email} setEmail={setEmail}
-                streetAddress={streetAddress} setStreetAddress={setStreetAddress}
-                secondAddress={secondAddress} setSecondAddress={setSecondAddress}
-                zipcode={zipcode} setZipcode={setZipcode}
-                city={city} setCity={setCity}
-                country={country} setCountry={setCountry}
-                stateProvince={stateProvince} setStateProvince={setStateProvince} />
-            </main>
-            <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
-                <RSVPFormDiet
-                  drinkAlcohol={drinkAlcohol} setDrinkAlcohol={setDrinkAlcohol}
-                  eatMeat={eatMeat} setEatMeat={setEatMeat}
-                  eatDairy={eatDairy} setEatDairy={setEatDairy}
-                  eatFish={eatFish} setEatFish={setEatFish}
-                  eatShellfish={eatShellfish} setEatShellfish={setEatShellfish}
-                  eatEggs={eatEggs} setEatEggs={setEatEggs}
-                  eatGluten={eatGluten} setEatGluten={setEatGluten}
-                  eatPeanuts={eatPeanuts} setEatPeanuts={setEatPeanuts}
-                  moreRestrictions={moreRestrictions} setMoreRestrictions={setMoreRestrictions} />
-            </main>
-            {/* <main className="section-content swipe-card w-full h-screen flex-grow bg-amber-400/75 border-amber-500/50 border-2">
-                <RSVPFormSubmit />
-            </main> */}
-        </main>
+        </div>
+        </>
+        
     )
 }
+
+// and maybe next what i do is, scrolltrigger to make the circle size down as it slides up
+// and then it lives at the top of the screen at 0.25 scale
+// and the other cars on the screen are slighly smaller
