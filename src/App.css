@@ -1,9 +1,3 @@
-/*  look into LESS https://lesscss.org/  
-
-@width: 10px;
-
-*/
-
 @keyframes fullrotation {
   0% {
   transform: rotate(0deg);
@@ -37,13 +31,10 @@ html, body {
   display: none;
   position: absolute; 
   min-width: 95%;
-  /* height:400px; */
-  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
   padding: 2% 5%;
   z-index: 100;
   max-height: 600%;
   opacity: 100%;
-  /* box-sizing: content-box; */
 }
 
 .dropdown:hover .dropdown-content {
@@ -55,7 +46,7 @@ html, body {
   background-color: #000000;
   opacity: 100%;
   font-weight: bold;
-  margin: 3px 0px;
+  margin: 3% 0;
   border-radius: 25px
 }
 
@@ -67,7 +58,7 @@ input[type="radio"] {
   appearance: none;
   /* background-color: #fff; */
   /* margin: 0.5% 8% 0% 8%; */
-  margin: 0em 15em;
+  margin: 0% 5% 8% 20%;
   font: inherit;
   color: currentColor;
   width: 1.15em;
@@ -102,14 +93,6 @@ input[type="radio"]:checked::before {
 
 
 /* header stuff */
-
-/* .content-header {
-  border: 4px solid indigo; 
-  justify-items: center;
-  color: aliceblue;
-  position: fixed;
-} */
-
 .header-main {
   height: 100vh;
   text-align: center;
@@ -124,25 +107,14 @@ input[type="radio"]:checked::before {
 /* icon still is not aligned */
 
 .header-main2 {
-  /* height: 60px;
-  width: 80%;
-  text-align: center; */
   justify-content: center;
-  /* display: flex;
-  align-items: center;
-  flex-direction: row; */
-  /* border-radius: 20%; */
-  /* border: 1px solid green;  */
-  /* background-color: lightgray; */
 }
 
 .header-side {
-  /* height: 50px; */
   text-align: center;
   margin: 25px 10px 25px 10px;
   font-family: Bonbance;
   font-style: italic;
-  /* border: 4px solid blueviolet;  */
   flex: 1
 }
 
@@ -157,9 +129,7 @@ input[type="radio"]:checked::before {
   border-color: aliceblue;
   border: 2px; 
   border-radius: 100%;
-  /* margin: auto; */
   display: flex;
-  /* rotate: 60deg; */
 }
 
 /* this plus the transition arg in header-nav are vanilla css animation */
@@ -258,7 +228,7 @@ section, header {
 section {
   height: 600px;
   width: 75%;
-  margin-bottom: 40px;
+  /* margin-bottom: 40px; */
   border-radius: 15px;
   margin-left: auto;
   margin-right: auto;
@@ -359,14 +329,19 @@ header {
   display: flex;
   flex-direction: column;
   align-items: left;
+  margin: 12% 0% 8% 0%
 }
 
-.rsvp #radio-item {
+/* this does nothing */
+/* .rsvp #radio-item {
   color: rgba(0, 0, 0, 0.566);
-  /* background-color: pink; */
-  /* font-size: medium; */
   font-family: gambetta;
   margin-bottom: 3%;
+} */
+
+#radio-item {
+  display: flex;
+  flex-direction: row;
 }
 
 #radio-item label {
@@ -412,7 +387,7 @@ header {
 .rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
   .state-country button, .state-country input, .other-restrictions input {
   opacity: 60%;
-  box-shadow: inset 0px 0px 40px 40px beige;
+  box-shadow: inset 0 0 40px 40px beige;
   color: red;
   font-family: elanor;
   font-size: medium;
@@ -501,30 +476,6 @@ header {
 
 .conditional-plusone h2 {
   margin-top: 17%
-}
-
-.conditional-plusone p {
-  font-size: 36px;
-  font-family: futura;
-  margin: 2% 0% 0% 50%;
-  height: 40px;
-  border: 3px solid brown;
-  border-radius: 100%;
-}
-
-.conditional-checked {
-  border-width: 0;
-  background-image: linear-gradient(to bottom left, #b1f04d, 
-  #5aed69
-  );
-  /* background-color: #7ef04d; */
-  
-}
-
-
-.conditional-plusone h3 {
-  color: brown;
-  font-size: 18px;
 }
 
 .card-stack {
@@ -619,7 +570,6 @@ header {
 }
 
 #submit-header1 {
-  /* padding: 30px 0px 0px 10px  */
   margin-top: 5%;
   margin-bottom: 0%;
 }
@@ -630,14 +580,12 @@ header {
   margin-bottom: 5%
 }
 
-.next-btn {
+/* .next-btn {
   border-radius: 27px;
-  /* background-color: #ffd700; */
   font-family: Bonbance;
   border: 1px solid #b79c05;
   color: maroon;
   width: 240px;
-  /* height: 80px; */
   padding: 8px 20px;
   margin: 15px 8px;
   opacity: 60%;
@@ -645,7 +593,7 @@ header {
 
 .next-btn:hover {
   background-color: #ee7fdb;
-}
+} */
 
 .btn-23 {
   color:  maroon;
@@ -653,10 +601,10 @@ header {
   font-family: Bonbance;
   font-size: 90%;
   opacity: 60%;
-  width: 240px;
-  padding: 10px 0px;
-  margin: 20px 8px 0px;
-  height: 40px;
+  width: 35%;
+  padding: 1% 0;
+  margin: 2% 1% 0;
+  height: 2%;
   text-transform: uppercase;
   border-radius: 27px;
   border: 1px solid #b79c05;
@@ -669,62 +617,20 @@ header {
 .btn-23:hover {
   background-color: #ffb6f3;
 }
-/* .btn-23:disabled {
-  cursor: default;
-} */
-/* doesnt do anything*/
-/* .btn-23:-moz-focusing {
-  outline: auto;
-} */
-/* .btn-23 svg {
-  display: block;
-  vertical-align: middle;
-} */
-/* .btn-23 [hidden] {
-  display: none;
-} */
-/* .btn-23 span {
-  display: grid;
-  inset: 0;
-  place-items: center;
-  position: absolute;
-  transition: opacity 0.2s ease;
-} */
-/* .btn-23 .marquee {
-  --spacing: 5em;
-  --start: 0em;
-  --end: 5em;
-  -webkit-animation: marquee 1s linear infinite;
-  animation: marquee 1s linear infinite;
-  -webkit-animation-play-state: paused;
-  animation-play-state: paused;
-  opacity: 0;
-  position: relative;
-  text-shadow: #fff var(--spacing) 0, #fff calc(var(--spacing) * -1) 0,
-    #fff calc(var(--spacing) * -2) 0;
-} */
-/* .btn-23:hover .marquee {
-  -webkit-animation-play-state: running;
-  animation-play-state: running;
-  opacity: 1;
-} */
-/* .btn-23:hover .text {
-  opacity: 0;
-} */
+
 @keyframes marquee {
   0% {transform: translateX(var(-100%));}
   100% {transform: translateX(var(100%));}
-  /* 100% {transform: translateX(var(-100%));} */
 }
-/* @media { */
-  .btn-23{
-    animation: marquee 50s linear infinite;
-    text-shadow: 
-    225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
-    -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
-    -300px 0px maroon
-  }
-/* } */
+
+.btn-23{
+  animation: marquee 50s linear infinite;
+  text-shadow: 
+  225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
+  -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
+  -300px 0px maroon
+}
+
 
 /* Customize the label (the container) */
 .checkbox-guest {
@@ -735,10 +641,6 @@ header {
   color: rgb(69, 50, 50);
   font-size: large;
   padding-left: 4%
-  /* -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; */
 }
 
 /* Hide the browser's default checkbox */

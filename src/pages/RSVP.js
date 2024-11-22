@@ -9,14 +9,8 @@ import '../App.css';
 
 // to do:
 
-// change padding and margin amounts to being % or em, not px
-// add back in dispatches into RSVPFormContact
-// formatting for RSVPFormResponse radio labels
-// formatting for RSVPFormSubmit CHECKBOX (dont reinvent the wheel!)
 // animate on click dietary
-// update copy 
 // update dietary sprites
-// better formatting for dropdowns
 
 // create store
 // create blinking eye animation
@@ -134,6 +128,9 @@ export function RSVP() {
         }
     }, [rsvpCode]);
 
+
+    console.log("code = ", rsvpCode)
+
     const rsvpString = rsvp === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
 
@@ -179,7 +176,7 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvp={rsvp} dispatch={dispatch} />} />
+                        <RSVPFormResponse rsvp={rsvp} rsvpCode={rsvpCode} dispatch={dispatch} />} />
                     <Route path="/contact" element={
                         <RSVPFormContact rsvpCode={rsvpCode} firstName={firstName} lastName={lastName} 
                             pronouns={pronouns} phoneNumber={phoneNumber} 

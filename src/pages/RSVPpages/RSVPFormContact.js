@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom';
 import React from 'react';
 
 export function RSVPFormContact({pronouns, country, stateProvince, canContinueDietary, dispatch}) {
-  
-    canContinueDietary = true
 
     return (
         <>
