@@ -5,15 +5,29 @@ import { RSVPFormContact } from './RSVPpages/RSVPFormContact'
 import { RSVPFormDietary } from './RSVPpages/RSVPFormDietary'
 import { RSVPFormSubmit } from './RSVPpages/RSVPFormSubmit'
 import { Routes, Route } from 'react-router-dom';
+import '../App.css';
 
-// dont forget to change the acceptable codes when we have them!!
-// error when moving to /rsvp/contact
-// Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node
+// to do:
+
+// change padding and margin amounts to being % or em, not px
+// add back in dispatches into RSVPFormContact
+// formatting for RSVPFormResponse radio labels
+// formatting for RSVPFormSubmit CHECKBOX (dont reinvent the wheel!)
+// animate on click dietary
+// update copy 
+// update dietary sprites
+// better formatting for dropdowns
+
+// create store
+// create blinking eye animation
+// move assets to s3 bucket
+
+// create homepage flow
 
 
 const initalState = {
     // could be 'ABC', 'DEF', 'GHI'
-    // rsvpCode: localStorage.getItem("rsvpCode") || "", // this is maybe throwing a remove node error?
+    // rsvpCode: localStorage.getItem("rsvpCode") || "", 
     rsvpCode: '',
     // 'undecided', 'attending', 'notattenting'
     rsvp: 'undecided', 
@@ -161,36 +175,36 @@ export function RSVP() {
             {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
         </GenericHeader>
         <div classname="container">
-        <main className="card-stack">
+            <main className="card-stack">
 
-            <Routes>
-                <Route path="/" element={
-                    <RSVPFormResponse rsvp={rsvp} dispatch={dispatch} />} />
-                <Route path="/contact" element={
-                    <RSVPFormContact rsvpCode={rsvpCode} firstName={firstName} lastName={lastName} 
-                        pronouns={pronouns} phoneNumber={phoneNumber} 
-                        email={email} streetAddress={streetAddress} secondAddress={secondAddress}
-                        zipcode={zipcode} city={city} country={country} stateProvince={stateProvince} 
-                        canContinueDietary={canContinueDietary} dispatch={dispatch} />} />
-                <Route path="/dietary" element={
-                    <RSVPFormDietary rsvpCode={rsvpCode} drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
-                        eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
-                        eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
-                        moreRestrictions={moreRestrictions} dispatch={dispatch} />} />
-                <Route path="/submit" element={
-                    <RSVPFormSubmit rsvpCode={rsvpCode} contactString={contactString} 
-                        firstName={firstName} lastName={lastName} pronouns={pronouns}
-                        phoneNumber={phoneNumber} 
-                        email={email} streetAddress={streetAddress} secondAddress={secondAddress}
-                        zipcode={zipcode} city={city} country={country} stateProvince={stateProvince}
-                        drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
-                        eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
-                        eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
-                        moreRestrictions={moreRestrictions} 
-                        dietaryString={dietaryString} dispatch={dispatch} />} />
-            </Routes>
+                <Routes>
+                    <Route path="/" element={
+                        <RSVPFormResponse rsvp={rsvp} dispatch={dispatch} />} />
+                    <Route path="/contact" element={
+                        <RSVPFormContact rsvpCode={rsvpCode} firstName={firstName} lastName={lastName} 
+                            pronouns={pronouns} phoneNumber={phoneNumber} 
+                            email={email} streetAddress={streetAddress} secondAddress={secondAddress}
+                            zipcode={zipcode} city={city} country={country} stateProvince={stateProvince} 
+                            canContinueDietary={canContinueDietary} dispatch={dispatch} />} />
+                    <Route path="/dietary" element={
+                        <RSVPFormDietary rsvpCode={rsvpCode} drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                            eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
+                            eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
+                            moreRestrictions={moreRestrictions} dispatch={dispatch} />} />
+                    <Route path="/submit" element={
+                        <RSVPFormSubmit rsvpCode={rsvpCode} contactString={contactString} 
+                            firstName={firstName} lastName={lastName} pronouns={pronouns}
+                            phoneNumber={phoneNumber} 
+                            email={email} streetAddress={streetAddress} secondAddress={secondAddress}
+                            zipcode={zipcode} city={city} country={country} stateProvince={stateProvince}
+                            drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
+                            eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
+                            eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
+                            moreRestrictions={moreRestrictions} 
+                            dietaryString={dietaryString} dispatch={dispatch} />} />
+                </Routes>
 
-        </main>
+            </main>
         </div>
         </>
         

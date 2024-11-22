@@ -1,5 +1,6 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
+import React from 'react';
 
 
 // use gsap for fun red X animation and green CHECK animation

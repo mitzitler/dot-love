@@ -175,24 +175,6 @@ input[type="radio"]:checked::before {
   animation: fullrotation 10s linear 0s infinite;
 }
 
-/* .inner-button {
-  margin: auto;
-  height: 90px;
-  width: 90px;
-  position: absolute;
-  transition: scale 0.6s ease-in-out;
-} */
-
-/* .inner-circle {
-  margin: auto;
-  height: 30px;
-  width: 30px;
-  border-radius: 100%;
-  background-color: grey;
-  position: absolute;
-  transition: scale 0.6s ease-in-out;
-} */
-
 .egg-container {
   display: block;
   width: 50px;
@@ -419,8 +401,8 @@ header {
   flex-direction: row;
 }
 
-.rsvp .name-info input, .name-info drp, .contact-num input, .contact-info input, 
-  .state-country drp, .state-country input, .other-restrictions input {
+.rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
+  .state-country button, .state-country input, .other-restrictions input {
   opacity: 60%;
   box-shadow: inset 0px 0px 40px 40px beige;
   color: red;

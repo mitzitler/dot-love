@@ -12,27 +12,23 @@ export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
                     <div id="main">
                         <h1>Repondez S'il Vous Plait!</h1>
                         <div>
-                        <h2>
-                            May we expect your presence at our wedding on <b>November 7th, 2025</b> in <b>Brooklyn, NY?</b>
-                        </h2>
-                        <p>
-                            If need be, you can change this, but please let us know soon!
-                        </p>
+                            <h2>May we expect your presence at our wedding on <b>November 7th, 2025</b> in <b>Brooklyn, NY?</b></h2>
+                            <p>If need be, you can change this, but please let us know soon!</p>
                         </div>
                         <div id="rsvp-radio">
                             <div id="radio-item">
-                            <input id="rsvp-yes" name="rsvp" type="radio"
-                            onClick={()=>dispatch({type: "rsvpInput", payload: "attending" })}></input>
-                            <label for="rsvp-yes">
-                                I will be in attendance
-                            </label>
+                                <input id="rsvp-yes" name="rsvp" type="radio"
+                                    onClick={()=>dispatch({type: "rsvpInput", payload: "attending" })}></input>
+                                <label for="rsvp-yes">
+                                    I will be in attendance
+                                </label>
                             </div>
                             <div id="radio-item">
-                            <input id="rsvp-no" name="rsvp" type="radio"
-                            onClick={()=>dispatch({type: "rsvpInput", payload: "notattending" })}></input>
-                            <label for="rsvp-no">
-                                Unfortunately I cannot attend
-                            </label>
+                                <input id="rsvp-no" name="rsvp" type="radio"
+                                    onClick={()=>dispatch({type: "rsvpInput", payload: "notattending" })}></input>
+                                <label for="rsvp-no">
+                                    Unfortunately I cannot attend
+                                </label>
                             </div>
                         </div>
                         {/* <h2> Please swipe or use the arrow keys to continue through this form! </h2> */}

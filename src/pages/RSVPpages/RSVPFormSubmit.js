@@ -9,30 +9,7 @@ export function RSVPFormSubmit({ // rsvpCode,
     drinkAlcohol, eatMeat, eatDairy, eatFish, eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions,
     dispatch}) {
 
-    // const firstName = "Pritham"
-    // const lastName = "Swaminathan"
-    // const pronouns = "he/him"
-    // const phoneNumber = "352 352 3522"
-    // const email = "pritham@pritham.com"
-    // const streetAddress = "221 S 3rd St"
-    // const secondAddress = "6A"
-    // const zipcode = "11211"
-    // const city = "Brooklyn"
-    // const country = "United States"
-    // const stateProvince = "New York"
-
     const countryNew = country === "United States" ? "the US" : country
-
-
-    // const drinkAlcohol = false 
-    // const eatMeat = false
-    // const eatDairy = false
-    // const eatFish = false
-    // const eatShellfish = false 
-    // const eatEggs = false
-    // const eatGluten = true
-    // const eatPeanuts = true 
-    // const moreRestrictions = ""
 
     const dietaryDict = {
         drinkAlcohol: "drink alcohol",
