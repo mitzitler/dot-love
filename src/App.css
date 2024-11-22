@@ -66,7 +66,8 @@ html, body {
 input[type="radio"] {
   appearance: none;
   /* background-color: #fff; */
-  margin: 0em 1em;
+  /* margin: 0.5% 8% 0% 8%; */
+  margin: 0em 15em;
   font: inherit;
   color: currentColor;
   width: 1.15em;
@@ -340,10 +341,9 @@ header {
 }
 
 .rsvp #main {
-  margin: 30;
-  min-height: 600; /* this doesnt work */
+  margin: 5%;
+  /* min-height: 600; */
   color: red;
-  margin: 10%
 }
 
 .rsvp div {
@@ -364,9 +364,16 @@ header {
 .rsvp #radio-item {
   color: rgba(0, 0, 0, 0.566);
   /* background-color: pink; */
-  font-size: medium;
+  /* font-size: medium; */
   font-family: gambetta;
-  margin-bottom: 5%;
+  margin-bottom: 3%;
+}
+
+#radio-item label {
+  color: maroon;
+  font-size: larger;
+  /* margin-bottom: 10em; */
+
 }
 
 .rsvp input {
@@ -378,14 +385,14 @@ header {
   font-family: Bonbance;
   color: rgb(85, 7, 7);
   /* background-color: aqua; */
-  margin-bottom: 10%
+  margin-bottom: 6%
 }
 
 .rsvp h2 {
   font-size: large;
   font-family: gambetta;
   color: rgba(0, 0, 0, 0.566);
-  margin-bottom: 5%
+  margin-bottom: 2%
 }
 
 .rsvp p {
@@ -393,12 +400,13 @@ header {
   color: rgba(0, 0, 0, 0.566);
   font-size: medium;
   font-family: elanor;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
 }
 
 .rsvp .name-info, .contact-num, .contact-info, .state-country, .other-restrictions {
   display: flex;
   flex-direction: row;
+  margin-bottom: 3%;
 }
 
 .rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
@@ -411,7 +419,7 @@ header {
   border-radius: 7px;
   margin: 0% 1%;
   height: 28px;
-  padding: 5px
+  padding: 0% 1%
 }
 
 .rsvp #other-restrictions {
@@ -732,3 +740,74 @@ header {
     -300px 0px maroon
   }
 /* } */
+
+/* Customize the label (the container) */
+.checkbox-guest {
+  display: block;
+  position: relative;
+  margin: 0% 2% 1% 2%;
+  cursor: pointer;
+  color: rgb(69, 50, 50);
+  font-size: large;
+  padding-left: 4%
+  /* -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; */
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-guest input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0% 2% 0% 0%;
+  height: 25px;
+  width: 25px;
+  border-radius: 8px;
+  background-color: #db568f
+}
+
+/* On mouse-over, add a grey background color */
+/* .checkbox-guest:hover input ~ .checkmark {
+  background-color: rgb(23, 245, 60)
+} */
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-guest input:checked ~ .checkmark {
+  background-color: #f32121;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-guest input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-guest .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}

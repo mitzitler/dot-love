@@ -111,15 +111,20 @@ export function RSVPFormSubmit({ // rsvpCode,
             ? 
             <div class="conditional-plusone">
                 <h2>Are you planning on bringing a guest?</h2>
-                <div class="grid grid-cols-8">
-                    <p 
+                <div>
+                {/* class="grid grid-cols-8"> */}
+                    {/* <p 
                     className={!clicked ? "col-span-1" :
                     "conditional-checked col-span-1"}
                     onClick={()=>handleClicked()}
-                    ></p>
-                    <h3 class="col-span-7">
-                        Click 'yes' to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
-                    </h3>
+                    ></p> */}
+
+                    <label className='checkbox-guest' for="guest-yes">
+                        Check this box to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
+                        <input id="guest-yes" name="guest-yes" type="checkbox"
+                            onClick={()=>handleClicked()}/>
+                        <span class="checkmark"></span>
+                    </label>
                 </div>
             </div>
             :<></>}

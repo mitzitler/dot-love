@@ -15,11 +15,12 @@ export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
                             <h2>May we expect your presence at our wedding on <b>November 7th, 2025</b> in <b>Brooklyn, NY?</b></h2>
                             <p>If need be, you can change this, but please let us know soon!</p>
                         </div>
+                        {/* look at this maybe */}
                         <div id="rsvp-radio">
                             <div id="radio-item">
                                 <input id="rsvp-yes" name="rsvp" type="radio"
                                     onClick={()=>dispatch({type: "rsvpInput", payload: "attending" })}></input>
-                                <label for="rsvp-yes">
+                                <label className='radio-label m-auto' for="rsvp-yes">
                                     I will be in attendance
                                 </label>
                             </div>

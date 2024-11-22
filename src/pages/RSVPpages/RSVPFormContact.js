@@ -14,21 +14,21 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                         <h1>Please enter some personal info...</h1>    
                         <div>
                             <h2>What do we call you?</h2>            
-                            <div class="name-info mb-5">
+                            <div class="name-info">
                                 <input label="first-name" type="text" 
                                     id="first-name" 
                                     placeholder="First"
                                     onChange={(e)=>
-                                        {dispatch({type: "firstNameInput", payload: e.target.value })//;
-                                        //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "firstNameInput", payload: e.target.value });
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                                 <input label="last-name" type="text" 
                                     id="first-name" 
                                     placeholder="Last" 
                                     onChange={(e)=>
-                                        {dispatch({type: "lastNameInput", payload: e.target.value })//;
-                                        //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "lastNameInput", payload: e.target.value });
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                                 <button id="pronouns" class="dropdown">
@@ -38,8 +38,8 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                         {Object.keys(pronouns_list).map((pronounKey) => (
                                             <li key={pronounKey} 
                                                 onClick={(e)=>
-                                                    {dispatch({type: "pronounsInput", payload: pronouns_list[pronounKey]})//;
-                                                    //dispatch({type: "continueDietary"})
+                                                    {dispatch({type: "pronounsInput", payload: pronouns_list[pronounKey]});
+                                                    dispatch({type: "continueDietary"})
                                                     }
                                                 }><a>
                                             {pronouns_list[pronounKey]}
@@ -73,23 +73,23 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                     id="address"
                                     placeholder="Street address" 
                                     onChange={(e)=>
-                                        {dispatch({type: "streetAddressInput", payload: e.target.value})//;
-                                        //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "streetAddressInput", payload: e.target.value});
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                                 <input label="apt-num" type="text" 
                                     id="address-2"
                                     placeholder="Apt #" 
                                     onChange={(e)=>
-                                        {dispatch({type: "secondAddressInput", payload: e.target.value})//;
-                                        //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "secondAddressInput", payload: e.target.value});
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                                 <input label="city" type="text" 
                                     id="city" placeholder="City" 
                                     onChange={(e)=>
-                                        {dispatch({type: "cityInput", payload: e.target.value})//;
-                                        //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "cityInput", payload: e.target.value});
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                             </div>
@@ -99,7 +99,8 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                     id="zipcode"
                                     placeholder="Zip" 
                                     onChange={(e)=>
-                                        {dispatch({type: "zipcodeInput", payload: e.target.value})//; //dispatch({type: "continueDietary"})
+                                        {dispatch({type: "zipcodeInput", payload: e.target.value}); 
+                                        dispatch({type: "continueDietary"})
                                         }
                                     }></input>
                                 <button id="country" class="dropdown state-country-item">
@@ -109,7 +110,8 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                         {Object.keys(countries).map((countryKey) => (
                                             <li key={countryKey} 
                                                 onClick={()=>
-                                                    {dispatch({type: "countryInput", payload: countries[countryKey]})//; //dispatch({type: "continueDietary"})
+                                                    {dispatch({type: "countryInput", payload: countries[countryKey]}); 
+                                                    dispatch({type: "continueDietary"})
                                                     }
                                                 }><a>
                                             {countries[countryKey]}
@@ -125,7 +127,8 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                         ? Object.keys(usStates).map((usStateKey) => (
                                             <li key={usStateKey}
                                                 onClick={()=>
-                                                    {dispatch({type: "stateProvinceInput", payload: usStates[usStateKey]})//; //dispatch({type: "continueDietary"})
+                                                    {dispatch({type: "stateProvinceInput", payload: usStates[usStateKey]}); 
+                                                    dispatch({type: "continueDietary"})
                                                     }
                                                 }><a>
                                             {usStates[usStateKey]}
@@ -136,7 +139,8 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                         ? Object.keys(mxStates).map((mxStateKey) => (
                                             <li key={mxStateKey}
                                                 onClick={()=>
-                                                    {dispatch({type: "stateProvinceInput", payload: mxStates[mxStateKey]})//; //dispatch({type: "continueDietary"})
+                                                    {dispatch({type: "stateProvinceInput", payload: mxStates[mxStateKey]}); 
+                                                    dispatch({type: "continueDietary"})
                                                     }
                                                 }><a>
                                             {mxStates[mxStateKey]}
@@ -147,14 +151,15 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                         ? Object.keys(caStates).map((caStateKey) => (
                                             <li key={caStateKey} 
                                                 onClick={()=>
-                                                    {dispatch({type: "stateProvinceInput", payload: caStates[caStateKey]})//; //dispatch({type: "continueDietary"})
+                                                    {dispatch({type: "stateProvinceInput", payload: caStates[caStateKey]}); 
+                                                    dispatch({type: "continueDietary"})
                                                     }
                                                 }><a>
                                             {caStates[caStateKey]}
                                             </a></li>
                                         ))
                                         : 
-                                        <li></li> // <></>
+                                        <li></li>
                                         ))
                                         }
                                     </ul>
