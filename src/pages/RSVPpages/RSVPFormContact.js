@@ -49,7 +49,7 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                 </button>
                             </div>
                             <h2>How do we reach you?</h2>
-                            <div class="contact-num mb-5">
+                            <div class="contact-num">
                                 <input label="phone" type="number" 
                                     id="phone"
                                     placeholder="Phone number" 
@@ -68,7 +68,7 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                     }></input>
                             </div>
             
-                            <div class="contact-info mb-5">
+                            <div class="contact-info">
                                 <input label="street-address" type="text" 
                                     id="address"
                                     placeholder="Street address" 
@@ -94,7 +94,7 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                     }></input>
                             </div>
             
-                            <div class="state-country mb-5">  
+                            <div class="state-country">  
                                 <input label="zipcode" type="text" 
                                     id="zipcode"
                                     placeholder="Zip" 
@@ -165,8 +165,7 @@ export function RSVPFormContact({pronouns, country, stateProvince, canContinueDi
                                     </ul>
                                 </button>
                             </div> 
-                            <div classname="pt-20px mb-5"> ``</div>
-                            <h2>We will send you text and email confirmations!</h2>
+                            <h2 id="contact-bottom">We will send you text and email confirmations!</h2>
                         </div>
                     </div>
                 </div>

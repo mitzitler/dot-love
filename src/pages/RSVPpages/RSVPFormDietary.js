@@ -30,57 +30,58 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
   return(
     <>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
-            <div class="rsvp">            
-                <h1 class="pt-10 my-0">... and any dietary restrictions, please!</h1> 
-                <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
-                    dietary restrictions</h2>
-                <div className="mx-auto mt-0 mb-5 grid grid-cols-2 px-2">
+            <div class="rsvp">     
+                <div id="main">     
+                    <h1 >... and any dietary restrictions, please!</h1> 
+                    <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
+                        dietary restrictions</h2>
+                    <div className="dietary-grid grid grid-cols-2">
 
-                    {/* gsap animate big red X on click */}
+                        {/* gsap animate big red X on click */}
 
-                    <img src={Alcohol} alt="I drink alcohol" 
-                    className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "drinkAlcoholToggle"})}/> 
-                    
-                    <img src={Meat} alt="I eat meat" 
-                    className={eatMeat ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatMeatToggle"})}/>
+                        <img src={Alcohol} alt="I drink alcohol" 
+                        className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "drinkAlcoholToggle"})}/> 
+                        
+                        <img src={Meat} alt="I eat meat" 
+                        className={eatMeat ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatMeatToggle"})}/>
 
-                    <img src={Dairy} alt="I eat dairy" 
-                    className={eatDairy ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatDairyToggle"})}/>
+                        <img src={Dairy} alt="I eat dairy" 
+                        className={eatDairy ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatDairyToggle"})}/>
 
-                    <img src={Fish} alt="I eat fish" 
-                    className={eatFish ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatFishToggle"})}/>  
+                        <img src={Fish} alt="I eat fish" 
+                        className={eatFish ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatFishToggle"})}/>  
 
-                    <img src={Eggs} alt="I eat eggs" 
-                    className={eatEggs ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatEggsToggle"})}/>
+                        <img src={Eggs} alt="I eat eggs" 
+                        className={eatEggs ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatEggsToggle"})}/>
 
-                    <img src={Gluten} alt="I eat gluten" 
-                    className={eatGluten ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatGlutenToggle"})}/>
+                        <img src={Gluten} alt="I eat gluten" 
+                        className={eatGluten ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatGlutenToggle"})}/>
 
-                    <img src={Peanuts} alt="I eat peanuts" 
-                    className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
-                    onClick={()=>dispatch({type: "eatPeanutsToggle"})}/>
+                        <img src={Peanuts} alt="I eat peanuts" 
+                        className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatPeanutsToggle"})}/>
 
-                    {/* add in i eat shellfish for even 4x2 grid */}
+                        {/* add in i eat shellfish for even 4x2 grid */}
 
-                    <img src={Other} alt="I eat shellfish" 
-                    // className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
-                    className="diet-image"
-                    // onClick={()=>dispatch({type: "eatShellfishToggle"})}
-                    />      
+                        <img src={Other} alt="I eat shellfish" 
+                        // className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
+                        className="diet-image"
+                        // onClick={()=>dispatch({type: "eatShellfishToggle"})}
+                        />      
+                        </div>
+                    <div className="other-restrictions">
+                        <input label="other-restrictions" type="text" 
+                        id="other-restrictions" 
+                        placeholder="Other restrictions?" 
+                        onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
                     </div>
-                <div className="other-restrictions">
-                    <input label="other-restrictions" type="text" 
-                    id="other-restrictions" 
-                    placeholder="Other restrictions?" 
-                    onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
                 </div>
-
             </div>
         </section>
         <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>

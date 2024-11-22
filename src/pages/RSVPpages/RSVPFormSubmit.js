@@ -73,38 +73,26 @@ export function RSVPFormSubmit({ // rsvpCode,
 
             <h1 id="submit-header1">Does this all look right, {firstName} {lastName}?</h1>
             <p id="submit-header2">({pronouns})</p>
-            <div className="grid col-2">
-                
-                <div className="submit-div mx-auto my-0 grid grid-cols-2 px-2">
-                    <div>
-                        <div className="submit-card-left"
-                        // className="submit-card bg-rose-400/75 border-rose-400/75 border-2 
-                        // backdrop-blur-md"
-                        >
-                            {/* i hate this styling so much */}
-                            <h3 className="submit-text-overlay ">
-                            Your mailing address is: {streetAddress} {city}, {stateProvince} {zipcode} - in  {countryNew}
-                            </h3>
-                            <p></p>
-                            <h3 className="submit-text-overlay">
-                            We will reach out to you at {phoneNumber} and {email}
-                            </h3>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="submit-card-right">
-                            <h3 className="submit-text-overlay">
-                                {createRestrictionsString(dietaryRestrictions)}
-                            </h3>
-                            <p></p>
-                            <h3 className="submit-text-overlay">
-                                {createInclusionsString(dietaryInclusions)}
-                            </h3>
-                        </div>
-
-                    </div>
+            <div className="submit-div grid grid-cols-2">
+                <div className="submit-card-left">
+                    {/* i hate this styling so much */}
+                    <h3 className="submit-text-overlay ">
+                    Your mailing address is: {streetAddress} {city}, {stateProvince} {zipcode} - in  {countryNew}
+                    </h3>
+                    <p></p>
+                    <h3 className="submit-text-overlay">
+                    We will reach out to you at {phoneNumber} and {email}
+                    </h3>
                 </div>
-
+                <div className="submit-card-right">
+                    <h3 className="submit-text-overlay">
+                        {createRestrictionsString(dietaryRestrictions)}
+                    </h3>
+                    <p></p>
+                    <h3 className="submit-text-overlay">
+                        {createInclusionsString(dietaryInclusions)}
+                    </h3>
+                </div>
             </div>
             
             {rsvpCode === 'DEF' 
