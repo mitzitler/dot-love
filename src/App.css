@@ -595,6 +595,7 @@ header {
   background-color: #ee7fdb;
 } */
 
+/* this needs a max width */
 .btn-23 {
   color:  maroon;
   background-color: #ffef92;
@@ -697,4 +698,13 @@ header {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+
+.big-red-x {
+  font-size: 48px !important;
+  font-family: futura !important;
+  color: red !important;
+  z-index: 999;
+  /* background-color: #d6d6d6; */
 }

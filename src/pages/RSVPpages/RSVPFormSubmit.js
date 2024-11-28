@@ -1,6 +1,10 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackFooter } from '../../components/CardStackFooter';
+
+// on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({ // rsvpCode, 
     contactString, dietaryString, 
@@ -68,9 +72,7 @@ export function RSVPFormSubmit({ // rsvpCode,
 
   return(
     <>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
-            <div class="rsvp">    
-
+        <CardStackPage>
             <h1 id="submit-header1">Does this all look right, {firstName} {lastName}?</h1>
             <p id="submit-header2">({pronouns})</p>
             <div className="submit-div grid grid-cols-2">
@@ -116,26 +118,18 @@ export function RSVPFormSubmit({ // rsvpCode,
                 </div>
             </div>
             :<></>}
-            </div>
-        </section>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
-            <span className='button-container'>
-                <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
-                {rsvpCode.toUpperCase() === 'ABC'
-                ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
-                : rsvpCode.toUpperCase() === 'DEF'
-                ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1.5", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
-                : rsvpCode.toUpperCase() === 'GHI'
-                ? <NavLink className='btn-23' to='/rsvp' onClick={()=>dispatch({type:"submitFormGC2", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></NavLink>
-                : <p>error you should not have gotten this far!!</p>
-                }
-                
-            </span>
-        </section>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        {/* <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/> */}
+        </CardStackPage>
+        <CardStackFooter>
+            <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
+            {rsvpCode.toUpperCase() === 'ABC'
+            ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
+            : rsvpCode.toUpperCase() === 'DEF'
+            ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1.5", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
+            : rsvpCode.toUpperCase() === 'GHI'
+            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>dispatch({type:"submitFormGC2", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></NavLink>
+            : <p>error you should not have gotten this far!!</p>
+            }
+        </CardStackFooter>
     </>
     )
 }

@@ -10,7 +10,6 @@ import '../App.css';
 // to do:
 
 // animate on click dietary
-// update dietary sprites
 
 // create store
 // create blinking eye animation

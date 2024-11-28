@@ -1,6 +1,9 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
+import { useState } from 'react';
+import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackFooter } from '../../components/CardStackFooter';
 
 
 // use gsap for fun red X animation and green CHECK animation
@@ -12,7 +15,7 @@ import "../../assets/dietary-restrictions/fish.png";
 import "../../assets/dietary-restrictions/gluten.png";
 import "../../assets/dietary-restrictions/meat.png";
 import "../../assets/dietary-restrictions/peanuts.png";
-import "../../assets/dietary-restrictions/alcohol_2.png";
+import "../../assets/dietary-restrictions/shellfish.png";
 
 
 const Alcohol = require("../../assets/dietary-restrictions/alcohol_1.png")
@@ -22,16 +25,25 @@ const Fish = require("../../assets/dietary-restrictions/fish.png")
 const Gluten = require("../../assets/dietary-restrictions/gluten.png")
 const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
-const Other = require("../../assets/dietary-restrictions/alcohol_2.png")
+const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
 export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish, 
   eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions, dispatch}) {
 
+  const [divPositiion, setDivPosition] = useState({ x: 0, y: 0 })
+
+  function handleClickAnimation(event) {
+    console.log("x: ", event.clientX, " - y: ", event.clientY)
+    setDivPosition({ x: event.clientX, y: event.clientY})
+    // document.body.textContent =
+    // "clientX: " + event.clientX +
+    // " - clientY: " + event.clientY;
+    // ?? // https://stackoverflow.com/questions/53337998/insert-html-at-clientx-and-clienty-position-of-cursor-in-editor-having-div-conte
+  }
+
   return(
     <>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md">
-            <div class="rsvp">     
-                <div id="main">     
+        <CardStackPage>  
                     <h1 >... and any dietary restrictions, please!</h1> 
                     <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
                         dietary restrictions</h2>
@@ -39,9 +51,23 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
 
                         {/* gsap animate big red X on click */}
 
+                        {/* <div onClick={handleClickAnimation}> */}
+                            <div className='big-red-x'
+                                style ={{
+                                    position: 'absolute',
+                                    left: divPositiion.x-60,
+                                    top: divPositiion.y-60
+                                }}
+                            >
+                                X
+                            </div>
+                        {/* </div> */}
+
                         <img src={Alcohol} alt="I drink alcohol" 
                         className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
-                        onClick={()=>dispatch({type: "drinkAlcoholToggle"})}/> 
+                        onClick={(e)=>{dispatch({type: "drinkAlcoholToggle"});
+                            handleClickAnimation(e)}
+                        }/> 
                         
                         <img src={Meat} alt="I eat meat" 
                         className={eatMeat ? "diet-image" : "diet-image-clicked"}
@@ -67,27 +93,19 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
                         className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
                         onClick={()=>dispatch({type: "eatPeanutsToggle"})}/>
 
-                        {/* add in i eat shellfish for even 4x2 grid */}
+                        <img src={Shellfish} alt="I eat shellfish" 
+                        className={eatShellfish ? "diet-image" : "diet-image-clicked"}
+                        onClick={()=>dispatch({type: "eatShellfishToggle"})}/>    
 
-                        <img src={Other} alt="I eat shellfish" 
-                        // className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
-                        className="diet-image"
-                        // onClick={()=>dispatch({type: "eatShellfishToggle"})}
-                        />      
-                        </div>
+                    </div>
                     <div className="other-restrictions">
                         <input label="other-restrictions" type="text" 
                         id="other-restrictions" 
                         placeholder="Other restrictions?" 
                         onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
                     </div>
-                </div>
-            </div>
-        </section>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute">
-            <span className='button-container'>
+        </CardStackPage>
+        <CardStackFooter>
                 <NavLink className='btn-23' to='/rsvp/contact' end>
                     <marquee>Return</marquee>
                 </NavLink> 
@@ -95,10 +113,7 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
                 <NavLink className='btn-23' to='/rsvp/submit' end>
                     <marquee>Continue</marquee>
                 </NavLink> 
-            </span>
-        </section>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
-        <section className="section-content swipe-card flex-grow bg-amber-400/75 border-amber-500/50 border-2 backdrop-blur-md position-absolute"/>
+        </CardStackFooter>
     </>
     )
 }
