@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 
 // on desktop all the information is pushed down too far
 
-export function RSVPFormSubmit({ // rsvpCode, 
+export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode, 
     contactString, dietaryString, 
     firstName, lastName, pronouns,
     phoneNumber,email, streetAddress, secondAddress, zipcode, city, country, stateProvince, 
@@ -72,7 +72,7 @@ export function RSVPFormSubmit({ // rsvpCode,
 
   return(
     <>
-        <CardStackPage>
+        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
             <h1 id="submit-header1">Does this all look right, {firstName} {lastName}?</h1>
             <p id="submit-header2">({pronouns})</p>
             <div className="submit-div grid grid-cols-2">

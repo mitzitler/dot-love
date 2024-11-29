@@ -4,7 +4,7 @@ import '../../App.css';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 
-export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
+export function RSVPFormResponse({pageMainColor, pageSection, rsvp, rsvpCode, dispatch}) {
     console.log(rsvp)
     console.log("code = ", rsvpCode)
 
@@ -12,7 +12,7 @@ export function RSVPFormResponse({rsvp, rsvpCode, dispatch}) {
 
     return (
         <>
-            <CardStackPage>
+            <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
                 <h1>Repondez S'il Vous Plait!</h1>
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>

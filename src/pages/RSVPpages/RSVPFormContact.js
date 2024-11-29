@@ -4,11 +4,11 @@ import React from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 
-export function RSVPFormContact({pronouns, country, stateProvince, canContinueDietary, dispatch}) {
+export function RSVPFormContact({pageMainColor, pageSection, pronouns, country, stateProvince, canContinueDietary, dispatch}) {
 
     return (
         <>
-            <CardStackPage>
+            <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
                 <h1>Please enter some personal info...</h1>    
                 <div>
                     <h2>What do we call you?</h2>            

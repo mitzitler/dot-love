@@ -27,7 +27,7 @@ const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
 const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
-export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish, 
+export function RSVPFormDietary({pageMainColor, pageSection, drinkAlcohol, eatMeat, eatDairy, eatFish, 
   eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions, dispatch}) {
 
   const [divPositiion, setDivPosition] = useState({ x: 0, y: 0 })
@@ -43,7 +43,7 @@ export function RSVPFormDietary({drinkAlcohol, eatMeat, eatDairy, eatFish,
 
   return(
     <>
-        <CardStackPage>  
+        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>  
                     <h1 >... and any dietary restrictions, please!</h1> 
                     <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
                         dietary restrictions</h2>
