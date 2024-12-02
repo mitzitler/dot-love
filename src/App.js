@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { GenericHeader } from './components/GenericHeader';
 import { Info } from './pages/Info'
-import { About } from './pages/About'
+import { AboutUs } from './pages/AboutUs'
 import { Registry } from './pages/Registry'
 import { Data } from './pages/Data'
 import { RSVP } from './pages/RSVP'
@@ -70,7 +70,7 @@ export default function App() {
             <Routes>
               {/* add an all page element here */}
               {/* this will have its own version of generic header, which asks for name instead */}
-                <Route path="*" element={<h1>Oops!</h1>} /> 
+                <Route path="*" element={<Info/>} /> {/* actually instead, it should be a MainRouter skeleton, which has the generic header and the subroutes for the main pages*/}
                 <Route path="rsvp/*" element={<RSVP/>} />
             </Routes>
           {/* </div> */}

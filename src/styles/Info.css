@@ -1,0 +1,66 @@
+/* info styles */
+
+.info h1 {
+    font-size: x-large;
+    margin-top: 5%;
+    text-align: center;
+}
+
+.info h2 {
+    margin-bottom: 5%;
+    text-align: center;
+}
+
+.right-justify {
+    justify-content: right;
+    min-width: 400px;
+    display: flex;
+} 
+
+.collapsable-boxes {
+    align-items: right;
+    min-width: 400px;
+    color: rgb(21, 21, 102);
+    font-size: large;
+    flex-direction: column;
+}
+
+.info-box {
+    background-color: rgb(231, 208, 28);
+    min-width: 400px;
+    padding: 0.5em;
+    margin-right: 3%;
+    border-radius: 15px;
+    justify-content: left;
+}
+
+.info-box-button {
+    display: inline-block;
+    text-align: left;
+    padding-left: 2%;
+    margin-right: 3%;
+    font-size: x-large;
+}
+
+.info-box-p {
+    display: inline-block;
+    text-align: right
+}
+
+.info, .expanded-box-area {
+    text-align: left;
+    background-color: transparent;
+    color: rgb(21, 21, 102);
+    font-size: medium;
+    min-width: 400px;
+    margin-bottom: 4%;
+    text-wrap: wrap;
+    margin-right: 3%;
+    /* text-indent: -1% */
+}
+
+.expanded-box-area li {
+    margin-left: 4%;
+    margin-bottom: 1%;
+    text-indent: 2%;
+}

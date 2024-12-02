@@ -1,9 +1,9 @@
 import React, { useEffect, useReducer } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
-import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse'
-import { RSVPFormContact } from './RSVPPages/RSVPFormContact'
-import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary'
-import { RSVPFormSubmit } from './RSVPPages/RSVPFormSubmit'
+import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
+import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
+import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
+import { RSVPFormSubmit } from './RSVPPages/RSVPFormSubmit.js';
 import { Routes, Route } from 'react-router-dom';
 import '../App.css';
 
