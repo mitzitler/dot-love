@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
@@ -15,9 +15,16 @@ import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 // zoom: 8,
 // })
 
+// look at this: https://blog.openreplay.com/creating-a-collapsible-component-for-react/
+
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    const toggleIsExpanded = useCallback(() => {
+        setIsExpanded((isExpanded) => !isExpanded);
+      }, []);
 
     const pageMainColor = "indigo" 
     const pageSection = "info"
@@ -59,8 +66,8 @@ export function Info() {
                     </InfoBox>
                         <InfoBoxExpanded>
                             <ul>
-                                <li>O We will announce hotels in the downtown Brooklyn area</li>
-                                <li>O The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
+                                <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
+                                <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
                             </ul>
                         </InfoBoxExpanded>
 
@@ -69,9 +76,9 @@ export function Info() {
                     </InfoBox>
                         <InfoBoxExpanded>
                             <ul>
-                                <li>O Dress code is semi-formal</li>
-                                <li>O We ask that you stay in this palette</li>
-                                <li>O More guidelines, as well as a pinterest board, are here</li>
+                                <li>🟡 Dress code is semi-formal</li>
+                                <li>🟡 We ask that you stay in this palette</li>
+                                <li>🟡 More guidelines, as well as a pinterest board, are here</li>
                             </ul>    
                         </InfoBoxExpanded>
                     
@@ -80,7 +87,7 @@ export function Info() {
                     </InfoBox>
                         <InfoBoxExpanded>
                             <ul>
-                                <li>O This event has stairs, please let us know if you have mobility issues</li>
+                                <li>🟡 This event has stairs, please let us know if you have mobility issues</li>
                                 <li></li>
                             </ul>
                         </InfoBoxExpanded>
