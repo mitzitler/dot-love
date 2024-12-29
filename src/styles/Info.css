@@ -17,12 +17,17 @@
     display: flex;
 } 
 
+/* ideally, the open and close motion is smoother */
+
 .collapsable-boxes {
-    align-items: right;
-    min-width: 400px;
-    color: rgb(21, 21, 102);
-    font-size: large;
+    display: flex;
     flex-direction: column;
+    gap: 16px;
+    align-items: right;
+    width: 80%;
+    font-size: large;
+    color: rgb(21, 21, 102);
+
 }
 
 .info-box {
@@ -51,13 +56,24 @@
     text-align: left;
     background-color: transparent;
     color: rgb(21, 21, 102);
-    font-size: medium;
+    font-size: small;
     min-width: 400px;
     margin-top: 2%;
     margin-bottom: 4%;
     text-wrap: wrap;
     margin-right: 3%;
     /* text-indent: -1% */
+}
+
+.info h4 {
+    text-align: left;
+    padding-left: 42px;
+    font-size: x-large;
+}
+
+.info .schedule ul {
+    font-size: small;
+    padding-left: 50px;
 }
 
 .expanded-box-area li {
