@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import nameReducer from "./features/guest/nameSlice";
+import rsvpReducer from "./features/guest/rsvpSlice";
 import { gizmoApi } from './services/gizmo';
 
 const store = configureStore({
     reducer: {
-        name: nameReducer,
+        rsvps: rsvpReducer,
         [gizmoApi.reducerPath]: gizmoApi.reducer,
     }
 })
