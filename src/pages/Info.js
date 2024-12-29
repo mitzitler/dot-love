@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
+import { exp } from 'three/webgpu';
 // import { MapBox } from '../components/MapBox.js'; // this doesnt work rn
 // import {Loader, LoaderOptions} from 'google-maps';
 
@@ -20,11 +21,11 @@ import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
-    const [isExpanded, setIsExpanded] = useState(false)
+    // const [isExpanded, setIsExpanded] = useState(false)
 
-    const toggleIsExpanded = useCallback(() => {
-        setIsExpanded((isExpanded) => !isExpanded);
-      }, []);
+    // const toggleIsExpanded = useCallback(() => {
+    //     setIsExpanded((isExpanded) => !isExpanded);
+    //   }, []);
 
     const pageMainColor = "indigo" 
     const pageSection = "info"
@@ -34,9 +35,12 @@ export function Info() {
         coordinates: [40.68725385467351, -73.98617663587743], 
       };
 
-    function onClickExpand() {
-        console.log('click')
+    function onClickExpand(id) {
+        console.log(id)
+        setExpandedBox((current) => (current === id ? null : id)); // Toggle expansion
     }
+
+    console.log(expandedBox)
 
     return (
 
@@ -57,44 +61,61 @@ export function Info() {
             <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
                 <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
 
-                    {/* <InfoBox class="schedule" collapsable={false}>
-                        <h3>Schedule</h3>
-                    </InfoBox> */}
+                    <InfoBox id="time" class="schedule" collapsable={false}>
+                        <h4>Schedule</h4>
+                        <ul>
+                            <li class="text-sm">Nov 7th 6.30pm - Ceremony at Diety Events</li>
+                            {/* <li>7.00pm - Drinks</li>
+                            <li>8.00pm - Dinner</li>
+                            <li>9.00pm - Dancing</li>
+                            <li>11.59pm - Afters</li> */}
+                        </ul>
+                    </InfoBox>
 
-                    <InfoBox id="A" class="lodging" collapsable={true} onClickExpand={onClickExpand}>
+                    <InfoBox id="stay" class="lodging" collapsable={true} onClickExpand={onClickExpand} 
+                        expandedBox={expandedBox}>
                         <h3>Where should I stay?</h3>
                     </InfoBox>
-                        <InfoBoxExpanded>
-                            <ul>
-                                <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
-                                <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
-                            </ul>
-                        </InfoBoxExpanded>
+                        {expandedBox === "stay" && (
+                            <InfoBoxExpanded>
+                                <ul>
+                                    <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
+                                    <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
+                                </ul>
+                            </InfoBoxExpanded>
+                        )}
 
-                    <InfoBox id="B" class="dress-code" collapsable={true} onClickExpand={onClickExpand}>
+                    <InfoBox id="wear" class="dress-code" collapsable={true} onClickExpand={onClickExpand}
+                        expandedBox={expandedBox}>
                         <h3>What should I wear?</h3>
                     </InfoBox>
-                        <InfoBoxExpanded>
-                            <ul>
-                                <li>🟡 Dress code is semi-formal</li>
-                                <li>🟡 We ask that you stay in this palette</li>
-                                <li>🟡 More guidelines, as well as a pinterest board, are here</li>
-                            </ul>    
-                        </InfoBoxExpanded>
+                        {expandedBox === "wear" && (
+                            <InfoBoxExpanded>
+                                <ul>
+                                    <li>🟡 Dress code is semi-formal</li>
+                                    <li>🟡 We ask that you stay in this palette</li>
+                                    <li>🟡 More guidelines, as well as a pinterest board, are here</li>
+                                </ul>    
+                            </InfoBoxExpanded>
+                        )}
                     
-                    <InfoBox id="C" class="faq" collapsable={true} onClickExpand={onClickExpand}>
+                    <InfoBox id="faq" class="faq" collapsable={true} onClickExpand={onClickExpand}
+                        expandedBox={expandedBox}>
                         <h3>What else should I know?</h3>
                     </InfoBox>
-                        <InfoBoxExpanded>
-                            <ul>
-                                <li>🟡 This event has stairs, please let us know if you have mobility issues</li>
-                                <li></li>
-                            </ul>
-                        </InfoBoxExpanded>
+                        {expandedBox === "faq" && (
+                            <InfoBoxExpanded>
+                                <ul>
+                                    <li>🟡 This venue has stairs, so please let us know as soon as you can if you have mobility issues</li>
+                                    <li>🟡 We'll text whenever we have updates with more information!</li>
+                                    <li></li>
+                                </ul>
+                            </InfoBoxExpanded>
+                        )}
                     
-                    <InfoBox class="map" collapsable={false}>
+                    {/* <InfoBox id="map" class="map" collapsable={false}> */}
                         {/* <MapBox business={diety}/> */}
-                    </InfoBox>
+                    {/* </InfoBox> */}
 
                 </div>
             </div>
