@@ -1,22 +1,15 @@
 import React, { useEffect, useReducer } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
-import { RSVPFormResponse } from './RSVPpages/RSVPFormResponse'
-import { RSVPFormContact } from './RSVPpages/RSVPFormContact'
-import { RSVPFormDietary } from './RSVPpages/RSVPFormDietary'
-import { RSVPFormSubmit } from './RSVPpages/RSVPFormSubmit'
+import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
+import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
+import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
+import { RSVPFormSubmit } from './RSVPPages/RSVPFormSubmit.js';
 import { Routes, Route } from 'react-router-dom';
 import '../App.css';
 
 // to do:
 
-// change padding and margin amounts to being % or em, not px
-// add back in dispatches into RSVPFormContact
-// formatting for RSVPFormResponse radio labels
-// formatting for RSVPFormSubmit CHECKBOX (dont reinvent the wheel!)
 // animate on click dietary
-// update copy 
-// update dietary sprites
-// better formatting for dropdowns
 
 // create store
 // create blinking eye animation
@@ -118,6 +111,9 @@ function reducer(state, action) {
 
 export function RSVP() {
 
+    const pageMainColor = "amber"
+    const pageSection = "rsvp"
+
     const [{rsvpCode, rsvp, firstName, lastName, pronouns, phoneNumber, 
         email, streetAddress, secondAddress, city, zipcode,
         country, stateProvince, canContinueDietary, drinkAlcohol, eatMeat, eatDairy,
@@ -133,6 +129,9 @@ export function RSVP() {
         document.body.style.overflowY = 'hidden';
         }
     }, [rsvpCode]);
+
+
+    console.log("code = ", rsvpCode)
 
     const rsvpString = rsvp === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
@@ -179,18 +178,24 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvp={rsvp} dispatch={dispatch} />} />
+                        <RSVPFormResponse rsvp={rsvp} rsvpCode={rsvpCode} 
+                            pageMainColor={pageMainColor} pageSection={pageSection} dispatch={dispatch} />} />
+
                     <Route path="/contact" element={
                         <RSVPFormContact rsvpCode={rsvpCode} firstName={firstName} lastName={lastName} 
                             pronouns={pronouns} phoneNumber={phoneNumber} 
                             email={email} streetAddress={streetAddress} secondAddress={secondAddress}
                             zipcode={zipcode} city={city} country={country} stateProvince={stateProvince} 
-                            canContinueDietary={canContinueDietary} dispatch={dispatch} />} />
+                            canContinueDietary={canContinueDietary} 
+                            pageMainColor={pageMainColor} pageSection={pageSection} dispatch={dispatch} />} />
+
                     <Route path="/dietary" element={
                         <RSVPFormDietary rsvpCode={rsvpCode} drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
                             eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
                             eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
-                            moreRestrictions={moreRestrictions} dispatch={dispatch} />} />
+                            moreRestrictions={moreRestrictions} 
+                            pageMainColor={pageMainColor} pageSection={pageSection} dispatch={dispatch} />} />
+
                     <Route path="/submit" element={
                         <RSVPFormSubmit rsvpCode={rsvpCode} contactString={contactString} 
                             firstName={firstName} lastName={lastName} pronouns={pronouns}
@@ -200,8 +205,8 @@ export function RSVP() {
                             drinkAlcohol={drinkAlcohol} eatMeat={eatMeat} 
                             eatDairy={eatDairy} eatFish={eatFish} eatShellfish={eatShellfish}
                             eatEggs={eatEggs} eatGluten={eatGluten} eatPeanuts={eatPeanuts} 
-                            moreRestrictions={moreRestrictions} 
-                            dietaryString={dietaryString} dispatch={dispatch} />} />
+                            moreRestrictions={moreRestrictions} dietaryString={dietaryString} 
+                            pageMainColor={pageMainColor} pageSection={pageSection} dispatch={dispatch} />} />
                 </Routes>
 
             </main>

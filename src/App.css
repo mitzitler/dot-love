@@ -1,8 +1,4 @@
-/*  look into LESS https://lesscss.org/  
-
-@width: 10px;
-
-*/
+@import './styles/Info.css';
 
 @keyframes fullrotation {
   0% {
@@ -10,6 +6,37 @@
   }
   100% {
   transform: rotate(360deg);
+  }
+}
+
+@keyframes redx {
+  0% {
+    transform: scale(0);
+    opacity: 0%;
+  }
+  10% {
+    transform: scale(0.1);
+    opacity: 5%;
+    }
+  20% {
+    transform: scale(0.8);
+    opacity: 40%;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 100%;
+  }
+  80% {
+    transform: scale(0.8);
+    opacity: 40%;
+  }
+  90% {
+    transform: scale(0.1);
+    opacity: 5%;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0%;
   }
 }
 
@@ -35,16 +62,12 @@ html, body {
 
 .dropdown-content {
   display: none;
-   position: absolute; /* position aboslute will stop the pill from moving around *?
-  /* background-color: #f9f9f9; */
-  min-width: 160px;
-  /* height:400px; */
-  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
-  padding: 12px 16px;
+  position: absolute; 
+  min-width: 95%;
+  padding: 2% 5%;
   z-index: 100;
-  max-height: 200px;
-  opacity: 100%
-
+  max-height: 600%;
+  opacity: 100%;
 }
 
 .dropdown:hover .dropdown-content {
@@ -52,21 +75,23 @@ html, body {
 }
 
 .dropdown-content li {
-  background-color: #dfdfdf;
+  color: rgb(255, 234, 47);
+  background-color: #000000;
   opacity: 100%;
   font-weight: bold;
-  margin: 3px 0px;
+  margin: 3% 0;
   border-radius: 25px
 }
 
 .dropdown-content li:hover {
-  background-color: #dfdfdf
+  background-color: #ff52dc
 }
 
 input[type="radio"] {
   appearance: none;
   /* background-color: #fff; */
-  margin: 0em 1em;
+  /* margin: 0.5% 8% 0% 8%; */
+  margin: 0% 5% 8% 20%;
   font: inherit;
   color: currentColor;
   width: 1.15em;
@@ -101,14 +126,6 @@ input[type="radio"]:checked::before {
 
 
 /* header stuff */
-
-/* .content-header {
-  border: 4px solid indigo; 
-  justify-items: center;
-  color: aliceblue;
-  position: fixed;
-} */
-
 .header-main {
   height: 100vh;
   text-align: center;
@@ -123,25 +140,14 @@ input[type="radio"]:checked::before {
 /* icon still is not aligned */
 
 .header-main2 {
-  /* height: 60px;
-  width: 80%;
-  text-align: center; */
   justify-content: center;
-  /* display: flex;
-  align-items: center;
-  flex-direction: row; */
-  /* border-radius: 20%; */
-  /* border: 1px solid green;  */
-  /* background-color: lightgray; */
 }
 
 .header-side {
-  /* height: 50px; */
   text-align: center;
   margin: 25px 10px 25px 10px;
   font-family: Bonbance;
   font-style: italic;
-  /* border: 4px solid blueviolet;  */
   flex: 1
 }
 
@@ -156,9 +162,7 @@ input[type="radio"]:checked::before {
   border-color: aliceblue;
   border: 2px; 
   border-radius: 100%;
-  /* margin: auto; */
   display: flex;
-  /* rotate: 60deg; */
 }
 
 /* this plus the transition arg in header-nav are vanilla css animation */
@@ -257,7 +261,7 @@ section, header {
 section {
   height: 600px;
   width: 75%;
-  margin-bottom: 40px;
+  /* margin-bottom: 40px; */
   border-radius: 15px;
   margin-left: auto;
   margin-right: auto;
@@ -340,10 +344,9 @@ header {
 }
 
 .rsvp #main {
-  margin: 30;
-  min-height: 600; /* this doesnt work */
+  margin: 5%;
+  /* min-height: 600; */
   color: red;
-  margin: 10%
 }
 
 .rsvp div {
@@ -359,14 +362,26 @@ header {
   display: flex;
   flex-direction: column;
   align-items: left;
+  margin: 12% 0% 8% 0%
 }
 
-.rsvp #radio-item {
+/* this does nothing */
+/* .rsvp #radio-item {
   color: rgba(0, 0, 0, 0.566);
-  /* background-color: pink; */
-  font-size: medium;
   font-family: gambetta;
-  margin-bottom: 5%;
+  margin-bottom: 3%;
+} */
+
+#radio-item {
+  display: flex;
+  flex-direction: row;
+}
+
+#radio-item label {
+  color: maroon;
+  font-size: larger;
+  /* margin-bottom: 10em; */
+
 }
 
 .rsvp input {
@@ -378,14 +393,14 @@ header {
   font-family: Bonbance;
   color: rgb(85, 7, 7);
   /* background-color: aqua; */
-  margin-bottom: 10%
+  margin-bottom: 6%
 }
 
 .rsvp h2 {
   font-size: large;
   font-family: gambetta;
   color: rgba(0, 0, 0, 0.566);
-  margin-bottom: 5%
+  margin-bottom: 2%
 }
 
 .rsvp p {
@@ -393,31 +408,31 @@ header {
   color: rgba(0, 0, 0, 0.566);
   font-size: medium;
   font-family: elanor;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
 }
 
 .rsvp .name-info, .contact-num, .contact-info, .state-country, .other-restrictions {
   display: flex;
   flex-direction: row;
+  margin-bottom: 5%;
 }
 
 .rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
   .state-country button, .state-country input, .other-restrictions input {
   opacity: 60%;
-  box-shadow: inset 0px 0px 40px 40px beige;
+  box-shadow: inset 0 0 40px 40px beige;
   color: red;
   font-family: elanor;
   font-size: medium;
   border-radius: 7px;
   margin: 0% 1%;
   height: 28px;
-  padding: 5px
+  padding: 0% 1%
 }
 
 .rsvp #other-restrictions {
   margin: auto;
-  width: 80%; 
-  margin-top: -1.2em;
+  width: 60%; 
 }
 
 .rsvp #first-name, #last-name, #address, #city {
@@ -425,19 +440,27 @@ header {
 }
 
 .rsvp #pronouns, #address-2, #zipcode {
-  width: 20%
+  width: 20%;
+  z-index: 1000
 }
 
 .rsvp #phone, #email, #country, #state {
   width: 50%
 }
 
+#contact-bottom {
+  margin-top: 27%;
+}
+
+.dietary-grid {
+  padding: 1% 6% 2%;
+  margin-bottom: 2%
+}
+
 .diet-image, .diet-image-clicked {
   width: 90px;
   height: 90px;
   margin: auto;
-  margin-bottom: 0px;
-  padding-bottom: 0px;
   transition: all 1.5s ease-in-out;
 }
 
@@ -450,51 +473,30 @@ header {
   /* transform: brightness(0.5);
   transform: saturate(0%);
   filter: grayscale(50%); */
-  filter: brightness(0.6);
-  filter: saturate(0%)
+  filter: brightness(0.4);
+  filter: saturate(0%);
+  /* animation: redx 3s linear; */
 }
 
-/* button {
-  border-radius: 27px;
-  font-family: Bonbance;
-  border: 1px solid #b79c05;
-  color: maroon;
-  width: 200px;
-  padding: 2px 20px;
-  margin-bottom: 8px;
-  opacity: 60%
-} */
-
-/* button:hover {
-  background-color: #ffd700;
-} */
+.submit-div {
+  padding: 0% 1%
+}
 
 .submit-card-left, .submit-card-right {
-  /* background-color: rgb(178, 155, 53); */
   border-radius: 15px;
-  margin: 10px;
-  padding: 10px 5px;
-  height: 300px;
-  /* opacity: 80%; */
+  margin: 10% 10% 5% 10%;
+  padding: 3% 2%;
+  height: 120%;
+  opacity: 90%;
   filter: blur(0.5px);
-  /* border: 2px solid #eb8872; */
-  /* backdrop-filter: blur(500px); */
 }
 
 .submit-card-left {
-  background-image: linear-gradient(to bottom right, #e0b002, 
-  #db568f
-  );
-  border: 0px;
-  margin-bottom: 0%;
+  background-image: linear-gradient(to bottom right, #e0b002, #db568f);
 }
 
 .submit-card-right  {
-  background-image: linear-gradient(to bottom left, #e0b002, 
-  #db568f
-  );
-  border: 0px;
-  margin-bottom: 0%;
+  background-image: linear-gradient(to bottom left, #e0b002, #db568f);
 }
 
 .submit-text-overlay {
@@ -507,31 +509,7 @@ header {
 }
 
 .conditional-plusone h2 {
-  margin-top: 10%
-}
-
-.conditional-plusone p {
-  font-size: 36px;
-  font-family: futura;
-  margin: 2% 0% 0% 50%;
-  height: 40px;
-  border: 3px solid brown;
-  border-radius: 100%;
-}
-
-.conditional-checked {
-  border-width: 0;
-  background-image: linear-gradient(to bottom left, #b1f04d, 
-  #5aed69
-  );
-  /* background-color: #7ef04d; */
-  
-}
-
-
-.conditional-plusone h3 {
-  color: brown;
-  font-size: 18px;
+  margin-top: 17%
 }
 
 .card-stack {
@@ -626,7 +604,6 @@ header {
 }
 
 #submit-header1 {
-  /* padding: 30px 0px 0px 10px  */
   margin-top: 5%;
   margin-bottom: 0%;
 }
@@ -637,14 +614,12 @@ header {
   margin-bottom: 5%
 }
 
-.next-btn {
+/* .next-btn {
   border-radius: 27px;
-  /* background-color: #ffd700; */
   font-family: Bonbance;
   border: 1px solid #b79c05;
   color: maroon;
   width: 240px;
-  /* height: 80px; */
   padding: 8px 20px;
   margin: 15px 8px;
   opacity: 60%;
@@ -652,18 +627,19 @@ header {
 
 .next-btn:hover {
   background-color: #ee7fdb;
-}
+} */
 
+/* this needs a max width */
 .btn-23 {
   color:  maroon;
   background-color: #ffef92;
   font-family: Bonbance;
   font-size: 90%;
   opacity: 60%;
-  width: 240px;
-  padding: 10px 0px;
-  margin: 20px 8px 0px;
-  height: 40px;
+  width: 35%;
+  padding: 1% 0;
+  margin: 2% 1% 0;
+  height: 2%;
   text-transform: uppercase;
   border-radius: 27px;
   border: 1px solid #b79c05;
@@ -676,59 +652,100 @@ header {
 .btn-23:hover {
   background-color: #ffb6f3;
 }
-/* .btn-23:disabled {
-  cursor: default;
-} */
-/* doesnt do anything*/
-/* .btn-23:-moz-focusing {
-  outline: auto;
-} */
-/* .btn-23 svg {
-  display: block;
-  vertical-align: middle;
-} */
-/* .btn-23 [hidden] {
-  display: none;
-} */
-/* .btn-23 span {
-  display: grid;
-  inset: 0;
-  place-items: center;
-  position: absolute;
-  transition: opacity 0.2s ease;
-} */
-/* .btn-23 .marquee {
-  --spacing: 5em;
-  --start: 0em;
-  --end: 5em;
-  -webkit-animation: marquee 1s linear infinite;
-  animation: marquee 1s linear infinite;
-  -webkit-animation-play-state: paused;
-  animation-play-state: paused;
-  opacity: 0;
-  position: relative;
-  text-shadow: #fff var(--spacing) 0, #fff calc(var(--spacing) * -1) 0,
-    #fff calc(var(--spacing) * -2) 0;
-} */
-/* .btn-23:hover .marquee {
-  -webkit-animation-play-state: running;
-  animation-play-state: running;
-  opacity: 1;
-} */
-/* .btn-23:hover .text {
-  opacity: 0;
-} */
+
 @keyframes marquee {
   0% {transform: translateX(var(-100%));}
   100% {transform: translateX(var(100%));}
-  /* 100% {transform: translateX(var(-100%));} */
 }
-/* @media { */
-  .btn-23{
-    animation: marquee 50s linear infinite;
-    text-shadow: 
-    225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
-    -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
-    -300px 0px maroon
-  }
-/* } */
+
+.btn-23{
+  animation: marquee 50s linear infinite;
+  text-shadow: 
+  225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
+  -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
+  -300px 0px maroon
+}
+
+
+/* Customize the label (the container) */
+.checkbox-guest {
+  display: block;
+  position: relative;
+  margin: 0% 2% 1% 2%;
+  cursor: pointer;
+  color: rgb(69, 50, 50);
+  font-size: large;
+  padding-left: 4%
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-guest input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0% 2% 0% 0%;
+  height: 25px;
+  width: 25px;
+  border-radius: 8px;
+  background-color: #db568f
+}
+
+/* On mouse-over, add a grey background color */
+/* .checkbox-guest:hover input ~ .checkmark {
+  background-color: rgb(23, 245, 60)
+} */
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-guest input:checked ~ .checkmark {
+  background-color: #f32121;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-guest input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-guest .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+  
+.big-red-x, .big-green-o {
+  position: absolute;
+  font-size: 48px !important;
+  font-family: futura !important;
+  z-index: 999;
+  animation: redx 3s linear;
+  margin: auto;
+  padding: auto;
+  text-align: center;
+  justify-content: center;
+  /* background-color: #d6d6d6; */
+}
+
+.big-red-x {color: red !important;}
+.big-green-o {color: rgb(90, 165, 33) !important;}
