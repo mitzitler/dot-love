@@ -43,7 +43,7 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvp, rsvpCode, di
                     : ( rsvpCode.toLowerCase() === 'ghi'
                     ? <p>After the first guest fills out and submits this form, 
                         <br/>please continue to swipe for the next guest's form.</p> 
-                    : <p>error</p> )}
+                    : <p></p> )}
             </CardStackPage>
             <CardStackFooter>
                 <NavLink className='btn-23' 

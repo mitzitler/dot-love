@@ -8,6 +8,7 @@ import { AboutUs } from './pages/AboutUs'
 import { Registry } from './pages/Registry'
 import { Data } from './pages/Data'
 import { RSVP } from './pages/RSVP'
+import { Home } from './pages/Home';
 // moved video out because it was 1.3 GB lol
 import { LightShow } from './components/LightShowVideo'
 import { Routes, Route } from 'react-router-dom';
@@ -70,8 +71,9 @@ export default function App() {
             <Routes>
               {/* add an all page element here */}
               {/* this will have its own version of generic header, which asks for name instead */}
-                <Route path="*" element={<Info/>} /> {/* actually instead, it should be a MainRouter skeleton, which has the generic header and the subroutes for the main pages*/}
+                <Route path="info" element={<Home/>} /> {/* actually instead, it should be a MainRouter skeleton, which has the generic header and the subroutes for the main pages*/}
                 <Route path="rsvp/*" element={<RSVP/>} />
+                <Route path="*" element={<Home/>} />
             </Routes>
           {/* </div> */}
         {/* </div> */}
