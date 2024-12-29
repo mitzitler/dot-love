@@ -1,0 +1,7 @@
+aws-cdk-lib==2.134.0
+aws-cdk.aws-apigatewayv2-alpha==2.65.0a0
+aws-cdk.aws_apigatewayv2_integrations_alpha
+aws_cdk.aws_apigatewayv2_authorizers_alpha
+constructs>=10.0.0,<11.0.0
+boto3==1.26.72
+six
