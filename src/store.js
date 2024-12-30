@@ -4,8 +4,9 @@ import { gizmoApi } from './services/gizmo';
 
 const store = configureStore({
     reducer: {
-        rsvps: rsvpReducer,
+        rsvp: rsvpReducer,
         [gizmoApi.reducerPath]: gizmoApi.reducer,
+
     }
 })
 

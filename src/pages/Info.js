@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
-import { exp } from 'three/webgpu';
+
 // import { MapBox } from '../components/MapBox.js'; // this doesnt work rn
 // import {Loader, LoaderOptions} from 'google-maps';
 

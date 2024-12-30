@@ -307,4 +307,39 @@
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
+
+
+.big-red-x, .big-green-o {
+    position: absolute;
+    font-size: 3rem;
+    /* font-size: 48px !important; */
+    /* font-family: futura !important; */
+    z-index: 999;
+    /* animation: redx 3s linear; */
+    animation: fadeInOut 1s forwards;
+    /* margin: auto; */
+    /* padding: auto; */
+    /* text-align: center; */
+    /* justify-content: center; */
+    /* background-color: #d6d6d6; */
+}
+  
+.big-red-x {
+    color: red !important;
+}
+
+.big-green-o {
+    color: rgb(90, 165, 33) !important;
+}
     
+@keyframes fadeInOut {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }

@@ -96,37 +96,30 @@ const rsvpSlice = createSlice({
      // only allow this action if the items on the page are ready
     };
     },
-    drinkAlcoholToggle(state, action) {
-      const drinkAlcohol = action.payload
-      state.entities[drinkAlcohol.id] = drinkAlcohol
+    drinkAlcoholToggle(state) {
+      state.drinkAlcohol = !state.drinkAlcohol;
+      console.log('drinkAlcoholToggle triggered')
     },
-    eatMeatToggle(state, action) {
-      const eatMeat = action.payload
-      state.entities[eatMeat.id] = eatMeat
+    eatMeatToggle(state) {
+      state.eatMeat = !state.eatMeat
     },
-    eatDairyToggle(state, action) {
-      const eatDairy = action.payload
-      state.entities[eatDairy.id] = eatDairy
+    eatDairyToggle(state) {
+      state.eatDairy = !state.eatDairy
     },
-    eatFishToggle(state, action) {
-      const eatFish = action.payload
-      state.entities[eatFish.id] = eatFish
+    eatFishToggle(state) {
+      state.eatFish = !state.eatFish
     },
-    eatShellfishToggle(state, action) {
-      const eatShellfish = action.payload
-      state.entities[eatShellfish.id] = eatShellfish
+    eatShellfishToggle(state) {
+      state.eatShellfish = !state.eatShellfish
     },
-    eatEggsToggle(state, action) {
-      const eatEggs = action.payload
-      state.entities[eatEggs.id] = eatEggs
+    eatEggsToggle(state) {
+      state.eatEggs = !state.eatEggs
     },
-    eatGlutenToggle(state, action) {
-      const eatGluten = action.payload
-      state.entities[eatGluten.id] = eatGluten
+    eatGlutenToggle(state) {
+      state.eatGluten = !state.eatGluten
     },
-    eatPeanutsToggle(state, action) {
-      const eatPeanuts = action.payload
-      state.entities[eatPeanuts.id] = eatPeanuts
+    eatPeanutsToggle(state) {
+      state.eatPeanuts = !state.eatPeanuts
     },
     moreRestrictionsInput(state, action) {
       const moreRestrictions = action.payload
