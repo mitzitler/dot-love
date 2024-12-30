@@ -3,9 +3,16 @@ import { NavLink } from 'react-router-dom';
 import '../../App.css';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
+import { useDispatch, useSelector } from 'react-redux';
+import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormResponse({pageMainColor, pageSection, rsvp, rsvpCode, dispatch}) {
-    console.log(rsvp)
+export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
+
+    const dispatch = useDispatch();
+
+    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
+
+    console.log(rsvpStatus)
     console.log("code = ", rsvpCode)
 
     // const rsvpCodeLower = rsvpCode.lo
@@ -22,15 +29,15 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvp, rsvpCode, di
                 {/* look at this maybe */}
                 <div id="rsvp-radio">
                     <div id="radio-item">
-                        <input id="rsvp-yes" name="rsvp" type="radio"
-                            onClick={()=>dispatch({type: "rsvpInput", payload: "attending" })}></input>
+                        <input id="rsvp-yes" name="rsvp" type="radio" value={rsvpStatus}
+                            onClick={()=>dispatch(rsvpStatusInput("attending"))}></input>
                         <label className='radio-label' for="rsvp-yes">
                             Yes, I will be in attendance!
                         </label>
                     </div>
                     <div id="radio-item">
-                        <input id="rsvp-no" name="rsvp" type="radio"
-                            onClick={()=>dispatch({type: "rsvpInput", payload: "notattending" })}></input>
+                        <input id="rsvp-no" name="rsvp" type="radio" value={rsvpStatus}
+                            onClick={()=>dispatch(rsvpStatusInput("notattending"))}></input>
                         <label className='radio-label' for="rsvp-no">
                             No, unfortunately I cannot attend
                         </label>
@@ -47,8 +54,8 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvp, rsvpCode, di
             </CardStackPage>
             <CardStackFooter>
                 <NavLink className='btn-23' 
-                    disabled={rsvp === 'undecided' ? true : false} 
-                    to={rsvp === 'undecided' ? '/rsvp' : '/rsvp/contact'} 
+                    disabled={rsvpStatus === 'undecided' ? true : false} 
+                    to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 
                     end><marquee>Continue</marquee></NavLink>
                     {/* and there needs to be an error message too */}
             </CardStackFooter>

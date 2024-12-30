@@ -7,7 +7,7 @@ const rsvpSlice = createSlice({
     // rsvpCode: localStorage.getItem("rsvpCode") || "", 
     rsvpCode: '',
     // 'undecided', 'attending', 'notattenting'
-    rsvp: 'undecided', 
+    rsvpStatus: 'undecided', 
     firstName: "", 
     lastName: "", 
     pronouns: "", 
@@ -33,56 +33,43 @@ const rsvpSlice = createSlice({
   },
   reducers: {
     rsvpCodeInput(state, action) {
-      const rsvpCode = action.payload
-      state.entities[rsvpCode.id] = rsvpCode
+      state.rsvpCode = action.payload
     },
-    rsvpInput(state, action) {
-      const rsvp = action.payload
-      state.entities[rsvp.id] = rsvp
+    rsvpStatusInput(state, action) {
+      state.rsvpStatus = action.payload
     },
     firstNameInput(state, action) {
-      const firstName = action.payload
-      state.entities[firstName.id] = firstName
+      state.firstName = action.payload
     },
     lastNameInput(state, action) {
-      const lastName = action.payload
-      state.entities[lastName.id] = lastName
+      state.lastName = action.payload
     },
     pronounsInput(state, action) {
-      const pronouns = action.payload
-      state.entities[pronouns.id] = pronouns
+      state.pronouns = action.payload
     },
     phoneNumberInput(state, action) {
-      const phoneNumber = action.payload
-      state.entities[phoneNumber.id] = phoneNumber
+      state.phoneNumber = action.payload
     },
     emailInput(state, action) {
-      const email = action.payload
-      state.entities[email.id] = email
+      state.email = action.payload
     },
     streetAddressInput(state, action) {
-      const streetAddress = action.payload
-      state.entities[streetAddress.id] = streetAddress
+      state.streetAddress = action.payload
     },
     secondAddressInput(state, action) {
-      const secondAddress = action.payload
-      state.entities[secondAddress.id] = secondAddress
+      state.secondAddress = action.payload
     },
     cityInput(state, action) {
-      const city = action.payload
-      state.entities[city.id] = city
+      state.city = action.payload
     },
     zipcodeInput(state, action) {
-      const zipcode = action.payload
-      state.entities[zipcode.id] = zipcode
+      state.zipcode = action.payload
     },
     countryInput(state, action) {
-      const country = action.payload
-      state.entities[country.id] = country
+      state.country = action.payload
     },
     stateProvinceInput(state, action) {
-      const stateProvince = action.payload
-      state.entities[stateProvince.id] = stateProvince
+      state.stateProvince = action.payload
     },
     continueDietary(state, action) {
     // is this okay?
@@ -97,8 +84,7 @@ const rsvpSlice = createSlice({
     };
     },
     drinkAlcoholToggle(state) {
-      state.drinkAlcohol = !state.drinkAlcohol;
-      console.log('drinkAlcoholToggle triggered')
+      state.drinkAlcohol = !state.drinkAlcohol
     },
     eatMeatToggle(state) {
       state.eatMeat = !state.eatMeat
@@ -122,29 +108,24 @@ const rsvpSlice = createSlice({
       state.eatPeanuts = !state.eatPeanuts
     },
     moreRestrictionsInput(state, action) {
-      const moreRestrictions = action.payload
-      state.entities[moreRestrictions.id] = moreRestrictions
+      state.moreRestrictions = action.payload
     },
     // not sure how i feel about these tbh
     submitFormGC1(state, action) {
-      const submitted = action.payload
-      state.entities[submitted.id] = submitted
+      state.submitted = action.payload
     },
     submitFormGC1_5(state, action) {
-      const submitted = action.payload
-      state.entities[submitted.id] = submitted
+      state.submitted = action.payload
     },
     // does this work?
     submitFormGC2(state, action) {
-      const submitted = action.payload
-      const rsvpCode = state.entities[rsvpCode]
-      state.entities[submitted.id] = submitted
-      state.entities[rsvpCode.id] = 'ABC'
+      state.submitted = action.payload
+      state.rsvpCode = 'ABC'
     }  
   }
 })
 
-export const { rsvpCodeInput, rsvpInput, firstNameInput, lastNameInput, pronounsInput, 
+export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, 
   phoneNumberInput, emailInput, streetAddressInput, secondAddressInput, cityInput, zipcodeInput, countryInput, stateProvinceInput,
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
   eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput,

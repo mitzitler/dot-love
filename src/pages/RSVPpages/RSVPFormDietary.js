@@ -29,48 +29,20 @@ const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
 const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
-export function RSVPFormDietary({pageMainColor, pageSection, eatMeat, eatDairy, eatFish, 
-  eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions}) {
+export function RSVPFormDietary({pageMainColor, pageSection}) {
 
-  const [animation, setAnimation] = useState(null)
-//   const [divSymbol, setDivSymbol] = useState(true)
-//   const [divPositiion, setDivPosition] = useState({ x: 0, y: 0 })
-//   const [counter, setCounter] = useState(0)
-//   const [clickCounter, setClickCounter] = useState({
-//     alcohol: 0,
-//     dairy: 0,
-//     eggs: 0,
-//     fish: 0,
-//     gluten: 0,
-//     meat: 0,
-//     peanuts: 0,
-//     shellfish: 0,
-//   });
+    const [animation, setAnimation] = useState(null)
+    const dispatch = useDispatch();
 
-  const dispatch = useDispatch();
-
-  const drinkAlcohol = useSelector((state) => state.rsvp.drinkAlcohol)
-
-//   console.log("count is ", counter)
-//   let newCounter = 0
-
-//   function handleClickAnimation(event) {
-//     console.log("Click position: x: ", event.clientX, ", y: ", event.clientY)
-//     console.log(event.target.id)
-//     setDivPosition({ x: event.clientX - 40, y: event.clientY + 5})
-//     setClickCounter((prevState) => ({
-//         ...prevState,
-//         [event.target.id]: prevState[event.target.id] + 1,
-//     }))
-//     if ( counter == NaN ) { newCounter = 0;} 
-//     else { newCounter = counter;}
-//     setCounter(newCounter + 1)
-    // document.body.textContent =
-    // "clientX: " + event.clientX +
-    // " - clientY: " + event.clientY;
-    // ?? // https://stackoverflow.com/questions/53337998/insert-html-at-clientx-and-clienty-position-of-cursor-in-editor-having-div-conte
-    // console.log("click counter is: ", [event.target.id], ": ", {clickCounter[event.target.id]})
-// }
+    const drinkAlcohol = useSelector((state) => state.rsvp.drinkAlcohol) 
+    const eatMeat = useSelector((state) => state.rsvp.eatMeat)
+    const eatDairy = useSelector((state) => state.rsvp.eatDairy)
+    const eatFish = useSelector((state) => state.rsvp.eatFish)
+    const eatShellfish = useSelector((state) => state.rsvp.eatShellfish)
+    const eatEggs = useSelector((state) => state.rsvp.eatEggs)
+    const eatGluten = useSelector((state) => state.rsvp.eatGluten)
+    const eatPeanuts = useSelector((state) => state.rsvp.eatPeanuts)
+    const moreRestrictions = useSelector((state) => state.rsvp.moreRestrictions)
 
     const handleClickAnimation = (event, toggleValue) => {
         const { id } = event.target;
@@ -89,74 +61,74 @@ export function RSVPFormDietary({pageMainColor, pageSection, eatMeat, eatDairy, 
                         dietary restrictions</h2>
                     <div className="dietary-grid grid grid-cols-2">
 
-                        {/* {counter > 0 && <RedX divPositiionX={divPositiion.x} divPositiionY={divPositiion.y}/>} */}
-                        {/* {counter > 0 && <GreenO divPositiionX={divPositiion.x} divPositiionY={divPositiion.y}/>} */}
-
-
                         {animation && animation.type === 'red' && (
-                        <RedX
-                            divPositionX={animation.position.x}
-                            divPositionY={animation.position.y}
-                            onAnimationEnd={() => setAnimation(null)}
-                        />
+                            <RedX
+                                divPositionX={animation.position.x}
+                                divPositionY={animation.position.y}
+                                onAnimationEnd={() => setAnimation(null)}
+                            />
                         )}
                         {animation && animation.type === 'green' && (
-                        <GreenO
-                            divPositionX={animation.position.x}
-                            divPositionY={animation.position.y}
-                            onAnimationEnd={() => setAnimation(null)}
-                        />
+                            <GreenO
+                                divPositionX={animation.position.x}
+                                divPositionY={animation.position.y}
+                                onAnimationEnd={() => setAnimation(null)}
+                            />
                         )}
 
                         <img src={Alcohol} id="alcohol" alt="I drink alcohol" 
                         className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>
-                            {
-                                dispatch(drinkAlcoholToggle());
-                                console.log(drinkAlcohol);
-                                handleClickAnimation(e, !drinkAlcohol)
-                        }
+                        onClick={(e)=>{
+                            dispatch(drinkAlcoholToggle(e.target.value));
+                            handleClickAnimation(e, !drinkAlcohol)}
                         }/> 
 
                         <img src={Meat} id="meat" alt="I eat meat" 
                         className={eatMeat ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatMeatToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatMeatToggle());
                             handleClickAnimation(e, !eatMeat)}
                         }/>
 
                         <img src={Dairy} id="dairy" alt="I eat dairy" 
                         className={eatDairy ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatDairyToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatDairyToggle());
                             handleClickAnimation(e, !eatDairy)}
                         }/>
 
                         <img src={Fish} id="fish" alt="I eat fish" 
                         className={eatFish ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatFishToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatFishToggle());
                             handleClickAnimation(e, !eatFish)}
                         }/>  
 
                         <img src={Eggs} id="eggs" alt="I eat eggs" 
                         className={eatEggs ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatEggsToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatEggsToggle());
                             handleClickAnimation(e, !eatEggs)}
                         }/>
 
                         <img src={Gluten} id="gluten" alt="I eat gluten" 
                         className={eatGluten ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatGlutenToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatGlutenToggle());
                             handleClickAnimation(e, !eatGluten)}
                         }/>
 
                         <img src={Peanuts} id="peanuts" alt="I eat peanuts" 
                         className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatPeanutsToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatPeanutsToggle());
                             handleClickAnimation(e, !eatPeanuts)}
                         }/>
 
                         <img src={Shellfish} id="shellfish" alt="I eat shellfish" 
                         className={eatShellfish ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch(eatShellfishToggle(e));
+                        onClick={(e)=>{
+                            dispatch(eatShellfishToggle());
                             handleClickAnimation(e, !eatShellfish)}
                         }/>    
 
@@ -165,7 +137,8 @@ export function RSVPFormDietary({pageMainColor, pageSection, eatMeat, eatDairy, 
                         <input label="other-restrictions" type="text" 
                         id="other-restrictions" 
                         placeholder="Other restrictions?" 
-                        onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
+                        // is this format right?
+                        onChange={(e)=>dispatch(moreRestrictionsInput(e.target.value))}/> 
                     </div>
         </CardStackPage>
         <CardStackFooter>
