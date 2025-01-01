@@ -12,6 +12,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_ses as ses,
     aws_sns as sns,
+    aws_cloudfront as cloudfront,
+    aws_cloudfront_origins as origins,
     aws_sns_subscriptions as subscriptions,
     aws_apigatewayv2_alpha as apigw,
     CfnOutput,
@@ -163,7 +165,8 @@ class DotLoveCoreStack(Stack):
         # DOT LOVE MEDIA ETC S3
         ###################################################
         # Create S3 to store bounce and complaints
-        self.create_dot_love_website_media_etc_s3()
+        self.dot_love_website_media_s3 = self.create_dot_love_website_media_etc_s3()
+        self.create_dot_love_cdn(self.dot_love_website_media_s3)
 
     ###################################################
     # DOT LOVE DATABASES
@@ -602,9 +605,32 @@ class DotLoveCoreStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[
+                        s3.HttpMethods.GET,
+                    ],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                )
+            ],
         )
 
         return {"bucket": website_media_etc_bucket}
+
+    def create_dot_love_cdn(self, website_media_s3):
+        distribution = cloudfront.Distribution(
+            self,
+            f"{self.stack_env}-dot-love-cdn",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3Origin(website_media_s3["bucket"]),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,  # ;)
+            ),
+        )
+
+        return distribution
 
     def obtain_ssm_client_secret(self, secret_name):
         secret = self.ssm.get_parameter(Name=secret_name, WithDecryption=True)
