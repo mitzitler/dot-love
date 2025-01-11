@@ -49,7 +49,7 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
                         <br/> We will text you a unique link for your invitee.</p>
                     : ( rsvpCode.toLowerCase() === 'ghi'
                     ? <p>After the first guest fills out and submits this form, 
-                        <br/>please continue to swipe for the next guest's form.</p> 
+                        <br/>please continue through the flow for the next guest's form.</p> 
                     : <p></p> )}
             </CardStackPage>
             <CardStackFooter>
