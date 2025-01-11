@@ -12,6 +12,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_ses as ses,
     aws_sns as sns,
+    aws_cloudfront as cloudfront,
+    aws_cloudfront_origins as origins,
     aws_sns_subscriptions as subscriptions,
     aws_apigatewayv2_alpha as apigw,
     CfnOutput,
@@ -42,7 +44,8 @@ class DotLoveCoreStack(Stack):
         ses_sns_arn: str,
         ses_sender_email: str,
         ses_admin_list: str,
-        ssl_cert_arn: str,
+        api_ssl_cert_arn: str,
+        cdn_ssl_cert_arn: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -87,8 +90,11 @@ class DotLoveCoreStack(Stack):
         ##################################################
         # DOMAIN SETUP
         ##################################################
-        self.domain_cert = cert_manager.Certificate.from_certificate_arn(
-            self, "dot_love_domain_cert", ssl_cert_arn
+        self.api_domain_cert = cert_manager.Certificate.from_certificate_arn(
+            self, "api_dot_love_domain_cert", api_ssl_cert_arn
+        )
+        self.cdn_domain_cert = cert_manager.Certificate.from_certificate_arn(
+            self, "cdn_dot_love_domain_cert", cdn_ssl_cert_arn
         )
 
         ###################################################
@@ -108,7 +114,9 @@ class DotLoveCoreStack(Stack):
         self.create_global_dependency_layer()
 
         # Create API Gateway
-        self.dot_love_api_gw = self.create_dot_love_api_gw(ssl_cert=self.domain_cert)
+        self.dot_love_api_gw = self.create_dot_love_api_gw(
+            ssl_cert=self.api_domain_cert
+        )
 
         ###################################################
         # GIZMO USER SERVICE
@@ -163,7 +171,8 @@ class DotLoveCoreStack(Stack):
         # DOT LOVE MEDIA ETC S3
         ###################################################
         # Create S3 to store bounce and complaints
-        self.create_dot_love_website_media_etc_s3()
+        self.dot_love_website_media_s3 = self.create_dot_love_website_media_etc_s3()
+        self.create_dot_love_cdn(self.dot_love_website_media_s3, self.cdn_domain_cert)
 
     ###################################################
     # DOT LOVE DATABASES
@@ -602,9 +611,66 @@ class DotLoveCoreStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[
+                        s3.HttpMethods.GET,
+                    ],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                )
+            ],
         )
 
         return {"bucket": website_media_etc_bucket}
+
+    def create_dot_love_cdn(self, website_media_s3, dot_love_cert):
+        origin_access_control = cloudfront.CfnOriginAccessControl(
+            self,
+            f"{self.stack_env}-dot-love-cdn-origin-access-control",
+            origin_access_control_config=cloudfront.CfnOriginAccessControl.OriginAccessControlConfigProperty(
+                name="s3-access-control",
+                origin_access_control_origin_type="s3",
+                signing_behavior="always",
+                signing_protocol="sigv4",
+            ),
+        )
+
+        distribution = cloudfront.Distribution(
+            self,
+            f"{self.stack_env}-dot-love-cdn",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3Origin(website_media_s3["bucket"]),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,  # ;)
+            ),
+            domain_names=["cdn.mitzimatthew.love"],
+            certificate=dot_love_cert,
+        )
+
+        website_media_s3["bucket"].add_to_resource_policy(
+            iam.PolicyStatement(
+                actions=["s3:GetObject"],
+                resources=[f"{website_media_s3['bucket'].bucket_arn}/*"],
+                principals=[iam.ServicePrincipal("cloudfront.amazonaws.com")],
+                conditions={
+                    "StringEquals": {
+                        "AWS:SourceArn": f"arn:aws:cloudfront::{self.account}:distribution/{distribution.distribution_id}"
+                    }
+                },
+            )
+        )
+
+        # This output is for the cname record
+        CfnOutput(
+            self,
+            "CloudfrontCnameRecordValue",
+            value=distribution.distribution_domain_name,
+            description="The custom domain URL for the CloudFront distribution cname record value",
+        )
+
+        return distribution
 
     def obtain_ssm_client_secret(self, secret_name):
         secret = self.ssm.get_parameter(Name=secret_name, WithDecryption=True)
