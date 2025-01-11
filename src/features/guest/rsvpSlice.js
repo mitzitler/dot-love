@@ -29,7 +29,8 @@ const rsvpSlice = createSlice({
     eatGluten: true, 
     eatPeanuts: true, 
     moreRestrictions: "",
-    submitted: null
+    submitted: null,
+    rsvpSubmission: "",
   },
   reducers: {
     rsvpCodeInput(state, action) {
@@ -113,14 +114,25 @@ const rsvpSlice = createSlice({
     // not sure how i feel about these tbh
     submitFormGC1(state, action) {
       state.submitted = action.payload
+      state.rsvpSubmission = {
+        rsvp: state.rsvp
+      }
     },
     submitFormGC1_5(state, action) {
       state.submitted = action.payload
+      state.rsvpSubmission = {
+        rsvpStatus: state.rsvpStatus,
+        pair_first_last: action.payload
+      }
     },
     // does this work?
     submitFormGC2(state, action) {
       state.submitted = action.payload
       state.rsvpCode = 'ABC'
+      state.rsvpSubmission = {
+        rsvpStatus: state.rsvpStatus,
+        pair_first_last: action.payload
+      }
     }  
   }
 })

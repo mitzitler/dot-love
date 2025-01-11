@@ -3,15 +3,51 @@ import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
+import { useDispatch, useSelector } from 'react-redux';
+import { submitFormGC1, submitFormGC1_5, submitFormGC2 } from '../../features/guest/rsvpSlice';
 
 // on desktop all the information is pushed down too far
 
-export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode, 
-    contactString, dietaryString, 
-    firstName, lastName, pronouns,
-    phoneNumber,email, streetAddress, secondAddress, zipcode, city, country, stateProvince, 
-    drinkAlcohol, eatMeat, eatDairy, eatFish, eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions,
-    dispatch}) {
+export function RSVPFormSubmit({pageMainColor, pageSection}) {
+
+    const dispatch = useDispatch();
+
+    const rsvpCode = useSelector((state) => state.rsvp.rsvpCode)
+    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
+
+    const firstName = useSelector((state) => state.rsvp.firstName) 
+    const lastName = useSelector((state) => state.rsvp.lastName)
+    const pronouns = useSelector((state) => state.rsvp.pronouns)
+    const phoneNumber = useSelector((state) => state.rsvp.phoneNumber)
+    const email = useSelector((state) => state.rsvp.email)
+    const streetAddress = useSelector((state) => state.rsvp.streetAddress)
+    const secondAddress = useSelector((state) => state.rsvp.secondAddress)
+    const city = useSelector((state) => state.rsvp.city)
+    const zipcode = useSelector((state) => state.rsvp.zipcode)
+    const country = useSelector((state) => state.rsvp.country)
+    const stateProvince = useSelector((state) => state.rsvp.stateProvince)
+
+    const drinkAlcohol = useSelector((state) => state.rsvp.drinkAlcohol) 
+    const eatMeat = useSelector((state) => state.rsvp.eatMeat)
+    const eatDairy = useSelector((state) => state.rsvp.eatDairy)
+    const eatFish = useSelector((state) => state.rsvp.eatFish)
+    const eatShellfish = useSelector((state) => state.rsvp.eatShellfish)
+    const eatEggs = useSelector((state) => state.rsvp.eatEggs)
+    const eatGluten = useSelector((state) => state.rsvp.eatGluten)
+    const eatPeanuts = useSelector((state) => state.rsvp.eatPeanuts)
+    const moreRestrictions = useSelector((state) => state.rsvp.moreRestrictions)
+
+    const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
+
+    const name = firstName + " " + lastName
+
+    const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
+        "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
+
+    const contactString = "Hi " + firstName + " " + lastName + " (" + pronouns + "), " +
+        "we can reach you at " + phoneNumber + " or " + email + " and your mailing address is " + 
+        streetAddress + " " + secondAddress + ", in " + city + ", " + zipcode + " - " + 
+        stateProvince + ", " + country 
 
     const countryNew = country === "United States" ? "the US" : country
 
@@ -61,7 +97,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode,
         return `You can ${allButLast} and ${lastItem}.`;
     }
 
-    const rsvpCode = "DEF"
+    // const rsvpCode = "DEF"
 
     const [clicked, setClicked] = useState(false)
 
@@ -73,8 +109,9 @@ export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode,
   return(
     <>
         <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
-            <h1 id="submit-header1">Does this all look right, {firstName} {lastName}?</h1>
+            <h1 id="submit-header1">Does this all look right, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
+            <p>{rsvpString}</p>
             <div className="submit-div grid grid-cols-2">
                 <div className="submit-card-left">
                     {/* i hate this styling so much */}
@@ -86,6 +123,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode,
                     We will reach out to you at {phoneNumber} and {email}
                     </h3>
                 </div>
+                {/* need to make much smaller bottom padding */}
                 <div className="submit-card-right">
                     <h3 className="submit-text-overlay">
                         {createRestrictionsString(dietaryRestrictions)}
@@ -94,6 +132,14 @@ export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode,
                     <h3 className="submit-text-overlay">
                         {createInclusionsString(dietaryInclusions)}
                     </h3>
+                    {moreRestrictions.length > 0 && 
+                    <>
+                        <p></p>
+                        <h3 className="submit-text-overlay">
+                            You also noted restrictions: {moreRestrictions}
+                        </h3>
+                    </>
+                    }
                 </div>
             </div>
             
@@ -122,14 +168,46 @@ export function RSVPFormSubmit({pageMainColor, pageSection, // rsvpCode,
         <CardStackFooter>
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
             {rsvpCode.toUpperCase() === 'ABC'
-            ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
+            ? <button className='btn-23' onClick={()=>
+                {dispatch(submitFormGC1(`${firstName}_${lastName}`));
+                console.log(rsvpSubmission)}
+            }><marquee>Submit</marquee></button>
             : rsvpCode.toUpperCase() === 'DEF'
-            ? <button className='btn-23' onClick={()=>dispatch({type:"submitFormGC1.5", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></button>
+            ? <button className='btn-23' onClick={()=>dispatch(submitFormGC1_5(`${firstName}_${lastName}`))}><marquee>Submit</marquee></button>
             : rsvpCode.toUpperCase() === 'GHI'
-            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>dispatch({type:"submitFormGC2", payload:`${firstName} ${lastName}`})}><marquee>Submit</marquee></NavLink>
+            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>dispatch(submitFormGC2(`${firstName}_${lastName}`))}><marquee>Submit</marquee></NavLink>
             : <p>error you should not have gotten this far!!</p>
             }
         </CardStackFooter>
     </>
     )
 }
+
+// {
+//     "registration_fields": {
+//         "first_last": "mitzi_zitler"
+//         "rsvpStatus": "ATTENDING",
+//         "pronouns": "SHEHER",
+//         "streetAddress": "221 s 3rd st",
+//         "secondAddress": "5b",
+//         "city": "brooklyn",
+//         "country": "united states",
+//         "stateProvince": "new york",
+//         "phone": "+15046387943",
+//         "email": "mitzitler@gmail.com",
+//         "drinkAlcohol": true,
+//         "eatMeat": true,
+//         "eatDairy": true,
+//         "eatFish": true,
+//         "eatShellfish": true,
+//         "eatEggs": true,
+//         "eatGluten": true,
+//         "eatPeanuts": true,
+//         "moreRestrictions": "",
+//         "pair_first_last": "",
+//         "rsvpCode": "GHI",
+//         "zipcode": "11211",
+//         "hasPlusOne": false
+//     },
+//     "referralCode": ""
+// }

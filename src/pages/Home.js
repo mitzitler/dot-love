@@ -7,13 +7,33 @@ import { AboutUs } from './AboutUs';
 
 export function Home() {
 
+
+    const nameInput = "mitzi zitler"
+    const acceptableNames = ['test name']
+
+    useEffect(() => {
+        if (acceptableNames.includes(nameInput.toUpperCase())) {
+        document.body.style.overflowY = 'auto';
+        } else {
+        document.body.style.overflowY = 'hidden';
+        }
+    }, [nameInput]);
+
+    // const handleNameInput() {
+
+    // }
+
+
     return (
 
         <>
         <GenericHeader classname="h-screen transfom-scale-5">
 
             <div class= "egg backdrop-blur-xl" />
-            <input placeholder="Full name?"/>
+            <input placeholder="Full name?"
+                value={nameInput}
+                // onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}
+                />
                 {/* onInput={(e)=>dispatch({type: "rsvpCodeInput", payload: e.target.value})}/> */}
 
         </GenericHeader>
@@ -21,8 +41,8 @@ export function Home() {
             <main className="card-stack">
 
                 <Routes>
-                    <Route path="/" element={<Info/>} />
-                    {/* <Route path="/aboutus" element={<AboutUs/>} /> */}
+                    {/* <Route path="/" element={<Info/>} /> */}
+                    <Route path="/" element={<AboutUs/>} />
                 </Routes>
 
             </main>

@@ -3,7 +3,7 @@ import { GenericHeader } from '../components/GenericHeader';
 import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
 import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
-import { RSVPFormSubmit } from './RSVPPages/RSVPFormSubmit.js';
+import { RSVPFormSubmit } from  './RSVPPages/RSVPFormSubmit.js';
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpCodeInput } from '../features/guest/rsvpSlice';
@@ -80,20 +80,17 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvpCode={rsvpCode} 
-                            pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
-                        <RSVPFormContact 
-                            pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormContact pageMainColor={pageMainColor} pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
-                        <RSVPFormDietary 
-                            pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormDietary pageMainColor={pageMainColor} pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
-                        <RSVPFormSubmit contactString={contactString} dietaryString={dietaryString} 
-                            pageMainColor={pageMainColor} pageSection={pageSection} dispatch={dispatch} />} />
+                        <RSVPFormSubmit pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        
                 </Routes>
 
             </main>

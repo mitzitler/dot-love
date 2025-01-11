@@ -33,6 +33,7 @@
   #radio-item {
     display: flex;
     flex-direction: row;
+    color: maroon;
   }
   
   #radio-item label {

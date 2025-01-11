@@ -1,5 +1,5 @@
 import '../App.css';
-import BgVideo from '../assets/video/temp_60s_light_show.mov';
+import BgVideo from '../assets/video/trim_vid.mp4';
 
 export function LightShow() {
     return(
