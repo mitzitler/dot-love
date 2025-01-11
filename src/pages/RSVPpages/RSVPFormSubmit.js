@@ -99,11 +99,11 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
 
     // const rsvpCode = "DEF"
 
-    const [clicked, setClicked] = useState(false)
+    const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
-    function handleClicked() {
-        setClicked(!clicked);
-        console.log(clicked)
+    function handleDateLinkRequested() {
+        setDateLinkRequested(!dateLinkRequested);
+        console.log('text me a link: ' + !dateLinkRequested)
     }
 
   return(
@@ -143,27 +143,22 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
                 </div>
             </div>
             
-            {rsvpCode === 'DEF' 
+            {/* conditional case for open plus ones */}
+            {rsvpCode.toUpperCase() === 'DEF' 
             ? 
             <div class="conditional-plusone">
                 <h2>Are you planning on bringing a guest?</h2>
                 <div>
-                {/* class="grid grid-cols-8"> */}
-                    {/* <p 
-                    className={!clicked ? "col-span-1" :
-                    "conditional-checked col-span-1"}
-                    onClick={()=>handleClicked()}
-                    ></p> */}
-
                     <label className='checkbox-guest' for="guest-yes">
                         Check this box to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
                         <input id="guest-yes" name="guest-yes" type="checkbox"
-                            onClick={()=>handleClicked()}/>
+                            onClick={()=>handleDateLinkRequested()}/>
                         <span class="checkmark"></span>
                     </label>
                 </div>
             </div>
             :<></>}
+
         </CardStackPage>
         <CardStackFooter>
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
@@ -173,7 +168,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
                 console.log(rsvpSubmission)}
             }><marquee>Submit</marquee></button>
             : rsvpCode.toUpperCase() === 'DEF'
-            ? <button className='btn-23' onClick={()=>dispatch(submitFormGC1_5(`${firstName}_${lastName}`))}><marquee>Submit</marquee></button>
+            ? <button className='btn-23' onClick={()=>dispatch(submitFormGC1_5([`${firstName}_${lastName}`, dateLinkRequested]))}><marquee>Submit</marquee></button>
             : rsvpCode.toUpperCase() === 'GHI'
             ? <NavLink className='btn-23' to='/rsvp' onClick={()=>dispatch(submitFormGC2(`${firstName}_${lastName}`))}><marquee>Submit</marquee></NavLink>
             : <p>error you should not have gotten this far!!</p>

@@ -30,6 +30,7 @@ const rsvpSlice = createSlice({
     eatPeanuts: true, 
     moreRestrictions: "",
     submitted: null,
+    dateLinkRequested: false,
     rsvpSubmission: "",
   },
   reducers: {
@@ -119,7 +120,8 @@ const rsvpSlice = createSlice({
       }
     },
     submitFormGC1_5(state, action) {
-      state.submitted = action.payload
+      state.submitted = action.payload[0]
+      state.dateLinkRequested = action.payload[1]
       state.rsvpSubmission = {
         rsvpStatus: state.rsvpStatus,
         pair_first_last: action.payload
