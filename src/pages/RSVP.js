@@ -3,7 +3,7 @@ import { GenericHeader } from '../components/GenericHeader';
 import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
 import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
-import { RSVPFormSubmit } from  './RSVPPages/RSVPFormSubmit.js';
+import { RSVPFormSubmit } from  './RSVPPages/RSVPFormSubmit.js'; // ignore error
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpCodeInput } from '../features/guest/rsvpSlice';
