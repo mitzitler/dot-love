@@ -1,10 +1,20 @@
 import React from 'react';
+import { useState, useCallback } from 'react';
+import { CardStackPage } from '../components/CardStackPage.js';
 import {AboutUsBody} from '../components/AboutUsBody.js'
 
 export function AboutUs() {
+
+    // indigo, amber, teal, pink
+    const pageMainColor = "pink" 
+    const pageSection = "aboutus"
+
     return (
-        <main className="section-content w-full flex-grow bg-indigo-400/75 border-indigo-500/50 border-2">
-            <AboutUsBody />
-        </main>
+
+        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+            <div>
+                hi
+            </div>
+        </CardStackPage>
     )
 }

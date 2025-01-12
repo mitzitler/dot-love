@@ -2,6 +2,10 @@ import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
 import { useState, useEffect, setShow } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, 
+    eatFishToggle, eatEggsToggle, eatGlutenToggle, eatPeanutsToggle,
+    eatShellfishToggle, moreRestrictionsInput} from '../../features/guest/rsvpSlice';
 import { RedX } from   '../../components/RedX';
 import { GreenO } from '../../components/GreenO';
 import { CardStackPage } from '../../components/CardStackPage';
@@ -15,8 +19,6 @@ import "../../assets/dietary-restrictions/gluten.png";
 import "../../assets/dietary-restrictions/meat.png";
 import "../../assets/dietary-restrictions/peanuts.png";
 import "../../assets/dietary-restrictions/shellfish.png";
-import { click } from '@testing-library/user-event/dist/click';
-
 
 const Alcohol = require("../../assets/dietary-restrictions/alcohol_1.png")
 const Dairy = require("../../assets/dietary-restrictions/dairy.png")
@@ -27,54 +29,29 @@ const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
 const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
-// const click_counter = {
-//     alcohol: 0,
-//     dairy: 0,
-//     eggs: 0,
-//     fish: 0,
-//     gluten: 0,
-//     meat: 0,
-//     peanuts: 0,
-//     shellfish: 0
-// }
+export function RSVPFormDietary({pageMainColor, pageSection}) {
 
-export function RSVPFormDietary({pageMainColor, pageSection, drinkAlcohol, eatMeat, eatDairy, eatFish, 
-  eatShellfish, eatEggs, eatGluten, eatPeanuts, moreRestrictions, dispatch}) {
+    const [animation, setAnimation] = useState(null)
+    const dispatch = useDispatch();
 
-  const [divSymbol, setDivSymbol] = useState(true)
-  const [divPositiion, setDivPosition] = useState({ x: 0, y: 0 })
-  const [counter, setCounter] = useState(0)
-  const [clickCounter, setClickCounter] = useState({
-    alcohol: 0,
-    dairy: 0,
-    eggs: 0,
-    fish: 0,
-    gluten: 0,
-    meat: 0,
-    peanuts: 0,
-    shellfish: 0,
-  });
+    const drinkAlcohol = useSelector((state) => state.rsvp.drinkAlcohol) 
+    const eatMeat = useSelector((state) => state.rsvp.eatMeat)
+    const eatDairy = useSelector((state) => state.rsvp.eatDairy)
+    const eatFish = useSelector((state) => state.rsvp.eatFish)
+    const eatShellfish = useSelector((state) => state.rsvp.eatShellfish)
+    const eatEggs = useSelector((state) => state.rsvp.eatEggs)
+    const eatGluten = useSelector((state) => state.rsvp.eatGluten)
+    const eatPeanuts = useSelector((state) => state.rsvp.eatPeanuts)
+    const moreRestrictions = useSelector((state) => state.rsvp.moreRestrictions)
 
-  console.log("count is ", counter)
-  let newCounter = 0
+    const handleClickAnimation = (event, toggleValue) => {
+        const { id } = event.target;
+        const position = { x: event.clientX - 40, y: event.clientY + 5 };
 
-  function handleClickAnimation(event) {
-    console.log("Click position: x: ", event.clientX, ", y: ", event.clientY)
-    console.log(event.target.id)
-    setDivPosition({ x: event.clientX - 40, y: event.clientY + 5})
-    setClickCounter((prevState) => ({
-        ...prevState,
-        [event.target.id]: prevState[event.target.id] + 1,
-    }))
-    if ( counter == NaN ) { newCounter = 0;} 
-    else { newCounter = counter;}
-    setCounter(newCounter + 1)
-    // document.body.textContent =
-    // "clientX: " + event.clientX +
-    // " - clientY: " + event.clientY;
-    // ?? // https://stackoverflow.com/questions/53337998/insert-html-at-clientx-and-clienty-position-of-cursor-in-editor-having-div-conte
-    // console.log("click counter is: ", [event.target.id], ": ", {clickCounter[event.target.id]})
-}
+        setAnimation({ type: toggleValue ? 'green' : 'red', position });
+
+        dispatch({ type: `${id}Toggle` });
+    };
 
   return(
     <>
@@ -84,76 +61,75 @@ export function RSVPFormDietary({pageMainColor, pageSection, drinkAlcohol, eatMe
                         dietary restrictions</h2>
                     <div className="dietary-grid grid grid-cols-2">
 
-                        {/* gsap animate big red X on click */}
-                        {counter > 0 && <RedX divPositiionX={divPositiion.x} divPositiionY={divPositiion.y}/>}
-                        {counter > 0 && <GreenO divPositiionX={divPositiion.x} divPositiionY={divPositiion.y}/>}
-                        {/* <RedX divPositiionX={divPositiion.x} divPositiionY={divPositiion.y}/> */}
-
-                            {/* <div className='big-red-x'
-                                style ={{
-                                    position: 'absolute',
-                                    left: divPositiion.x,
-                                    top: divPositiion.y,
-                                    margin: 'auto',
-                                    textAlign: 'center',
-                                    justifyContent: 'center',
-                                    
-                                }}
-                            >
-                                ❌
-                            </div> */}
-                            
-                        {/* </div> */}
+                        {animation && animation.type === 'red' && (
+                            <RedX
+                                divPositionX={animation.position.x}
+                                divPositionY={animation.position.y}
+                                onAnimationEnd={() => setAnimation(null)}
+                            />
+                        )}
+                        {animation && animation.type === 'green' && (
+                            <GreenO
+                                divPositionX={animation.position.x}
+                                divPositionY={animation.position.y}
+                                onAnimationEnd={() => setAnimation(null)}
+                            />
+                        )}
 
                         <img src={Alcohol} id="alcohol" alt="I drink alcohol" 
                         className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "drinkAlcoholToggle"});
-                            setCounter();
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(drinkAlcoholToggle(e.target.value));
+                            handleClickAnimation(e, !drinkAlcohol)}
                         }/> 
-                            {/* <div class="redx-onclick position-absolute">❌</div> */}
-                            {/* <div>🚫</div> */}
-                        
+
                         <img src={Meat} id="meat" alt="I eat meat" 
                         className={eatMeat ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatMeatToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatMeatToggle());
+                            handleClickAnimation(e, !eatMeat)}
                         }/>
 
                         <img src={Dairy} id="dairy" alt="I eat dairy" 
                         className={eatDairy ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatDairyToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatDairyToggle());
+                            handleClickAnimation(e, !eatDairy)}
                         }/>
 
                         <img src={Fish} id="fish" alt="I eat fish" 
                         className={eatFish ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatFishToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatFishToggle());
+                            handleClickAnimation(e, !eatFish)}
                         }/>  
 
                         <img src={Eggs} id="eggs" alt="I eat eggs" 
                         className={eatEggs ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatEggsToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatEggsToggle());
+                            handleClickAnimation(e, !eatEggs)}
                         }/>
 
                         <img src={Gluten} id="gluten" alt="I eat gluten" 
                         className={eatGluten ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatGlutenToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatGlutenToggle());
+                            handleClickAnimation(e, !eatGluten)}
                         }/>
 
                         <img src={Peanuts} id="peanuts" alt="I eat peanuts" 
                         className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatPeanutsToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatPeanutsToggle());
+                            handleClickAnimation(e, !eatPeanuts)}
                         }/>
 
                         <img src={Shellfish} id="shellfish" alt="I eat shellfish" 
                         className={eatShellfish ? "diet-image" : "diet-image-clicked"}
-                        onClick={(e)=>{dispatch({type: "eatShellfishToggle"});
-                            handleClickAnimation(e)}
+                        onClick={(e)=>{
+                            dispatch(eatShellfishToggle());
+                            handleClickAnimation(e, !eatShellfish)}
                         }/>    
 
                     </div>
@@ -161,7 +137,8 @@ export function RSVPFormDietary({pageMainColor, pageSection, drinkAlcohol, eatMe
                         <input label="other-restrictions" type="text" 
                         id="other-restrictions" 
                         placeholder="Other restrictions?" 
-                        onChange={(e)=>dispatch({type: "moreRestrictionsInput", payload: e.target.value})}/>
+                        // is this format right?
+                        onChange={(e)=>dispatch(moreRestrictionsInput(e.target.value))}/> 
                     </div>
         </CardStackPage>
         <CardStackFooter>
