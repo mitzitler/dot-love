@@ -130,7 +130,7 @@ const rsvpSlice = createSlice({
     // does this work?
     submitFormGC2(state, action) {
       state.submitted = action.payload
-      state.rsvpCode = 'ABC'
+      // state.rsvpCode = 'ABC'
       state.rsvpSubmission = {
         rsvpStatus: state.rsvpStatus,
         pair_first_last: action.payload

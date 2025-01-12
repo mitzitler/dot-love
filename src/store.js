@@ -2,16 +2,18 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import rsvpReducer from "./features/guest/rsvpSlice";
+import rsvpCompletedReducer from "./features/guest/rsvpCompletedSlice";
 import { gizmoApi } from './services/gizmo';
 
 const persistConfig = {
     key: 'root',
     storage, // storage mechanism
-    whitelist: ['rsvp'], // this is the list of reducers to persist
+    whitelist: ['rsvp', 'rsvpCompleted'], // this is the list of reducers to persist
 }
 
 const rootReducer = combineReducers({
     rsvp: rsvpReducer,
+    rsvpCompleted: rsvpCompletedReducer,
     [gizmoApi.reducerPath]: gizmoApi.reducer,
 });
 

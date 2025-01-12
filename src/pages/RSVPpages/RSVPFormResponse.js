@@ -11,16 +11,12 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
     const dispatch = useDispatch();
 
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-
-    console.log(rsvpStatus)
-    console.log("code = ", rsvpCode)
-
-    // const rsvpCodeLower = rsvpCode.lo
+    const submitted = useSelector((state) => state.rsvp.submitted)
 
     return (
         <>
             <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
-                <h1>Repondez S'il Vous Plait!</h1>
+                { submitted === null ? <h1>Repondez S'il Vous Plait!</h1> : <h1>Please RSVP For the Second Guest...</h1> }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
                         November 7th, 2025 in Brooklyn, NY?</h2>
@@ -47,10 +43,14 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
                 { rsvpCode.toLowerCase() === 'def' 
                     ? <p>Are you bringing a plus one?
                         <br/> We will text you a unique link for your invitee.</p>
-                    : ( rsvpCode.toLowerCase() === 'ghi'
+                    : ((rsvpCode.toLowerCase() === 'ghi' & submitted === null)
                     ? <p>After the first guest fills out and submits this form, 
                         <br/>please continue through the flow for the next guest's form.</p> 
-                    : <p></p> )}
+                    : ((rsvpCode.toLowerCase() === 'ghi' & submitted != null)
+                    ? <p>This RSVP will not be complete until both guests fill out the form. 
+                        <br/>if you do not receive confirmation that the RSVPs were submitted, please start over!</p> 
+                    : <p></p> ))}
+
             </CardStackPage>
             <CardStackFooter>
                 <NavLink className='btn-23' 

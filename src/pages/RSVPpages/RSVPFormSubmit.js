@@ -7,6 +7,7 @@ import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitFormGC1, submitFormGC1_5, submitFormGC2 } from '../../features/guest/rsvpSlice';
+import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
 
 // on desktop all the information is pushed down too far
 
@@ -20,10 +21,9 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
     const lastName = useSelector((state) => state.rsvp.lastName)
     const pronouns = useSelector((state) => state.rsvp.pronouns)
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
+    const fullGuestInfo = useSelector((state) => state.rsvp)
 
-    // if (rsvpCode.toUpperCase() === "GHI") {
-    //     const rsvpCodeOriginal = "GHI"
-    // } else null
+    console.log(fullGuestInfo)
 
     const name = firstName + " " + lastName
 
@@ -71,18 +71,18 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
 
             {rsvpCode.toUpperCase() === 'ABC'
             ? <NavLink className='btn-23' to='/' onClick={()=>
-                {dispatch(submitFormGC1(`${firstName}_${lastName}`));
+                {dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 console.log(rsvpSubmission)}
             }><marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'DEF'
             ? <NavLink className='btn-23' to='/' onClick={()=>
-                dispatch(submitFormGC1_5([`${firstName}_${lastName}`, dateLinkRequested]))
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]))
             }><marquee>Submit</marquee></NavLink>
             
             : rsvpCode.toUpperCase() === 'GHI'
             ? <NavLink className='btn-23' to='/rsvp' onClick={()=>
-                dispatch(submitFormGC2(`${firstName}_${lastName}`))
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]))
             }><marquee>Submit</marquee></NavLink>
             
             : <p>error you should not have gotten this far!!</p>}
