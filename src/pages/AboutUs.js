@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useCallback } from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
 import {AboutUsBody} from '../components/AboutUsBody.js'
+import ApiTestComponent from '../components/ApiTestComponent.js'
 
 export function AboutUs() {
 
@@ -15,6 +16,7 @@ export function AboutUs() {
             <div>
                 hi
             </div>
+          {/* <ApiTestComponent /> */}
         </CardStackPage>
     )
 }
