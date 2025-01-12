@@ -894,7 +894,7 @@ class CWDynamoClient:
 ########################################################
 @app.get("/gizmo/ping")
 def ping():
-    return {"code": 200, "message": "ping success"}
+    return {"statusCode": 200, "message": "ping success"}
 
 
 @app.get("/gizmo/user")
@@ -905,7 +905,7 @@ def login():
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
         return {
-            "code": 500,
+            "statusCode": 500,
             "message": err_msg,
         }
 
@@ -913,11 +913,11 @@ def login():
         err_msg = "no such user exists in db"
         log.info(err_msg)
         return {
-            "code": 404,
+            "statusCode": 404,
             "message": err_msg,
         }
     return {
-        "code": 200,
+        "statusCode": 200,
         "message": "login success",
         "body": {
             "user": user.as_map(),
@@ -929,7 +929,7 @@ def login():
 def get_user_by_guest_link():
     guest_link = app.current_event.get_query_string_value("code", "")
     if not guest_link:
-        return {"code": 400, "message": "no guest code provided in query param"}
+        return {"statusCode": 400, "message": "no guest code provided in query param"}
 
     try:
         user = User.from_guest_link_db(guest_link, CW_DYNAMO_CLIENT)
@@ -937,7 +937,7 @@ def get_user_by_guest_link():
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
         return {
-            "code": 500,
+            "statusCode": 500,
             "message": err_msg,
         }
 
@@ -945,14 +945,14 @@ def get_user_by_guest_link():
         err_msg = "no such user exists in db"
         log.warn(err_msg)
         return {
-            "code": 404,
+            "statusCode": 404,
             "message": err_msg,
         }
 
     log.append_keys(user=user.__repr__())
     log.info("success retrieving user from guest link")
     return {
-        "code": 200,
+        "statusCode": 200,
         "message": "guest lookup success",
         "body": {
             "user": user.as_map(),
@@ -979,7 +979,7 @@ def register():
         except Exception as e:
             log.exception("failed lookup of our actual friend")
             return {
-                "code": 500,
+                "statusCode": 500,
                 "message": "failed lookup of our actual friend",
             }
 
@@ -995,12 +995,12 @@ def register():
         err_msg = "failed to register user in db"
         log.exception(err_msg)
         return {
-            "code": 500,
+            "statusCode": 500,
             "message": err_msg,
         }
     if err:
         log.error(f"encountered error registering user in dynamo err={err}")
-        return {"code": 400, "message": err}
+        return {"statusCode": 400, "message": err}
     log.append_keys(user=user.__repr__())
     log.info("succeeded registering user in db")
 
@@ -1011,7 +1011,7 @@ def register():
         except Exception as e:
             log.exception("failed updating guest_first_last of our actual friend")
             return {
-                "code": 500,
+                "statusCode": 500,
                 "message": "failed lookup of our actual friend",
             }
 
@@ -1030,7 +1030,7 @@ def register():
         err_msg = "failed to send user registration success text"
         log.exception(err_msg)
 
-    return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
+    return {"statusCode": 200, "message": "success", "body": {"user": user.as_map()}}
 
 
 @app.patch("/gizmo/user")
@@ -1048,18 +1048,18 @@ def update():
         err_msg = "failed to update user in db"
         log.exception(err_msg)
         return {
-            "code": 500,
+            "statusCode": 500,
             "message": err_msg,
             "error": e,
         }
     if err:
         log.append_keys(dynamo_err=err)
         log.error("encountered error updating user in dynamo")
-        return {"code": 400, "message": err}
+        return {"statusCode": 400, "message": err}
     log.append_keys(user=user.__repr__())
     log.info("succeeded updating user in db")
 
-    return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
+    return {"statusCode": 200, "message": "success", "body": {"user": user.as_map()}}
 
 
 @app.post("/gizmo/email")
@@ -1071,7 +1071,7 @@ def send_email():
         # TODO: This should be a database lookup when we have time
         recipient_email=payload["recipient_email"],
     )
-    return {"code": 200, "data": res}
+    return {"statusCode": 200, "data": res}
 
 
 @app.post("/gizmo/text")
@@ -1083,7 +1083,7 @@ def send_text():
         # TODO: This should be a database lookup when we have time
         recipient_phone=payload["recipient_phone"],
     )
-    return {"code": 200, "data": res}
+    return {"statusCode": 200, "data": res}
 
 
 # Fallback for unhandled routes
@@ -1092,7 +1092,7 @@ def send_text():
 @app.patch("/*")
 def not_found():
     log.info(f"route not found route={app.current_event.path}")
-    return {"code": 404, "message": "Route not found"}
+    return {"statusCode": 404, "message": "Route not found"}
 
 
 @lambda_handler_decorator
@@ -1118,7 +1118,7 @@ def middleware_before(handler, event, context):
     if not first_last:
         log.error("First and last name not included in headers")
         return {
-            "code": 400,
+            "statusCode": 400,
             "message": "First and last name not included in headers",
         }
     log.append_keys(first_last=first_last)
@@ -1135,7 +1135,7 @@ def handler(event, context):
     except Exception as e:
         log.exception("unhandled server error encountered")
         return {
-            "code": 500,
+            "statusCode": 500,
             "message": "Unhandled server error encountered",
         }
 
