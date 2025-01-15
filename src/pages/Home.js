@@ -8,8 +8,8 @@ import { AboutUs } from './AboutUs';
 export function Home() {
 
 
-    const nameInput = "mitzi zitler"
-    const acceptableNames = ['test name']
+    const nameInput = "test name"
+    const acceptableNames = ['TEST NAME']
 
     useEffect(() => {
         if (acceptableNames.includes(nameInput.toUpperCase())) {

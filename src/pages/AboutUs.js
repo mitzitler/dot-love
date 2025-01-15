@@ -5,13 +5,13 @@ import {AboutUsBody} from '../components/AboutUsBody.js'
 
 export function AboutUs() {
 
-    // indigo, amber, teal, pink
-    const pageMainColor = "pink" 
+    const pageMainColor = "lilac" 
     const pageSection = "aboutus"
 
     return (
 
         <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+            {/* <div className={`section-content swipe-card flex-grow bg-lilac-400/75 border-lilac-500/50 border-2 backdrop-blur-md`}> */}
             <div>
                 hi
             </div>

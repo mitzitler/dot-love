@@ -135,6 +135,31 @@ const rsvpSlice = createSlice({
         rsvpStatus: state.rsvpStatus,
         pair_first_last: action.payload
       }
+    },
+    clearForm(state) {
+      state.rsvpStatus = 'undecided'
+      state.firstName = ""
+      state.lastName = "" 
+      state.pronouns = "" 
+      state.phoneNumber = "" 
+      state.email = "" 
+      state.streetAddress = "" 
+      state.secondAddress = ""
+      state.city = ""
+      state.zipcode = ""  
+      state.country = "" 
+      state.stateProvince = ""
+      state.canContinueDietary = false
+      state.drinkAlcohol = true
+      state.eatMeat = true
+      state.eatDairy = true
+      state.eatFish = true
+      state.eatShellfish = true
+      state.eatEggs = true
+      state.eatGluten = true
+      state.eatPeanuts = true
+      state.moreRestrictions = ""
+      state.dateLinkRequested = false
     }  
   }
 })

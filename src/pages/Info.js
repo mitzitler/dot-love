@@ -27,7 +27,7 @@ export function Info() {
     //     setIsExpanded((isExpanded) => !isExpanded);
     //   }, []);
 
-    const pageMainColor = "indigo" 
+    const pageMainColor = "babyblue" 
     const pageSection = "info"
 
     const diety = {
@@ -43,17 +43,6 @@ export function Info() {
     console.log(expandedBox)
 
     return (
-
-        // but the header is specifcally for the 
-
-        // <>
-        // <GenericHeader classname="h-screen transfom-scale-5">
-
-        //     <div class= "egg backdrop-blur-xl" />
-        //     <input placeholder="RSVP code?"
-        //         onInput={(e)=>dispatch({type: "rsvpCodeInput", payload: e.target.value})}/>
-
-        // </GenericHeader>
 
         <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
             <h1>Info</h1>

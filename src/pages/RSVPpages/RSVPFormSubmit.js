@@ -20,6 +20,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
     const firstName = useSelector((state) => state.rsvp.firstName) 
     const lastName = useSelector((state) => state.rsvp.lastName)
     const pronouns = useSelector((state) => state.rsvp.pronouns)
+    const submitted = useSelector((state) => state.rsvp.submitted)
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
     const fullGuestInfo = useSelector((state) => state.rsvp)
 
@@ -70,19 +71,31 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
             {rsvpCode.toUpperCase() === 'ABC'
-            ? <NavLink className='btn-23' to='/' onClick={()=>
-                {dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                console.log(rsvpSubmission)}
+            ? <NavLink className='btn-23' to='/' onClick={()=>{
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
+                dispatch()
+                }
             }><marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'DEF'
-            ? <NavLink className='btn-23' to='/' onClick={()=>
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]))
+            ? <NavLink className='btn-23' to='/' onClick={()=>{
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
+                dispatch()
+                }
             }><marquee>Submit</marquee></NavLink>
             
-            : rsvpCode.toUpperCase() === 'GHI'
-            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]))
+            : (rsvpCode.toUpperCase() === 'GHI' & submitted === null)
+            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>{
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
+                dispatch()
+                }
+            }><marquee>Continue</marquee></NavLink>
+            
+            : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
+            ? <NavLink className='btn-23' to='/' onClick={()=>{
+                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
+                dispatch()
+                }
             }><marquee>Submit</marquee></NavLink>
             
             : <p>error you should not have gotten this far!!</p>}
