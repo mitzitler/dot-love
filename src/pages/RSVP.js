@@ -39,42 +39,6 @@ export function RSVP() {
         }
     }, [rsvpCode]);
 
-    console.log("code = ", rsvpCode)
-
-    const rsvpString = "Hi"
-    const contactString = "Yo"
-
-    // const rsvpString = rsvp === "attending" ? "We are excited you are coming!" :
-    //     "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-
-    // const contactString = "Hi " + firstName + " " + lastName + " (" + pronouns + "), " +
-    //     "we can reach you at " + phoneNumber + " or " + email + " and your mailing address is " + 
-    //     streetAddress + " " + secondAddress + ", in " + city + ", " + zipcode + " - " + 
-    //     stateProvince + ", " + country 
-    
-    // function dietaryToWords(dietaryState, dietaryName) {
-    //     const verb = dietaryState ? "do" : "don't"
-    //     return "I " + verb + " " + dietaryName
-    // }
-
-    // function moreRestrictionsToWords(moreRestrictions) {
-    //     if (moreRestrictions.length === 0) 
-    //         return("")
-    //     else return "; and I have other restrictions, such as " + moreRestrictions
-    // }
-
-    // const dietaryString = dietaryToWords(drinkAlcohol, "drink alcohol") + "; " +
-    //     dietaryToWords(eatMeat, "eat meat") + "; " +
-    //     dietaryToWords(eatDairy, "have dairy") + "; " +
-    //     dietaryToWords(eatFish, "eat fish") + "; " +
-    //     dietaryToWords(eatShellfish, "eat shellfish") + "; " +
-    //     dietaryToWords(eatEggs, "eat eggs") + "; " +
-    //     dietaryToWords(eatGluten, "eat gluten products") + "; " +
-    //     dietaryToWords(eatPeanuts, "eat peanuts and legumes") +
-    //     moreRestrictionsToWords(moreRestrictions)
-
-    const dietaryString = "Lol"
-
     return (
 
         <>
@@ -96,16 +60,24 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
-                        <RSVPFormContact pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormContact pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
-                        <RSVPFormDietary pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormDietary pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
-                        <RSVPFormSubmit pageMainColor={pageMainColor} pageSection={pageSection} />} />
+                        <RSVPFormSubmit pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSection={pageSection} />} />
                         
                 </Routes>
 

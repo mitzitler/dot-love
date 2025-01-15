@@ -28,6 +28,8 @@ export function Info() {
     //   }, []);
 
     const pageMainColor = "babyblue" 
+    // const pageSecondaryColor = "babyblue" 
+    // const pageTertiaryColor = "babyblue" 
     const pageSection = "info"
 
     const diety = {
@@ -44,7 +46,10 @@ export function Info() {
 
     return (
 
-        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+        <CardStackPage pageMainColor={pageMainColor} 
+        pageSecondaryColor={pageMainColor}
+        pageTertiaryColor={pageMainColor}
+        pageSection={pageSection}>
             <h1>Info</h1>
             <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
             <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
