@@ -4,6 +4,7 @@ import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
 import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
 import { RSVPFormSubmit } from  './RSVPPages/RSVPFormSubmit.js'; // ignore error
+import { RSVPFormConfirmation } from  './RSVPPages/RSVPFormConfirmation.js'; // ignore error
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpCodeInput } from '../features/guest/rsvpSlice';
@@ -60,6 +61,11 @@ export function RSVP() {
 
                     <Route path="/submit" element={
                         <RSVPFormSubmit pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSection={pageSection} />} />
+
+                    <Route path="/confirmation" element={
+                        <RSVPFormConfirmation pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
                         pageSection={pageSection} />} />
                         

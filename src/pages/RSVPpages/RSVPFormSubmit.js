@@ -71,14 +71,14 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
             {rsvpCode.toUpperCase() === 'ABC'
-            ? <NavLink className='btn-23' to='/' onClick={()=>{
+            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch()
                 }
             }><marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'DEF'
-            ? <NavLink className='btn-23' to='/' onClick={()=>{
+            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch()
                 }
@@ -92,7 +92,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
             }><marquee>Continue</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
-            ? <NavLink className='btn-23' to='/' onClick={()=>{
+            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch()
                 }
