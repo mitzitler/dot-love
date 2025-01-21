@@ -8,6 +8,7 @@ import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitFormGC1, submitFormGC1_5, submitFormGC2 } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
+import { useRegisterUserMutation } from '../../services/gizmo';
 
 // on desktop all the information is pushed down too far
 
@@ -23,6 +24,8 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
     const fullGuestInfo = useSelector((state) => state.rsvp)
 
+    const [registerUser] = useRegisterUserMutation();
+
     console.log(fullGuestInfo)
 
     const name = firstName + " " + lastName
@@ -35,6 +38,51 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
     function handleDateLinkRequested() {
         setDateLinkRequested(!dateLinkRequested);
         console.log('text me a link: ' + !dateLinkRequested)
+    }
+
+    async function handleSubmit() {
+        const registrationFields = {
+            rsvp_status: rsvpStatus.toUpperCase(),
+            pronouns,
+            street: '221 s 3rd st',
+            second_line: '5b',
+            city: 'brooklyn',
+            country: 'united states',
+            state_loc: 'new york',
+            phone: '+15046387943', // Replace with actual phone
+            email: 'mitzitler@gmail.com', // Replace with actual email
+            alcohol: true,
+            meat: true,
+            dairy: true,
+            fish: true,
+            shellfish: true,
+            eggs: true,
+            gluten: true,
+            peanuts: true,
+            restrictions: 'none',
+            pair_first_last: '',
+            rsvp_code: rsvpCode,
+            zipcode: '11211',
+        };
+
+        const payload = {
+            registration_fields: registrationFields,
+            guest_link: dateLinkRequested ? 'requested' : '',
+        };
+
+        try {
+            const response = await registerUser({
+                headers: { 'X-First-Last': `${firstName}_${lastName}` },
+                body: payload,
+            }).unwrap();
+
+            console.log('Registration Successful:', response);
+
+            // Dispatch Redux action to store completed RSVP
+            dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
+        } catch (error) {
+            console.error('Registration Failed:', error);
+        }
     }
 
   return(
@@ -57,8 +105,13 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
                 <div>
                     <label className='checkbox-guest' for="guest-yes">
                         Check this box to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
-                        <input id="guest-yes" name="guest-yes" type="checkbox"
-                            onClick={()=>handleDateLinkRequested()}/>
+                        <input
+                          id="guest-yes"
+                          name="guest-yes"
+                          type="checkbox"
+                          checked={dateLinkRequested}
+                          onChange={()=>handleDateLinkRequested()}
+                        />
                         <span class="checkmark"></span>
                     </label>
                 </div>
@@ -67,7 +120,16 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
 
         </CardStackPage>
         <CardStackFooter>
-            <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
+            <NavLink className='btn-23' to='/rsvp/dietary' end>
+              <marquee>
+                Return
+              </marquee>
+            </NavLink>
+            <NavLink className="btn-23" to="/" onClick={handleSubmit}>
+                <marquee>
+                  Submit
+                </marquee>
+            </NavLink>
 
             {rsvpCode.toUpperCase() === 'ABC'
             ? <NavLink className='btn-23' to='/' onClick={()=>
