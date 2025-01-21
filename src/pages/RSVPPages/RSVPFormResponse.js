@@ -22,7 +22,7 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
                         November 7th, 2025 in Brooklyn, NY?</h2>
                     <p>If need be, you can change this, but please let us know soon!</p>
                 </div>
-                {/* look at this maybe */}
+              {/* TODO: revisit this */}
                 <div id="rsvp-radio">
                     <div id="radio-item">
                         <input id="rsvp-yes" name="rsvp" type="radio" value={rsvpStatus}

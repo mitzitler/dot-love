@@ -8,7 +8,7 @@ import { AboutUs } from './AboutUs';
 export function Home() {
 
 
-    const nameInput = "mitzi zitler"
+    const nameInput = "RSVP code?"
     const acceptableNames = ['test name']
 
     useEffect(() => {
