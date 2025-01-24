@@ -18,7 +18,8 @@ stack_env = config["stack_env"]
 ses_sns_arn = config["ses_sns_arn"]
 ses_sender_email = config["ses_sender_email"]
 ses_admin_list = config["ses_admin_list"]
-ssl_cert_arn = config["ssl_cert_arn"]
+api_ssl_cert_arn = config["api_ssl_cert_arn"]
+cdn_ssl_cert_arn = config["cdn_ssl_cert_arn"]
 
 dotLoveStack = DotLoveCoreStack(
     scope=app,
@@ -28,7 +29,8 @@ dotLoveStack = DotLoveCoreStack(
     ses_sns_arn=ses_sns_arn,
     ses_sender_email=ses_sender_email,
     ses_admin_list=ses_admin_list,
-    ssl_cert_arn=ssl_cert_arn,
+    api_ssl_cert_arn=api_ssl_cert_arn,
+    cdn_ssl_cert_arn=cdn_ssl_cert_arn,
 )
 
 app.synth()

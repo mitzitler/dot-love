@@ -22,7 +22,8 @@
       "ses_sns_arn": "arn:aws:sns:us-east-1:832303862315:carworld-ses-notif-sns",
       "ses_sender_email": "no-reply@mitzimatthew.love",
       "ses_admin_list": "themattsaucedo@gmail.com",
-      "ssl_cert_arn": "arn:aws:acm:us-east-1:832303862315:certificate/861c049e-8c06-4ed1-a5a6-861df3ecb741"
+      "api_ssl_cert_arn": "arn:aws:acm:us-east-1:832303862315:certificate/861c049e-8c06-4ed1-a5a6-861df3ecb741",
+      "cdn_ssl_cert_arn": "arn:aws:acm:us-east-1:832303862315:certificate/79fe203e-4888-4226-bcb9-e2ac780465f1"
     },
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,

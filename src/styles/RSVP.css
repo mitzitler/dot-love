@@ -309,7 +309,6 @@
     transform: rotate(45deg);
   }
 
-
 .big-red-x, .big-green-o {
     position: absolute;
     font-size: 3rem;
@@ -344,3 +343,33 @@
       opacity: 0;
     }
   }
+
+.Toastify {
+    height: 0px;
+    color: maroon;
+  }
+.Toastify__toast-icon {
+  padding-right: 3rem;
+  color: maroon;
+}
+.Toastify__toast-body {
+  color: maroon;
+  font-weight: bold;
+}
+.Toastify__progress-bar-theme--dark {
+  color: maroon;
+  background-color: maroon;
+}
+/* This doesn't work */
+.Toastify__toast-theme--dark {
+  color: maroon;
+  background-color: #ffc107 !important;
+}
+.Toastify__close-button {
+  color: #ffc107;
+  background-color: #ffc107;
+}
+.Toastify__close-button--dark  {
+  color: #ffc107;
+  background-color: #ffc107;
+}

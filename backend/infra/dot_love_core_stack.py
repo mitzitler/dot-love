@@ -12,6 +12,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_ses as ses,
     aws_sns as sns,
+    aws_cloudfront as cloudfront,
+    aws_cloudfront_origins as origins,
     aws_sns_subscriptions as subscriptions,
     aws_apigatewayv2_alpha as apigw,
     CfnOutput,
@@ -42,7 +44,8 @@ class DotLoveCoreStack(Stack):
         ses_sns_arn: str,
         ses_sender_email: str,
         ses_admin_list: str,
-        ssl_cert_arn: str,
+        api_ssl_cert_arn: str,
+        cdn_ssl_cert_arn: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -87,8 +90,11 @@ class DotLoveCoreStack(Stack):
         ##################################################
         # DOMAIN SETUP
         ##################################################
-        self.domain_cert = cert_manager.Certificate.from_certificate_arn(
-            self, "dot_love_domain_cert", ssl_cert_arn
+        self.api_domain_cert = cert_manager.Certificate.from_certificate_arn(
+            self, "api_dot_love_domain_cert", api_ssl_cert_arn
+        )
+        self.cdn_domain_cert = cert_manager.Certificate.from_certificate_arn(
+            self, "cdn_dot_love_domain_cert", cdn_ssl_cert_arn
         )
 
         ###################################################
@@ -108,7 +114,9 @@ class DotLoveCoreStack(Stack):
         self.create_global_dependency_layer()
 
         # Create API Gateway
-        self.dot_love_api_gw = self.create_dot_love_api_gw(ssl_cert=self.domain_cert)
+        self.dot_love_api_gw = self.create_dot_love_api_gw(
+            ssl_cert=self.api_domain_cert
+        )
 
         ###################################################
         # GIZMO USER SERVICE
@@ -163,7 +171,13 @@ class DotLoveCoreStack(Stack):
         # DOT LOVE MEDIA ETC S3
         ###################################################
         # Create S3 to store bounce and complaints
-        self.create_dot_love_website_media_etc_s3()
+        self.dot_love_website_media_s3 = self.create_dot_love_website_media_etc_s3()
+        self.dot_love_website_react_s3 = self.create_dot_love_website_react_s3()
+        self.create_dot_love_cdn(
+            self.dot_love_website_media_s3,
+            self.dot_love_website_react_s3,
+            self.cdn_domain_cert,
+        )
 
     ###################################################
     # DOT LOVE DATABASES
@@ -431,9 +445,9 @@ class DotLoveCoreStack(Stack):
         # Value: this value
         CfnOutput(
             self,
-            "RegionalDomainName",
+            "create a CNAME record: host = api value",
             value=domain_name.regional_domain_name,
-            description="regional domain name for mitzimatthew.love",
+            description="apigw regional domain name for mitzimatthew.love",
         )
 
         return dot_love_api
@@ -590,6 +604,7 @@ class DotLoveCoreStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
+            enforce_ssl=True,
         )
 
         return {"bucket": registry_item_img_bucket}
@@ -602,9 +617,118 @@ class DotLoveCoreStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[
+                        s3.HttpMethods.GET,
+                    ],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                )
+            ],
+            enforce_ssl=True,
         )
 
         return {"bucket": website_media_etc_bucket}
+
+    def create_dot_love_website_react_s3(self):
+        website_react_bucket = s3.Bucket(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-website-react-s3",
+            auto_delete_objects=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[
+                        s3.HttpMethods.GET,
+                    ],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                )
+            ],
+        )
+
+        return {"bucket": website_react_bucket}
+
+    def create_dot_love_cdn(self, website_media_s3, website_react_s3, dot_love_cert):
+        # Origin Access Identity (OAI) config
+        media_oai = cloudfront.OriginAccessIdentity(
+            self,
+            f"{self.stack_env}-dot-love-media-origin-access-identity",
+            comment=f"OAI for {self.stack_env}-dot-love-media-cdn",
+        )
+        website_media_s3["bucket"].grant_read(media_oai)
+        react_oai = cloudfront.OriginAccessIdentity(
+            self,
+            f"{self.stack_env}-dot-love-react-origin-access-identity",
+            comment=f"OAI for {self.stack_env}-dot-love-react-cdn",
+        )
+        website_react_s3["bucket"].grant_read(react_oai)
+
+        # Distribution for cdn.mitzimatthew.love (Media Bucket)
+        media_distribution = cloudfront.Distribution(
+            self,
+            f"{self.stack_env}-dot-love-media-cdn",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3Origin(
+                    website_media_s3["bucket"], origin_access_identity=media_oai
+                ),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+            ),
+            domain_names=["cdn.mitzimatthew.love"],
+            certificate=dot_love_cert,
+        )
+
+        # Distribution for mitzimatthew.love (React App Bucket)
+        react_distribution = cloudfront.Distribution(
+            self,
+            f"{self.stack_env}-dot-love-react-cdn",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3Origin(
+                    website_react_s3["bucket"], origin_access_identity=react_oai
+                ),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+                cached_methods=cloudfront.CachedMethods.CACHE_GET_HEAD,
+                cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
+            ),
+            domain_names=["mitzimatthew.love", "www.mitzimatthew.love"],
+            certificate=dot_love_cert,
+            default_root_object="index.html",
+            error_responses=[
+                cloudfront.ErrorResponse(
+                    http_status=403,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                    ttl=Duration.seconds(0),
+                ),
+                cloudfront.ErrorResponse(
+                    http_status=404,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                    ttl=Duration.seconds(0),
+                ),
+            ],
+        )
+
+        # Outputs for the cname records
+        CfnOutput(
+            self,
+            "create a CNAME record: host = cdn value",
+            value=media_distribution.domain_name,
+            description="The custom domain URL for the Media CloudFront distribution CNAME record value",
+        )
+        CfnOutput(
+            self,
+            "create a CNAME record: host = www value",
+            value=react_distribution.domain_name,
+            description="The custom domain URL for the React CloudFront distribution CNAME record value",
+        )
+
+        return {"media_cdn": media_distribution, "react_cdn": react_distribution}
 
     def obtain_ssm_client_secret(self, secret_name):
         secret = self.ssm.get_parameter(Name=secret_name, WithDecryption=True)

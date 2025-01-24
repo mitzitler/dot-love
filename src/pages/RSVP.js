@@ -8,11 +8,22 @@ import { RSVPFormConfirmation } from  './RSVPPages/RSVPFormConfirmation.js'; // 
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpCodeInput } from '../features/guest/rsvpSlice';
+import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
 import '../App.css';
 
 export function RSVP() {
 
     const dispatch = useDispatch();
+
+    const notify = (input, success) => {
+        if (success) {
+            toast.info(input, {
+                theme: "dark",
+                position: "top-right",
+                icon: ({theme, type}) =>  <img src=""/>
+            })
+        }
+    }
 
     const pageMainColor = "amber"
     const pageSecondaryColor = "lilac"
@@ -24,17 +35,22 @@ export function RSVP() {
 
     useEffect(() => {
         if (acceptableCodes.includes(rsvpCode.toUpperCase())) {
-        document.body.style.overflowY = 'auto';
+            document.body.style.overflowY = 'auto';
+            notify("Code accepted! Please scroll down", true);
         } else {
-        document.body.style.overflowY = 'hidden';
+            document.body.style.overflowY = 'hidden';
         }
     }, [rsvpCode]);
 
     return (
 
         <>
-        <GenericHeader classname="h-screen transfom-scale-5">
+        {/* Toast */}
+        <ToastContainer
+            position="top-right"
+            toastStyle={{}}/>
 
+        <GenericHeader classname="h-screen transfom-scale-5">
             <div class= "egg backdrop-blur-xl" />
             <input placeholder="RSVP code?"
                 value={rsvpCode}
