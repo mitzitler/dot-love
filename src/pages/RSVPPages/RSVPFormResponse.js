@@ -53,7 +53,7 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
                     : <p></p> ))}
 
             </CardStackPage>
-            <CardStackFooter>
+            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
                 <NavLink className='btn-23' 
                     disabled={rsvpStatus === 'undecided' ? true : false} 
                     to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 
