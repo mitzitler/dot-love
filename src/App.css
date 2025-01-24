@@ -444,19 +444,3 @@ header {
   align-items: center;
   justify-content: center;
 }
-
-.big-red-x, .big-green-o {
-  position: absolute;
-  font-size: 48px !important;
-  font-family: futura !important;
-  z-index: 999;
-  animation: redx 3s linear;
-  margin: auto;
-  padding: auto;
-  text-align: center;
-  justify-content: center;
-  /* background-color: #d6d6d6; */
-}
-
-.big-red-x {color: red !important;}
-.big-green-o {color: rgb(90, 165, 33) !important;}

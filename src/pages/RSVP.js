@@ -26,6 +26,8 @@ export function RSVP() {
     }
 
     const pageMainColor = "amber"
+    const pageSecondaryColor = "lilac"
+    const pageTertiaryColor = "lime"
     const pageSection = "rsvp"
     const acceptableCodes = ['ABC', 'DEF', 'GHI']
 
@@ -62,27 +64,27 @@ export function RSVP() {
                 <Routes>
                     <Route path="/" element={
                         <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
                         <RSVPFormContact pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
                         <RSVPFormDietary pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
                         <RSVPFormSubmit pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/confirmation" element={
                         <RSVPFormConfirmation pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageMainColor} pageTertiaryColor={pageMainColor}
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
                         
                 </Routes>

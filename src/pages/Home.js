@@ -8,8 +8,8 @@ import { AboutUs } from './AboutUs';
 export function Home() {
 
 
-    const nameInput = "RSVP code?"
-    const acceptableNames = ['test name']
+    const nameInput = "test name"
+    const acceptableNames = ['TEST NAME']
 
     useEffect(() => {
         if (acceptableNames.includes(nameInput.toUpperCase())) {
