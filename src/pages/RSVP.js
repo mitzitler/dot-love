@@ -26,8 +26,8 @@ export function RSVP() {
     }
 
     const pageMainColor = "amber"
-    const pageSecondaryColor = "lilac"
-    const pageTertiaryColor = "lime"
+    const pageSecondaryColor = "lime"
+    const pageTertiaryColor = "raspberry"
     const pageSection = "rsvp"
     const acceptableCodes = ['ABC', 'DEF', 'GHI']
 
@@ -60,6 +60,9 @@ export function RSVP() {
         </GenericHeader>
         <div classname="container">
             <main className="card-stack">
+                
+                {/* <div className={`section-content swipe-card flex-grow bg-lime-400/75 border-lime-500/50 border-2 backdrop-blur-md`}> */}
+                {/* </div> */}
 
                 <Routes>
                     <Route path="/" element={
