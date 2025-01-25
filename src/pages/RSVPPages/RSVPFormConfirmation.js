@@ -6,10 +6,11 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormConfirmation({pageMainColor, pageSection, rsvpCode}) {
+export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
     return (
-        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+        pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
 
                 <h1>RSVP Submission Confirmed!</h1>
                 <div>

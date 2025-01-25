@@ -29,7 +29,7 @@ const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
 const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
-export function RSVPFormDietary({pageMainColor, pageSection}) {
+export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const [animation, setAnimation] = useState(null)
     const dispatch = useDispatch();
@@ -55,7 +55,8 @@ export function RSVPFormDietary({pageMainColor, pageSection}) {
 
   return(
     <>
-        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>  
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>  
                     <h1 >... and any dietary restrictions, please!</h1> 
                     <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
                         dietary restrictions</h2>
@@ -141,7 +142,7 @@ export function RSVPFormDietary({pageMainColor, pageSection}) {
                         onChange={(e)=>dispatch(moreRestrictionsInput(e.target.value))}/> 
                     </div>
         </CardStackPage>
-        <CardStackFooter>
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
                 <NavLink className='btn-23' to='/rsvp/contact' end>
                     <marquee>Return</marquee>
                 </NavLink> 

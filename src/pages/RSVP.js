@@ -28,6 +28,7 @@ export function RSVP() {
     const pageMainColor = "amber"
     const pageSecondaryColor = "lime"
     const pageTertiaryColor = "raspberry"
+    const opacity = '50'
     const pageSection = "rsvp"
     const acceptableCodes = ['ABC', 'DEF', 'GHI']
 
@@ -61,34 +62,33 @@ export function RSVP() {
         <div classname="container">
             <main className="card-stack">
                 
-                {/* <div className={`section-content swipe-card flex-grow bg-lime-400/75 border-lime-500/50 border-2 backdrop-blur-md`}> */}
-                {/* </div> */}
+                {/* <div className={`section-content swipe-card flex-grow bg-lime-400/45 border-lime-500/50 border-1 backdrop-blur-md`}/> */}
 
                 <Routes>
                     <Route path="/" element={
                         <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        pageSection={pageSection} />} />
+                        opacity={opacity} pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
                         <RSVPFormContact pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        pageSection={pageSection} />} />
+                        opacity={opacity} pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
                         <RSVPFormDietary pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        pageSection={pageSection} />} />
+                        opacity={opacity} pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
                         <RSVPFormSubmit pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        pageSection={pageSection} />} />
+                        opacity={opacity} pageSection={pageSection} />} />
 
                     <Route path="/confirmation" element={
                         <RSVPFormConfirmation pageMainColor={pageMainColor} 
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        pageSection={pageSection} />} />
+                        opacity={opacity} pageSection={pageSection} />} />
                         
                 </Routes>
 
