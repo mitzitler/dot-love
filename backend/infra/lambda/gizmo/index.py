@@ -599,6 +599,7 @@ class User:
                 rsvp["guestInfo"]["firstName"] + "_" + rsvp["guestInfo"]["lastName"]
             )
             users.append(Users.from_guest_info(rsvp["guestInfo"]))
+        return users
 
     @staticmethod
     def from_guest_info(guest_info):
@@ -607,29 +608,30 @@ class User:
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
+        phone = "+" + guest_info["phoneNumberCountryCode"] + guest_info["phoneNumber"]
 
         rsvp_status = RsvpStatus[guest_info["rsvp_status"]]
         pronouns = Pronouns[guest_info["pronouns"]]
         address = UserAddress(
-            guest_info["street"],
-            guest_info["second_line"],
+            guest_info["streetAddress"],
+            guest_info["secondAddress"],
             guest_info["city"],
             guest_info["zipcode"],
             guest_info["country"],
-            guest_info["state_loc"],
-            guest_info["phone"],
+            guest_info["stateProvince"],
+            phone,
         )
         email = guest_info["email"]
         diet = UserDiet(
-            guest_info["alcohol"],
-            guest_info["meat"],
-            guest_info["dairy"],
-            guest_info["fish"],
-            guest_info["shellfish"],
-            guest_info["eggs"],
-            guest_info["gluten"],
-            guest_info["peanuts"],
-            guest_info["restrictions"],
+            guest_info["drinkAlcohol"],
+            guest_info["eatMeat"],
+            guest_info["eatDairy"],
+            guest_info["eatFish"],
+            guest_info["eatShellfish"],
+            guest_info["eatEggs"],
+            guest_info["eatGluten"],
+            guest_info["eatPeanuts"],
+            guest_info["moreRestrictions"],
         )
         guest_details = GuestDetails(
             link=guest_link_string,
@@ -639,7 +641,7 @@ class User:
         return User(
             first=first,
             last=last,
-            rsvp_code=guest_info["rsvp_code"],
+            rsvp_code=guest_info["rsvpCode"],
             rsvp_status=rsvp_status,
             pronouns=pronouns,
             address=address,
@@ -993,60 +995,67 @@ def register():
                 "message": "failed lookup of our actual friend",
             }
 
-    user = User.from_guest_info(
+    # we might get more than one rsvp
+    users = User.from_guest_info(
         app.context["first_last"],
         app.current_event.json_body["guest_info"],
     )
 
-    err = None
-    try:
-        err = user.register_db(CW_DYNAMO_CLIENT)
-    except Exception as e:
-        err_msg = "failed to register user in db"
-        log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-        }
-    if err:
-        log.error(f"encountered error registering user in dynamo err={err}")
-        return {"code": 400, "message": err}
-    log.append_keys(user=user.__repr__())
-    log.info("succeeded registering user in db")
-
-    if guest_link:
+    # register user(s) in db
+    for user in users:
+        err = None
         try:
-            our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
-            our_actual_friend.update_db(CW_DYNAMO_CLIENT)
+            err = user.register_db(CW_DYNAMO_CLIENT)
         except Exception as e:
-            log.exception("failed updating guest_first_last of our actual friend")
+            err_msg = "failed to register user in db"
+            log.exception(err_msg)
             return {
                 "code": 500,
-                "message": "failed lookup of our actual friend",
+                "message": err_msg,
             }
+        if err:
+            log.error(f"encountered error registering user in dynamo err={err}")
+            return {"code": 400, "message": err}
+        log.append_keys(user=user.__repr__())
+        log.info("succeeded registering user in db")
 
-    try:
-        has_guest = app.current_event.json_body["guest_info"]["rsvp_code"] == "GHI"
-        email_registration_success(user, has_guest)
-    except Exception as e:
-        err_msg = "failed to send user registration success email"
-        log.exception(err_msg)
+        if guest_link:
+            try:
+                our_actual_friend.guest_details.pair_first_last = app.context[
+                    "first_last"
+                ]
+                our_actual_friend.update_db(CW_DYNAMO_CLIENT)
+            except Exception as e:
+                log.exception("failed updating guest_first_last of our actual friend")
+                return {
+                    "code": 500,
+                    "message": "failed lookup of our actual friend",
+                }
 
-    try:
-        text_registration_success(user)
-    except Exception as e:
-        err_msg = "failed to send user registration success text"
-        log.exception(err_msg)
+    # notify user(s) of registration success
+    for user in users:
+        try:
+            has_guest = app.current_event.json_body["guest_info"]["rsvp_code"] == "GHI"
+            email_registration_success(user, has_guest)
+        except Exception as e:
+            err_msg = "failed to send user registration success email"
+            log.exception(err_msg)
+        try:
+            text_registration_success(user)
+        except Exception as e:
+            err_msg = "failed to send user registration success text"
+            log.exception(err_msg)
 
-    return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
+    users_registered = {}
+    for user in users:
+        users_registered[user.first] = user.as_map()
+
+    return {"code": 200, "message": "success", "body": users_registered}
 
 
 @app.patch("/gizmo/user")
 def update():
-    user = User.from_guest_info(
-        app.context["first_last"],
-        app.current_event.json_body["guest_info"],
-    )
+    user = extract_users_from_payload(app.current_event.json_body)[0]
 
     err = None
     try:
