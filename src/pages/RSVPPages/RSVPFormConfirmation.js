@@ -2,14 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
 import { CardStackPage } from '../../components/CardStackPage';
-import { CardStackFooter } from '../../components/CardStackFooter';
-import { useDispatch, useSelector } from 'react-redux';
-import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormConfirmation({pageMainColor, pageSection, rsvpCode}) {
+export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
     return (
-        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+        pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
 
                 <h1>RSVP Submission Confirmed!</h1>
                 <div>
@@ -24,7 +22,7 @@ export function RSVPFormConfirmation({pageMainColor, pageSection, rsvpCode}) {
                 {/* for some reason this routes at the same position, not to the top */}
                 {/* there are a million responses here: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition */}
                 <NavLink to='/'>
-                    <button>On to the main site!</button>
+                    <button class="btn-generic">On to the main site!</button>
                 </NavLink>
 
         </CardStackPage>

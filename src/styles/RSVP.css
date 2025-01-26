@@ -5,309 +5,355 @@
     margin: 5%;
     /* min-height: 600; */
     color: red;
-  }
+}
   
-  .rsvp div {
-    color: greenyellow;
-    font-size: large;
-    font-family: gambetta;
-    /* margin-bottom: 10% */
-    /* this was super frustrating ^ where else will it effect? */
-  }
-  
-  .rsvp #rsvp-radio {
-    /* background-color: bisque; */
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    margin: 12% 0% 8% 0%
-  }
-  
-  /* this does nothing */
-  /* .rsvp #radio-item {
-    color: rgba(0, 0, 0, 0.566);
-    font-family: gambetta;
-    margin-bottom: 3%;
-  } */
-  
-  #radio-item {
-    display: flex;
-    flex-direction: row;
-    color: maroon;
-  }
-  
-  #radio-item label {
-    color: maroon;
-    font-size: larger;
-    /* margin-bottom: 10em; */
-  
-  }
-  
-  .rsvp input {
-    color: red;
-  }
-  
-  .rsvp h1 {
-    font-size: x-large;
-    font-family: Bonbance;
-    color: rgb(85, 7, 7);
-    /* background-color: aqua; */
-    margin-bottom: 6%
-  }
-  
-  .rsvp h2 {
-    font-size: large;
-    font-family: gambetta;
-    color: rgba(0, 0, 0, 0.566);
-    margin-bottom: 2%
-  }
-  
-  .rsvp p {
-    margin: auto;
-    color: rgba(0, 0, 0, 0.566);
-    font-size: medium;
-    font-family: elanor;
-    margin-bottom: 5%;
-  }
-  
-  .rsvp .name-info, .contact-num, .contact-info, .state-country, .other-restrictions {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5%;
-  }
-  
-  .rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
-    .state-country button, .state-country input, .other-restrictions input {
-    opacity: 60%;
-    box-shadow: inset 0 0 40px 40px beige;
-    color: red;
-    font-family: elanor;
-    font-size: medium;
-    border-radius: 7px;
-    margin: 0% 1%;
-    height: 28px;
-    padding: 0% 1%
-  }
-  
-  .rsvp #other-restrictions {
-    margin: auto;
-    width: 60%; 
-  }
-  
-  .rsvp #first-name, #last-name, #address, #city {
-    width: 40%; 
-  }
-  
-  .rsvp #pronouns, #address-2, #zipcode {
-    width: 20%;
-    z-index: 1000
-  }
-  
-  .rsvp #phone, #email, #country, #state {
-    width: 50%
-  }
-  
-  #contact-bottom {
-    margin-top: 27%;
-  }
-  
-  .dietary-grid {
-    padding: 1% 6% 2%;
-    margin-bottom: 2%
-  }
-  
-  .diet-image, .diet-image-clicked {
-    width: 90px;
-    height: 90px;
-    margin: auto;
-    transition: all 1.5s ease-in-out;
-  }
-  
-  .rsvp .diet-image:hover, .diet-image-clicked:hover {
-    transition: all 1s ease-in-out;
-    scale: 1.1
-  }
-  
-  .rsvp .diet-image-clicked {
-    /* transform: brightness(0.5);
-    transform: saturate(0%);
-    filter: grayscale(50%); */
-    filter: brightness(0.4);
-    filter: saturate(0%);
-    /* animation: redx 3s linear; */
-  }
-  
-  .submit-div {
-    padding: 0% 1%
-  }
-  
-  .submit-card-left, .submit-card-right {
-    border-radius: 15px;
-    margin: 10% 10% 5% 10%;
-    padding: 3% 2%;
-    height: 120%;
-    opacity: 90%;
-    filter: blur(0.5px);
-  }
-  
-  .submit-card-left {
-    background-image: linear-gradient(to bottom right, #e0b002, #db568f);
-  }
-  
-  .submit-card-right  {
-    background-image: linear-gradient(to bottom left, #e0b002, #db568f);
-  }
-  
-  .submit-text-overlay {
-    color: maroon
-  }
-  
-  .conditional-plusone {
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .conditional-plusone h2 {
-    margin-top: 17%
-  }
+.rsvp div {
+  color: greenyellow;
+  font-size: large;
+  font-family: gambetta;
+  /* margin-bottom: 10% */
+  /* this was super frustrating ^ where else will it effect? */
+}
+
+.rsvp #rsvp-radio {
+  /* background-color: bisque; */
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin: 12% 0% 8% 0%
+}
+
+/* this does nothing */
+/* .rsvp #radio-item {
+  color: rgba(0, 0, 0, 0.566);
+  font-family: gambetta;
+  margin-bottom: 3%;
+} */
+
+#radio-item {
+  display: flex;
+  flex-direction: row;
+  color: maroon;
+}
+
+#radio-item label {
+  color: maroon;
+  font-size: larger;
+  /* margin-bottom: 10em; */
+
+}
+
+.rsvp input {
+  color: red;
+}
+
+.rsvp h1 {
+  font-size: x-large;
+  font-family: Bonbance;
+  color: rgb(85, 7, 7);
+  /* background-color: aqua; */
+  margin-bottom: 5%
+}
+
+.rsvp h2 {
+  font-size: large;
+  font-family: gambetta;
+  color: rgba(0, 0, 0, 0.566);
+  margin-bottom: 2%
+}
+
+.rsvp h3 {
+  margin: auto;
+  color: rgba(0, 0, 0, 0.566);
+  font-size: small;
+  font-family: elanor;
+  margin-bottom: 4%;
+}
+.rsvp span {
+  font-size: large;
+  font-family: gambetta;
+  color: rgba(0, 0, 0, 0.566);
+}
+
+.rsvp p {
+  margin: auto;
+  color: rgba(0, 0, 0, 0.566);
+  font-size: medium;
+  font-family: elanor;
+  margin-bottom: 4%;
+}
+
+.rsvp .name-info, .contact-num, .contact-info, .other-restrictions {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 5%;
+}
+
+.rsvp .state-country {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5em
+}
+
+.rsvp .name-info input, .name-info button, .contact-num input, .contact-info input, 
+  .state-country button, .state-country input, .other-restrictions input {
+  opacity: 60%;
+  box-shadow: inset 0 0 40px 40px beige;
+  color: red;
+  font-family: elanor;
+  font-size: medium;
+  border-radius: 7px;
+  margin: 0% 1%;
+  height: 28px;
+  padding: 0% 1%
+}
+
+.rsvp #country-code {
+  width: 10%;
+  z-index: 1000
+}
+
+.rsvp #pronouns, #address-2, #zipcode {
+  width: 20%;
+  z-index: 1000
+}
+
+.rsvp #first-name, #last-name, #address, #city {
+  width: 40%; 
+}
+
+.rsvp #phone, #email {
+  width: 45%; 
+}
+
+.rsvp #country, #state {
+  width: 50%
+}
+
+.rsvp #other-restrictions {
+  margin: auto;
+  width: 60%; 
+}
+
+#contact-bottom {
+  margin-top: 15%;
+}
+
+.dietary-grid {
+  padding: 1% 6% 2%;
+  margin-bottom: 2%
+}
+
+.diet-image, .diet-image-clicked {
+  width: 90px;
+  height: 90px;
+  margin: auto;
+  transition: all 1.5s ease-in-out;
+}
+
+.rsvp .diet-image:hover, .diet-image-clicked:hover {
+  transition: all 1s ease-in-out;
+  scale: 1.1
+}
+
+.rsvp .diet-image-clicked {
+  /* transform: brightness(0.5);
+  transform: saturate(0%);
+  filter: grayscale(50%); */
+  filter: brightness(0.4);
+  filter: saturate(0%);
+  /* animation: redx 3s linear; */
+}
+
+.submit-div {
+  padding: 0% 1%
+}
+
+.submit-card-left, .submit-card-right {
+  border-radius: 15px;
+  margin: 10% 10% 0% 10%;
+  /* padding: 3% 2%; */
+  height: 95%;
+  opacity: 90%;
+  filter: blur(0.5px);
+}
+
+.submit-card-left {
+  background-image: linear-gradient(to bottom right, #e0b002, #db568f);
+}
+
+.submit-card-right  {
+  background-image: linear-gradient(to bottom left, #e0b002, #db568f);
+}
+
+.submit-text-overlay {
+  color: maroon
+}
+
+.conditional-plusone {
+  align-items: center;
+  justify-content: center;
+}
+
+.conditional-plusone h2 {
+  margin-top: 17%
+}
 
 
 #submit-header1, #submit-header2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  #submit-header1 {
-    margin-top: 5%;
-    margin-bottom: 0%;
-  }
-  
-  #submit-header2 {
-    padding-top: 0%;
-    margin-top: 0%;
-    margin-bottom: 5%
-  }
-  
-  /* .next-btn {
-    border-radius: 27px;
-    font-family: Bonbance;
-    border: 1px solid #b79c05;
-    color: maroon;
-    width: 240px;
-    padding: 8px 20px;
-    margin: 15px 8px;
-    opacity: 60%;
-  }
-  
-  .next-btn:hover {
-    background-color: #ee7fdb;
-  } */
-  
-  /* this needs a max width */
-  .btn-23 {
-    color:  maroon;
-    background-color: #ffef92;
-    font-family: Bonbance;
-    font-size: 90%;
-    opacity: 60%;
-    width: 35%;
-    padding: 1% 0;
-    margin: 2% 1% 0;
-    height: 2%;
-    text-transform: uppercase;
-    border-radius: 27px;
-    border: 1px solid #b79c05;
-    /* transition: opacity 5s ease; */
-  }
-  
-  .btn-23[disabled]:hover {
-    background-color: #d6d6d6;
-  }
-  .btn-23:hover {
-    background-color: #ffb6f3;
-  }
-  
-  @keyframes marquee {
-    0% {transform: translateX(var(-100%));}
-    100% {transform: translateX(var(100%));}
-  }
-  
-  .btn-23{
-    animation: marquee 50s linear infinite;
-    text-shadow: 
-    225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
-    -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
-    -300px 0px maroon
-  }
-  
-  
-  /* Customize the label (the container) */
-  .checkbox-guest {
-    display: block;
-    position: relative;
-    margin: 0% 2% 1% 2%;
-    cursor: pointer;
-    color: rgb(69, 50, 50);
-    font-size: large;
-    padding-left: 4%
-  }
-  
-  /* Hide the browser's default checkbox */
-  .checkbox-guest input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-  
-  /* Create a custom checkbox */
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0% 2% 0% 0%;
-    height: 25px;
-    width: 25px;
-    border-radius: 8px;
-    background-color: #db568f
-  }
-  
-  /* On mouse-over, add a grey background color */
-  /* .checkbox-guest:hover input ~ .checkmark {
-    background-color: rgb(23, 245, 60)
-  } */
-  
-  /* When the checkbox is checked, add a blue background */
-  .checkbox-guest input:checked ~ .checkmark {
-    background-color: #f32121;
-  }
-  
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-  
-  /* Show the checkmark when checked */
-  .checkbox-guest input:checked ~ .checkmark:after {
-    display: block;
-  }
-  
-  /* Style the checkmark/indicator */
-  .checkbox-guest .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#submit-header1 {
+  margin-top: 5%;
+  margin-bottom: 0%;
+}
+
+#submit-header2 {
+  padding-top: 0%;
+  margin-top: 0%;
+  margin-bottom: 5%
+}
+
+/* .next-btn {
+  border-radius: 27px;
+  font-family: Bonbance;
+  border: 1px solid #b79c05;
+  color: maroon;
+  width: 240px;
+  padding: 8px 20px;
+  margin: 15px 8px;
+  opacity: 60%;
+}
+
+.next-btn:hover {
+  background-color: #ee7fdb;
+} */
+
+/* this needs a max width */
+.btn-23 {
+  color:  maroon;
+  background-color: #ffef92;
+  font-family: Bonbance;
+  font-size: 90%;
+  opacity: 60%;
+  width: 35%;
+  padding: 1% 0;
+  margin: 2% 1% 0;
+  height: 2%;
+  text-transform: uppercase;
+  border-radius: 27px;
+  border: 1px solid #b79c05;
+  /* transition: opacity 5s ease; */
+}
+
+.btn-23[disabled]:hover {
+  background-color: #d6d6d6;
+}
+.btn-23:hover {
+  background-color: #ffb6f3;
+}
+
+@keyframes marquee {
+  0% {transform: translateX(var(-100%));}
+  100% {transform: translateX(var(100%));}
+}
+
+.btn-23{
+  animation: marquee 50s linear infinite;
+  text-shadow: 
+  225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
+  -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
+  -300px 0px maroon
+}
+
+.btn-generic {
+  color: seashell;
+  font-size: x-large;
+  background-color: #f32121;
+  width: 60%;
+  height: 25%;
+  border-radius: 2em;
+  border-color: #cd5252;
+  border-width: 1px; 
+  padding: 5px;
+  box-shadow: 3px 3px 3px maroon;
+}
+
+.btn-generic:hover {
+  color: #f32121;
+  background-color: seashell;
+  box-shadow: 5px 5px 5px maroon;
+}
+
+/* Customize the label (the container) */
+.checkbox-guest {
+  display: block;
+  position: relative;
+  margin: 0% 2% 1% 2%;
+  cursor: pointer;
+  color: rgb(69, 50, 50);
+  font-size: large;
+  padding-left: 4%
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-guest input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0% 2% 0% 0%;
+  height: 25px;
+  width: 25px;
+  border-radius: 8px;
+  background-color: #db568f
+}
+
+/* On mouse-over, add a grey background color */
+/* .checkbox-guest:hover input ~ .checkmark {
+  background-color: rgb(23, 245, 60)
+} */
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-guest input:checked ~ .checkmark {
+  background-color: #f32121;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-guest input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-guest .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
 
 .big-red-x, .big-green-o {
     position: absolute;

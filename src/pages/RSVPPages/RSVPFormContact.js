@@ -4,17 +4,19 @@ import React from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
-import { firstNameInput, lastNameInput, pronounsInput, phoneNumberInput, emailInput,
+import { firstNameInput, lastNameInput, pronounsInput, 
+    phoneNumberCountryCodeInput, phoneNumberInput, emailInput,
     streetAddressInput, secondAddressInput, cityInput, zipcodeInput,
     countryInput, stateProvinceInput, continueDietary } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormContact({pageMainColor, pageSection}) {
+export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiaryColor, opacity, pageSection}) {
 
     const dispatch = useDispatch();
 
     const firstName = useSelector((state) => state.rsvp.firstName) 
     const lastName = useSelector((state) => state.rsvp.lastName)
     const pronouns = useSelector((state) => state.rsvp.pronouns)
+    const phoneNumberCountryCode = useSelector((state) => state.rsvp.phoneNumberCountryCode)
     const phoneNumber = useSelector((state) => state.rsvp.phoneNumber)
     const email = useSelector((state) => state.rsvp.email)
     const streetAddress = useSelector((state) => state.rsvp.streetAddress)
@@ -31,8 +33,12 @@ export function RSVPFormContact({pageMainColor, pageSection}) {
 
     return (
         <>
-            <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} opacity={opacity} pageSection={pageSection}>
                 <h1>Please enter some personal info...</h1>    
+
+                {/* <div className={`section-content swipe-card flex-grow bg-lilac-400/65 border-lilac-500/50 border-1 backdrop-blur-md`}/> */}
+                
                 <div>
                     <h2>What do we call you?</h2>            
                     <div class="name-info">
@@ -72,8 +78,18 @@ export function RSVPFormContact({pageMainColor, pageSection}) {
                         </button>
                     </div>
                     <h2>How do we reach you?</h2>
+                    <h3>Make sure to give us your phone number AND country code </h3>
                     <div class="contact-num">
-                        <input label="phone" type="number" 
+                        <span>+</span>
+                        <input label="country_code"
+                            id="country-code"
+                            value={phoneNumberCountryCode}
+                            onChange={(e)=>
+                                {dispatch(phoneNumberCountryCodeInput(e.target.value));
+                                dispatch(continueDietary())
+                                }
+                            }></input>
+                        <input label="phone" 
                             id="phone"
                             placeholder="Phone number" 
                             value={phoneNumber}
@@ -195,7 +211,7 @@ export function RSVPFormContact({pageMainColor, pageSection}) {
                     <h2 id="contact-bottom">We will send you text and email confirmations!</h2>
                 </div>
             </CardStackPage>
-            <CardStackFooter>
+            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
                 <NavLink className='btn-23' to='/rsvp' end><marquee>Return</marquee></NavLink> 
                 <NavLink className='btn-23' 
                     // maybe theres something to having an onhover here dispatch the continueDietary?
