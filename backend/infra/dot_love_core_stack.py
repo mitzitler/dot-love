@@ -425,6 +425,7 @@ class DotLoveCoreStack(Stack):
                     apigw.CorsHttpMethod.HEAD,
                     apigw.CorsHttpMethod.OPTIONS,
                     apigw.CorsHttpMethod.POST,
+                    apigw.CorsHttpMethod.PATCH,
                 ],
                 # NOTE: Should be fine for the calls I make from Spectaculo to Gizmo, we'll see
                 allow_origins=["*"],

@@ -174,5 +174,5 @@ export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pr
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
   eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput, clearForm,
   submitFormGC1, submitFormGC1_5, submitFormGC2 } = rsvpSlice.actions
-  
+
 export default rsvpSlice.reducer

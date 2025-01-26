@@ -8,12 +8,14 @@ import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearForm } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
+import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 
-// on desktop all the information is pushed down too far
+// TODO: on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const dispatch = useDispatch();
+    const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode)
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
@@ -23,6 +25,27 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const submitted = useSelector((state) => state.rsvp.submitted)
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
     const fullGuestInfo = useSelector((state) => state.rsvp)
+
+    const handleSubmit = async (makeApiCall) => {
+        // Step 1: Update Redux state
+        const submissionKey = `${firstName}_${lastName}`;
+        dispatch(storeCompletedRSVP([submissionKey, fullGuestInfo]));
+        dispatch(clearForm())
+
+        // Step 2: Make the API call
+        if (!makeApiCall) return;
+
+        try {
+            const result = await registerRSVP({
+            headers: { 'X-First-Last': submissionKey },
+            rsvpData: { 'registration_fields': fullGuestInfo },
+            }).unwrap();
+
+            console.log('RSVP registered successfully:', result);
+        } catch (err) {
+            console.error('Error registering RSVP:', err);
+        }
+    };
 
     console.log(fullGuestInfo)
 
@@ -98,7 +121,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                 dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
-            
+
             : <p>error you should not have gotten this far!!</p>}
 
         </CardStackFooter>
