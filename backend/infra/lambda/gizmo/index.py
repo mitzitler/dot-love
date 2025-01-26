@@ -591,45 +591,55 @@ class User:
         )
 
     @staticmethod
-    def from_first_last_registration_fields(first_last, registration_fields):
-        first = first_last.split("_")[0]
-        last = first_last.split("_")[1]
+    def extract_users_from_payload(json_body):
+        rsvps = json_body["rsvps"]
+        users = []
+        for rsvp in rsvps:
+            first_last = (
+                rsvp["guestInfo"]["firstName"] + "_" + rsvp["guestInfo"]["lastName"]
+            )
+            users.append(Users.from_guest_info(rsvp["guestInfo"]))
+
+    @staticmethod
+    def from_guest_info(guest_info):
+        first = guestName["firstName"]
+        last = guestName["lastName"]
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
 
-        rsvp_status = RsvpStatus[registration_fields["rsvp_status"]]
-        pronouns = Pronouns[registration_fields["pronouns"]]
+        rsvp_status = RsvpStatus[guest_info["rsvp_status"]]
+        pronouns = Pronouns[guest_info["pronouns"]]
         address = UserAddress(
-            registration_fields["street"],
-            registration_fields["second_line"],
-            registration_fields["city"],
-            registration_fields["zipcode"],
-            registration_fields["country"],
-            registration_fields["state_loc"],
-            registration_fields["phone"],
+            guest_info["street"],
+            guest_info["second_line"],
+            guest_info["city"],
+            guest_info["zipcode"],
+            guest_info["country"],
+            guest_info["state_loc"],
+            guest_info["phone"],
         )
-        email = registration_fields["email"]
+        email = guest_info["email"]
         diet = UserDiet(
-            registration_fields["alcohol"],
-            registration_fields["meat"],
-            registration_fields["dairy"],
-            registration_fields["fish"],
-            registration_fields["shellfish"],
-            registration_fields["eggs"],
-            registration_fields["gluten"],
-            registration_fields["peanuts"],
-            registration_fields["restrictions"],
+            guest_info["alcohol"],
+            guest_info["meat"],
+            guest_info["dairy"],
+            guest_info["fish"],
+            guest_info["shellfish"],
+            guest_info["eggs"],
+            guest_info["gluten"],
+            guest_info["peanuts"],
+            guest_info["restrictions"],
         )
         guest_details = GuestDetails(
             link=guest_link_string,
-            pair_first_last=registration_fields["pair_first_last"],
+            pair_first_last=guest_info["pair_first_last"],
         )
 
         return User(
             first=first,
             last=last,
-            rsvp_code=registration_fields["rsvp_code"],
+            rsvp_code=guest_info["rsvp_code"],
             rsvp_status=rsvp_status,
             pronouns=pronouns,
             address=address,
@@ -973,7 +983,7 @@ def register():
             log.append_keys(our_actual_friend=our_actual_friend)
 
             # attach the real friend to their guest
-            app.current_event.json_body["registration_fields"]["pair_first_last"] = (
+            app.current_event.json_body["guest_info"]["pair_first_last"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -983,9 +993,9 @@ def register():
                 "message": "failed lookup of our actual friend",
             }
 
-    user = User.from_first_last_registration_fields(
+    user = User.from_guest_info(
         app.context["first_last"],
-        app.current_event.json_body["registration_fields"],
+        app.current_event.json_body["guest_info"],
     )
 
     err = None
@@ -1016,9 +1026,7 @@ def register():
             }
 
     try:
-        has_guest = (
-            app.current_event.json_body["registration_fields"]["rsvp_code"] == "GHI"
-        )
+        has_guest = app.current_event.json_body["guest_info"]["rsvp_code"] == "GHI"
         email_registration_success(user, has_guest)
     except Exception as e:
         err_msg = "failed to send user registration success email"
@@ -1035,9 +1043,9 @@ def register():
 
 @app.patch("/gizmo/user")
 def update():
-    user = User.from_first_last_registration_fields(
+    user = User.from_guest_info(
         app.context["first_last"],
-        app.current_event.json_body["registration_fields"],
+        app.current_event.json_body["guest_info"],
     )
 
     err = None
