@@ -30,18 +30,21 @@ export function RSVP() {
     const pageTertiaryColor = "raspberry"
     const opacity = '50'
     const pageSection = "rsvp"
-    const acceptableCodes = ['ABC', 'DEF', 'GHI']
+    // fzo - single
+    // unf - open plus one
+    // nzu - closed plus one
+    const acceptableCodes = ['FZO', 'UNF', 'NZU']
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode) 
 
-    useEffect(() => {
-        if (acceptableCodes.includes(rsvpCode.toUpperCase())) {
-            document.body.style.overflowY = 'auto';
-            notify("Code accepted! Please scroll down", true);
-        } else {
-            document.body.style.overflowY = 'hidden';
-        }
-    }, [rsvpCode]);
+    // useEffect(() => {
+    //     if (acceptableCodes.includes(rsvpCode.toUpperCase())) {
+    //         document.body.style.overflowY = 'auto';
+    //         notify("Code accepted! Please scroll down", true);
+    //     } else {
+    //         document.body.style.overflowY = 'hidden';
+    //     }
+    // }, [rsvpCode]);
 
     return (
 
@@ -59,6 +62,8 @@ export function RSVP() {
 
             {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
         </GenericHeader>
+
+        { acceptableCodes.includes(rsvpCode.toUpperCase()) ?
         <div classname="container">
             <main className="card-stack">
                 
@@ -94,6 +99,8 @@ export function RSVP() {
 
             </main>
         </div>
+        : <></>
+        }
         </>
         
     )

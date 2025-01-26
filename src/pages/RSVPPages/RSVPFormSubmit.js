@@ -71,28 +71,28 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
-            {rsvpCode.toUpperCase() === 'ABC'
+            {rsvpCode.toUpperCase() === 'FZO'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
 
-            : rsvpCode.toUpperCase() === 'DEF'
+            : rsvpCode.toUpperCase() === 'UNF'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'GHI' & submitted === null)
+            : (rsvpCode.toUpperCase() === 'NZU' & submitted === null)
             ? <NavLink className='btn-23' to='/rsvp' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Continue</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
+            : (rsvpCode.toUpperCase() === 'NZU' & submitted != null)
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
