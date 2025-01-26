@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useCallback } from 'react';
-import { CardStackPage } from '../components/CardStackPage.js';
+import { CardStackPageClass } from '../components/CardStackPageClass.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 
@@ -28,8 +28,13 @@ export function Info() {
     //   }, []);
 
     const pageMainColor = "babyblue" 
-    // const pageSecondaryColor = "babyblue" 
-    // const pageTertiaryColor = "babyblue" 
+    const pageSecondaryColor = "lilac" 
+    const pageTertiaryColor = "amber" 
+
+    const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
+    const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
+    const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
+
     const pageSection = "info"
 
     const diety = {
@@ -42,13 +47,13 @@ export function Info() {
         setExpandedBox((current) => (current === id ? null : id)); // Toggle expansion
     }
 
-    console.log(expandedBox)
+    console.log(pageMainClass)
 
     return (
 
-        <CardStackPage pageMainColor={pageMainColor} 
-        pageSecondaryColor={pageMainColor}
-        pageTertiaryColor={pageMainColor}
+        <CardStackPageClass class="card-stack" pageMainClass={pageMainClass} 
+        pageSecondaryClass={pageSecondaryClass}
+        pageTertiaryClass={pageTertiaryClass}
         pageSection={pageSection}>
             <h1>Info</h1>
             <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
@@ -58,11 +63,12 @@ export function Info() {
                     <InfoBox id="time" class="schedule" collapsable={false}>
                         <h4>Schedule</h4>
                         <ul>
-                            <li class="text-sm">Nov 7th 6.30pm - Ceremony at Diety Events</li>
-                            {/* <li>7.00pm - Drinks</li>
-                            <li>8.00pm - Dinner</li>
-                            <li>9.00pm - Dancing</li>
-                            <li>11.59pm - Afters</li> */}
+                            <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
+                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Diety Events</li>
+                            <li class="text-sm text-left pl-1.5"> 7.00pm - Drinks</li>
+                            <li class="text-sm text-left pl-1.5"> 8.00pm - Dinner</li>
+                            <li class="text-sm text-left pl-1.5"> 9.00pm - Dancing</li>
+                            <li class="text-sm text-left">12.00am - Afters</li>
                         </ul>
                     </InfoBox>
 
@@ -87,8 +93,8 @@ export function Info() {
                             <InfoBoxExpanded>
                                 <ul>
                                     <li>🟡 Dress code is semi-formal</li>
-                                    <li>🟡 We ask that you stay in this palette</li>
-                                    <li>🟡 More guidelines, as well as a pinterest board, are here</li>
+                                    <li>🟡 Wedding colors to come soon!!!</li>
+                                    <li>🟡 Pinterest board to come soon!!!</li>
                                 </ul>    
                             </InfoBoxExpanded>
                         )}
@@ -113,7 +119,7 @@ export function Info() {
 
                 </div>
             </div>
-        </CardStackPage>
+        </CardStackPageClass>
         // this card stack page is missing the top child, and puts the third child as a nav bar card
         // </>
     )

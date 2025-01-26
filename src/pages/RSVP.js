@@ -28,7 +28,11 @@ export function RSVP() {
     const pageMainColor = "amber"
     const pageSecondaryColor = "lime"
     const pageTertiaryColor = "raspberry"
-    const opacity = '50'
+
+    const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
+    const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
+    const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
+
     const pageSection = "rsvp"
     // fzo - single
     // unf - open plus one
@@ -36,15 +40,6 @@ export function RSVP() {
     const acceptableCodes = ['FZO', 'UNF', 'NZU']
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode) 
-
-    // useEffect(() => {
-    //     if (acceptableCodes.includes(rsvpCode.toUpperCase())) {
-    //         document.body.style.overflowY = 'auto';
-    //         notify("Code accepted! Please scroll down", true);
-    //     } else {
-    //         document.body.style.overflowY = 'hidden';
-    //     }
-    // }, [rsvpCode]);
 
     return (
 
@@ -71,29 +66,34 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        opacity={opacity} pageSection={pageSection} />} />
+                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainClass={pageMainClass} 
+                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
+                        // opacity={opacity} 
+                        pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
-                        <RSVPFormContact pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        opacity={opacity} pageSection={pageSection} />} />
+                        <RSVPFormContact pageMainClass={pageMainClass} 
+                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
+                        // opacity={opacity} 
+                        pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
-                        <RSVPFormDietary pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        opacity={opacity} pageSection={pageSection} />} />
+                        <RSVPFormDietary pageMainClass={pageMainClass} 
+                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
+                        // opacity={opacity} 
+                        pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
-                        <RSVPFormSubmit pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        opacity={opacity} pageSection={pageSection} />} />
+                        <RSVPFormSubmit pageMainClass={pageMainClass} 
+                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
+                        // opacity={opacity} 
+                        pageSection={pageSection} />} />
 
                     <Route path="/confirmation" element={
-                        <RSVPFormConfirmation pageMainColor={pageMainColor} 
-                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
-                        opacity={opacity} pageSection={pageSection} />} />
+                        <RSVPFormConfirmation pageMainClass={pageMainClass} 
+                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
+                        // opacity={opacity} 
+                        pageSection={pageSection} />} />
                         
                 </Routes>
 

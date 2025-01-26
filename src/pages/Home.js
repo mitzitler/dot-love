@@ -1,28 +1,39 @@
 import React, { useEffect, useReducer } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
 import { Info } from './Info';
-import { Routes, Route } from 'react-router-dom';
-import '../App.css';
 import { AboutUs } from './AboutUs';
+import { Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fullNameCodeInput } from '../features/guest/userSlice';
+import '../App.css';
 
 export function Home() {
 
+    const dispatch = useDispatch();
 
-    const nameInput = "test name"
+    const fullNameCode = useSelector((state) => state.user.fullNameCode) 
+    // this needs to be a api lookup
     const acceptableNames = ['TEST NAME']
 
-    useEffect(() => {
-        if (acceptableNames.includes(nameInput.toUpperCase())) {
-        document.body.style.overflowY = 'auto';
-        } else {
-        document.body.style.overflowY = 'hidden';
-        }
-    }, [nameInput]);
+    // useEffect(() => {
+    //     if (acceptableNames.includes(nameInput.toUpperCase())) {
+    //     document.body.style.overflowY = 'auto';
+    //     } else {
+    //     document.body.style.overflowY = 'hidden';
+    //     }
+    // }, [nameInput]);
 
     // const handleNameInput() {
 
     // }
 
+    console.log(fullNameCode)
+    console.log(acceptableNames)
+
+    if (acceptableNames.includes(fullNameCode.toUpperCase()))
+        console.log('name accepted')
+    else 
+        console.log('name not accepted')
 
     return (
 
@@ -31,22 +42,25 @@ export function Home() {
 
             <div class= "egg backdrop-blur-xl" />
             <input placeholder="Full name?"
-                value={nameInput}
-                // onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}
+               value={fullNameCode}
+               onInput={(e)=>dispatch(fullNameCodeInput(e.target.value))}
                 />
-                {/* onInput={(e)=>dispatch({type: "rsvpCodeInput", payload: e.target.value})}/> */}
 
         </GenericHeader>
+        { acceptableNames.includes(fullNameCode.toUpperCase()) ?
         <div classname="container">
             <main className="card-stack">
 
                 <Routes>
-                    {/* <Route path="/" element={<Info/>} /> */}
-                    <Route path="/" element={<AboutUs/>} />
+                    <Route path="/" element={<Info/>} />
+                    <Route path="/info" element={<Info/>} />
+                    <Route path="/aboutus" element={<AboutUs/>} />
                 </Routes>
 
             </main>
         </div>
+        : <></>
+        }
         </>
         
     )
