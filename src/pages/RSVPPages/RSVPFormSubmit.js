@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { submitFormGC1, submitFormGC1_5, submitFormGC2 } from '../../features/guest/rsvpSlice';
+import { clearForm } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
 
 // on desktop all the information is pushed down too far
@@ -74,28 +74,28 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
             {rsvpCode.toUpperCase() === 'ABC'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'DEF'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'GHI' & submitted === null)
             ? <NavLink className='btn-23' to='/rsvp' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Continue</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             

@@ -269,6 +269,24 @@
   -300px 0px maroon
 }
 
+.btn-generic {
+  color: seashell;
+  font-size: x-large;
+  background-color: #f32121;
+  width: 60%;
+  height: 25%;
+  border-radius: 2em;
+  border-color: #cd5252;
+  border-width: 1px; 
+  padding: 5px;
+  box-shadow: 3px 3px 3px maroon;
+}
+
+.btn-generic:hover {
+  color: #f32121;
+  background-color: seashell;
+  box-shadow: 5px 5px 5px maroon;
+}
 
 /* Customize the label (the container) */
 .checkbox-guest {

@@ -172,7 +172,7 @@ const rsvpSlice = createSlice({
 export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, phoneNumberCountryCodeInput,
   phoneNumberInput, emailInput, streetAddressInput, secondAddressInput, cityInput, zipcodeInput, countryInput, stateProvinceInput,
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
-  eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput,
+  eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput, clearForm,
   submitFormGC1, submitFormGC1_5, submitFormGC2 } = rsvpSlice.actions
   
 export default rsvpSlice.reducer
