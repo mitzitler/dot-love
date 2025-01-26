@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
-import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackPageClass } from '../../components/CardStackPageClass';
 
-export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
+export function RSVPFormConfirmation({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection, rsvpCode}) {
 
     return (
-        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-        pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+        <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
+        pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>
 
                 <h1>RSVP Submission Confirmed!</h1>
                 <div>
@@ -25,6 +25,6 @@ export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTer
                     <button class="btn-generic">On to the main site!</button>
                 </NavLink>
 
-        </CardStackPage>
+        </CardStackPageClass>
     )
 }

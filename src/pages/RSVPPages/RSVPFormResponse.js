@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
-import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
+export function RSVPFormResponse({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection, rsvpCode}) {
 
     const dispatch = useDispatch();
 
@@ -15,8 +15,8 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
 
     return (
         <>
-            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+            <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
+                pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>
                 { submitted === null ? <h1>Repondez S'il Vous Plait!</h1> : <h1>Please RSVP For the Second Guest...</h1> }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
@@ -41,19 +41,19 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
                     </div>
                 </div>
                 
-                { rsvpCode.toLowerCase() === 'def' 
+                { rsvpCode.toUpperCase() === 'UNF' 
                     ? <p>Are you bringing a plus one?
                         <br/> We will text you a unique link for your invitee.</p>
-                    : ((rsvpCode.toLowerCase() === 'ghi' & submitted === null)
+                    : ((rsvpCode.toUpperCase() === 'NZU' & submitted === null)
                     ? <p>After the first guest fills out and submits this form, 
                         <br/>please continue through the flow for the next guest's form.</p> 
-                    : ((rsvpCode.toLowerCase() === 'ghi' & submitted != null)
+                    : ((rsvpCode.toUpperCase() === 'NZU' & submitted != null)
                     ? <p>This RSVP will not be complete until both guests fill out the form. 
                         <br/>if you do not receive confirmation that the RSVPs were submitted, please start over!</p> 
                     : <p></p> ))}
 
-            </CardStackPage>
-            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
+            </CardStackPageClass>
+            <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
                 <NavLink className='btn-23' 
                     disabled={rsvpStatus === 'undecided' ? true : false} 
                     to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 

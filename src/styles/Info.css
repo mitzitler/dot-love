@@ -1,5 +1,9 @@
 /* info styles */
 
+.info .card-stack {
+    background-color: rgb(231, 208, 28) !important;
+}
+
 .info h1 {
     font-size: x-large;
     margin-top: 5%;

@@ -1,3 +1,4 @@
+@import './styles/AboutUs.css';
 @import './styles/Info.css';
 @import './styles/RSVP.css';
 
@@ -220,7 +221,7 @@ input[type="radio"]:checked::before {
 .egg-container input {
   position: absolute;
   text-align: center;
-  font: 9px superbread;
+  font: 9px 'super-bread';
   color: rgb(57, 22, 48);
   width: 55px;
   margin-left: -27px;

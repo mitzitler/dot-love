@@ -1,7 +1,7 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
@@ -12,7 +12,7 @@ import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 
 // TODO: on desktop all the information is pushed down too far
 
-export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
+export function RSVPFormSubmit({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection}) {
 
     const dispatch = useDispatch();
     const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
@@ -63,8 +63,8 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
 
   return(
     <>
-        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+        <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
+                pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>
             <h1 id="submit-header1">Does this all look right, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
             <p>{rsvpString}</p>
@@ -90,33 +90,33 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
             </div>
             :<></>}
 
-        </CardStackPage>
-        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
+        </CardStackPageClass>
+        <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
-            {rsvpCode.toUpperCase() === 'ABC'
-            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
+            {rsvpCode.toUpperCase() === 'FZO'
+            ? <NavLink className='btn-23' id="vers1" to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
 
-            : rsvpCode.toUpperCase() === 'DEF'
-            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
+            : rsvpCode.toUpperCase() === 'UNF'
+            ? <NavLink className='btn-23' id="vers2" to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'GHI' & submitted === null)
-            ? <NavLink className='btn-23' to='/rsvp' onClick={()=>{
+            : (rsvpCode.toUpperCase() === 'NZU' & submitted === null)
+            ? <NavLink className='btn-23' id="vers3" to='/rsvp' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }
             }><marquee>Continue</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
-            ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
+            : (rsvpCode.toUpperCase() === 'NZU' & submitted != null)
+            ? <NavLink className='btn-23' id="vers4" to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())
                 }

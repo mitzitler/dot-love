@@ -1,7 +1,7 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
-import { CardStackPage } from '../../components/CardStackPage';
+import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { firstNameInput, lastNameInput, pronounsInput, 
@@ -9,7 +9,7 @@ import { firstNameInput, lastNameInput, pronounsInput,
     streetAddressInput, secondAddressInput, cityInput, zipcodeInput,
     countryInput, stateProvinceInput, continueDietary } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiaryColor, opacity, pageSection}) {
+export function RSVPFormContact({pageMainClass, pageSecondaryClass, pageTertiaryClass, opacity, pageSection}) {
 
     const dispatch = useDispatch();
 
@@ -33,8 +33,8 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
 
     return (
         <>
-            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} opacity={opacity} pageSection={pageSection}>
+            <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
+                pageTertiaryClass={pageTertiaryClass} opacity={opacity} pageSection={pageSection}>
                 <h1>Please enter some personal info...</h1>    
 
                 {/* <div className={`section-content swipe-card flex-grow bg-lilac-400/65 border-lilac-500/50 border-1 backdrop-blur-md`}/> */}
@@ -210,8 +210,8 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                     </div> 
                     <h2 id="contact-bottom">We will send you text and email confirmations!</h2>
                 </div>
-            </CardStackPage>
-            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
+            </CardStackPageClass>
+            <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
                 <NavLink className='btn-23' to='/rsvp' end><marquee>Return</marquee></NavLink> 
                 <NavLink className='btn-23' 
                     // maybe theres something to having an onhover here dispatch the continueDietary?
