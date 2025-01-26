@@ -4,16 +4,21 @@ const rsvpCompletedSlice = createSlice({
   name: "rsvpCompleted",
   initialState: {
     submitted: null,
-    rsvpSubmission: "",
+    completedRsvps: [],
   },
   reducers: {
     storeCompletedRSVP(state, action) {
-      state.submitted = action.payload[0] // this is the first_last
-      state.rsvpSubmission = action.payload[1] // this is the complete element
+      state.submitted = action.payload.submissionKey
+      state.completedRsvps.push({
+        guestInfo: action.payload.fullGuestInfo
+      });
     },
+    clearCompleteRSVPs(state) {
+      state.completedRsvps = [];
+    }
   }
 })
 
-export const { storeCompletedRSVP } = rsvpCompletedSlice.actions
+export const { storeCompletedRSVP, clearCompleteRSVPs } = rsvpCompletedSlice.actions
   
 export default rsvpCompletedSlice.reducer

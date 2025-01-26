@@ -2,33 +2,40 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const gizmoApi = createApi({
   reducerPath: 'gizmoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/gizmo' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://api.mitzimatthew.love/gizmo' }),
   endpoints: (builder) => ({
+    // Register a new user
+    registerRSVP: builder.mutation({
+      query: ({headers, rsvpData}) => ({
+        url: '/user',
+        method: 'POST',
+        body: rsvpData,
+        headers: headers,
+      }),
+    }),
+
     // Health Check
     ping: builder.query({
       query: () => '/ping',
     }),
 
     // Login a user
+    // headers: headers,
     getUser: builder.query({
-      query: () => '/user',
-    }),
-
-    // Register a new user
-    registerUser: builder.mutation({
-      query: (userData) => ({
+      query: (headers) => ({
         url: '/user',
-        method: 'POST',
-        body: userData,
+        headers: headers,
       }),
     }),
 
     // Update a user's info
+    // headers: headers,
     updateUser: builder.mutation({
-      query: (updateData) => ({
+      query: (headers, updateData) => ({
         url: '/user',
         method: 'PATCH',
         body: updateData,
+        headers: headers,
       }),
     }),
 
@@ -39,19 +46,21 @@ export const gizmoApi = createApi({
 
     // Email a user
     emailUser: builder.mutation({
-      query: (emailData) => ({
+      query: (headers, emailData) => ({
         url: '/email',
         method: 'POST',
         body: emailData,
+        headers: headers,
       }),
     }),
 
     // Text a user
     textUser: builder.mutation({
-      query: (textData) => ({
+      query: (headers, textData) => ({
         url: '/text',
         method: 'POST',
         body: textData,
+        headers: headers,
       }),
     }),
   }),
@@ -60,7 +69,7 @@ export const gizmoApi = createApi({
 export const {
   usePingQuery,
   useGetUserQuery,
-  useRegisterUserMutation,
+  useRegisterRSVPMutation,
   useUpdateUserMutation,
   useGetUserByGuestLinkQuery,
   useEmailUserMutation,

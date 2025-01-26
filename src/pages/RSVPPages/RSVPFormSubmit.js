@@ -8,13 +8,15 @@ import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearForm } from '../../features/guest/rsvpSlice';
-import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
+import { storeCompletedRSVP, clearCompleteRSVPs } from '../../features/guest/rsvpCompletedSlice.js'
+import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 
-// on desktop all the information is pushed down too far
+// TODO: on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const dispatch = useDispatch();
+    const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode)
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
@@ -24,6 +26,28 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const submitted = useSelector((state) => state.rsvp.submitted)
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
     const fullGuestInfo = useSelector((state) => state.rsvp)
+    const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
+
+    const handleSubmit = async (makeApiCall) => {
+        // Step 1: Update Redux state
+        const submissionKey = `${firstName}_${lastName}`;
+        dispatch(storeCompletedRSVP({submissionKey, fullGuestInfo}));
+        dispatch(clearForm())
+
+        // Step 2: Make the API call
+        if (!makeApiCall) return;
+
+        try {
+            const result = await registerRSVP({
+            headers: { 'X-First-Last': submissionKey },
+            rsvpData: { 'rsvps': completedRsvps },
+            }).unwrap();
+
+            console.log('RSVP(s) registered successfully:', result);
+        } catch (err) {
+            console.error('Error registering RSVP(s):', err);
+        }
+    };
 
     console.log(fullGuestInfo)
 
@@ -74,33 +98,21 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
             {rsvpCode.toUpperCase() === 'FZN'
-            ? <NavLink className='btn-23' id="vers1" to='/rsvp/confirmation' onClick={()=>{
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch(clearForm())
-                }
-            }><marquee>Submit</marquee></NavLink>
+             ? <NavLink className='btn-23' id="vers1" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
+                <marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'UNF'
-            ? <NavLink className='btn-23' id="vers2" to='/rsvp/confirmation' onClick={()=>{
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch(clearForm())
-                }
-            }><marquee>Submit</marquee></NavLink>
+             ? <NavLink className='btn-23' id="vers2" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
+                <marquee>Submit</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'NZU' & submitted === null)
-            ? <NavLink className='btn-23' id="vers3" to='/rsvp' onClick={()=>{
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch(clearForm())
-                }
-            }><marquee>Continue</marquee></NavLink>
+             ? <NavLink className='btn-23' id="vers3" to='/rsvp' onClick={() => handleSubmit(false)}>
+                <marquee>Continue</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'NZU' & submitted != null)
-            ? <NavLink className='btn-23' id="vers4" to='/rsvp/confirmation' onClick={()=>{
-                dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch(clearForm())
-                }
-            }><marquee>Submit</marquee></NavLink>
-            
+             ? <NavLink className='btn-23' id="vers4" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
+                <marquee>Submit</marquee></NavLink>
+
             : <p>error you should not have gotten this far!!</p>}
 
         </CardStackFooter>
