@@ -168,6 +168,6 @@ export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pr
   phoneNumberInput, emailInput, streetAddressInput, secondAddressInput, cityInput, zipcodeInput, countryInput, stateProvinceInput,
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
   eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput,
-  submitFormGC1, submitFormGC1_5, submitFormGC2 } = rsvpSlice.actions
+  submitFormGC1, submitFormGC1_5, submitFormGC2, clearForm } = rsvpSlice.actions
   
 export default rsvpSlice.reducer
