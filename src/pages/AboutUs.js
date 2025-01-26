@@ -15,7 +15,7 @@ export function AboutUs() {
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            {/* <div className={`section-content swipe-card flex-grow bg-lime-400/75 border-lime-500/50 border-2 backdrop-blur-md`}> */}
+            {/* <div className={`section-content swipe-card flex-grow bg-lilac-400/75 border-lilac-500/50 border-2 backdrop-blur-md`}> */}
             <div>
                 hi
             </div>

@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
+export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
     const dispatch = useDispatch();
 
@@ -15,7 +15,8 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
 
     return (
         <>
-            <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                 { submitted === null ? <h1>Repondez S'il Vous Plait!</h1> : <h1>Please RSVP For the Second Guest...</h1> }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
@@ -52,7 +53,7 @@ export function RSVPFormResponse({pageMainColor, pageSection, rsvpCode}) {
                     : <p></p> ))}
 
             </CardStackPage>
-            <CardStackFooter>
+            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
                 <NavLink className='btn-23' 
                     disabled={rsvpStatus === 'undecided' ? true : false} 
                     to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 

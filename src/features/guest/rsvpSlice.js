@@ -11,6 +11,7 @@ const rsvpSlice = createSlice({
     firstName: "", 
     lastName: "", 
     pronouns: "", 
+    phoneNumberCountryCode: "",
     phoneNumber: "", 
     email: "", 
     streetAddress: "", 
@@ -49,6 +50,9 @@ const rsvpSlice = createSlice({
     pronounsInput(state, action) {
       state.pronouns = action.payload
     },
+    phoneNumberCountryCodeInput(state, action) {
+      state.phoneNumberCountryCode = action.payload
+    },
     phoneNumberInput(state, action) {
       state.phoneNumber = action.payload
     },
@@ -77,7 +81,7 @@ const rsvpSlice = createSlice({
     // is this okay?
       { 
         console.log("can i continue? ", state.canContinueDietary);
-        if (!state.firstName || !state.lastName || !state.pronouns || 
+        if (!state.firstName || !state.lastName || !state.pronouns || !state.phoneNumberCountryCode ||
           !state.phoneNumber || !state.email || !state.streetAddress || 
           !state.city || !state.zipcode || !state.country || !state.stateProvince)
       return {...state, canContinueDietary: false} 
@@ -141,6 +145,7 @@ const rsvpSlice = createSlice({
       state.firstName = ""
       state.lastName = "" 
       state.pronouns = "" 
+      state.phoneNumberCountryCode = ""
       state.phoneNumber = "" 
       state.email = "" 
       state.streetAddress = "" 
@@ -164,10 +169,10 @@ const rsvpSlice = createSlice({
   }
 })
 
-export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, 
+export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, phoneNumberCountryCodeInput,
   phoneNumberInput, emailInput, streetAddressInput, secondAddressInput, cityInput, zipcodeInput, countryInput, stateProvinceInput,
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
-  eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput,
+  eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput, clearForm,
   submitFormGC1, submitFormGC1_5, submitFormGC2 } = rsvpSlice.actions
   
 export default rsvpSlice.reducer

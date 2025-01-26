@@ -6,12 +6,12 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { submitFormGC1, submitFormGC1_5, submitFormGC2 } from '../../features/guest/rsvpSlice';
+import { clearForm } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
 
 // on desktop all the information is pushed down too far
 
-export function RSVPFormSubmit({pageMainColor, pageSection}) {
+export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const dispatch = useDispatch();
 
@@ -40,7 +40,8 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
 
   return(
     <>
-        <CardStackPage pageMainColor={pageMainColor} pageSection={pageSection}>
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
             <h1 id="submit-header1">Does this all look right, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
             <p>{rsvpString}</p>
@@ -57,7 +58,7 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
                 <h2>Are you planning on bringing a guest?</h2>
                 <div>
                     <label className='checkbox-guest' for="guest-yes">
-                        Check this box to be texted a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
+                        Check this box to be sent a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
                         <input id="guest-yes" name="guest-yes" type="checkbox"
                             onClick={()=>handleDateLinkRequested()}/>
                         <span class="checkmark"></span>
@@ -67,34 +68,34 @@ export function RSVPFormSubmit({pageMainColor, pageSection}) {
             :<></>}
 
         </CardStackPage>
-        <CardStackFooter>
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}>
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
             {rsvpCode.toUpperCase() === 'ABC'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
 
             : rsvpCode.toUpperCase() === 'DEF'
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'GHI' & submitted === null)
             ? <NavLink className='btn-23' to='/rsvp' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Continue</marquee></NavLink>
             
             : (rsvpCode.toUpperCase() === 'GHI' & submitted != null)
             ? <NavLink className='btn-23' to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
-                dispatch()
+                dispatch(clearForm())
                 }
             }><marquee>Submit</marquee></NavLink>
             
