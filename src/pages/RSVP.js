@@ -29,15 +29,15 @@ export function RSVP() {
     const pageSecondaryColor = "lime"
     const pageTertiaryColor = "raspberry"
 
-    const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
-    const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
-    const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
+    // const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
+    // const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
+    // const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
 
     const pageSection = "rsvp"
-    // fzo - single
+    // fzn - single
     // unf - open plus one
     // nzu - closed plus one
-    const acceptableCodes = ['FZO', 'UNF', 'NZU']
+    const acceptableCodes = ['FZN', 'UNF', 'NZU']
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode) 
 
@@ -52,7 +52,7 @@ export function RSVP() {
         <GenericHeader classname="h-screen transfom-scale-5">
             <div class= "egg backdrop-blur-xl" />
             <input placeholder="RSVP code?"
-                value={rsvpCode}
+                value={rsvpCode} pattern="[A-Za-z]*"
                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}/>
 
             {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
@@ -66,33 +66,28 @@ export function RSVP() {
 
                 <Routes>
                     <Route path="/" element={
-                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainClass={pageMainClass} 
-                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
-                        // opacity={opacity} 
+                        <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/contact" element={
-                        <RSVPFormContact pageMainClass={pageMainClass} 
-                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
-                        // opacity={opacity} 
+                        <RSVPFormContact pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/dietary" element={
-                        <RSVPFormDietary pageMainClass={pageMainClass} 
-                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
-                        // opacity={opacity} 
+                        <RSVPFormDietary pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/submit" element={
-                        <RSVPFormSubmit pageMainClass={pageMainClass} 
-                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
-                        // opacity={opacity} 
+                        <RSVPFormSubmit pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 
                     <Route path="/confirmation" element={
-                        <RSVPFormConfirmation pageMainClass={pageMainClass} 
-                        pageSecondaryClass={pageSecondaryClass} pageTertiaryClass={pageTertiaryClass}
-                        // opacity={opacity} 
+                        <RSVPFormConfirmation pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
                         
                 </Routes>

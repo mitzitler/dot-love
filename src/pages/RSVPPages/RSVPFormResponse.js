@@ -2,11 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
 import { CardStackPageClass } from '../../components/CardStackPageClass';
+import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
 
-export function RSVPFormResponse({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection, rsvpCode}) {
+export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
     const dispatch = useDispatch();
 
@@ -15,8 +16,8 @@ export function RSVPFormResponse({pageMainClass, pageSecondaryClass, pageTertiar
 
     return (
         <>
-            <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
-                pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>
+            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                 { submitted === null ? <h1>Repondez S'il Vous Plait!</h1> : <h1>Please RSVP For the Second Guest...</h1> }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
@@ -52,8 +53,9 @@ export function RSVPFormResponse({pageMainClass, pageSecondaryClass, pageTertiar
                         <br/>if you do not receive confirmation that the RSVPs were submitted, please start over!</p> 
                     : <p></p> ))}
 
-            </CardStackPageClass>
-            <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
+            </CardStackPage>
+            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} >
                 <NavLink className='btn-23' 
                     disabled={rsvpStatus === 'undecided' ? true : false} 
                     to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 

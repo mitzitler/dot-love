@@ -5,6 +5,21 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  safelist: [
+    'bg-amber-400/75',
+    'border-amber-500/50',
+    'bg-babyblue-400/75',
+    'border-babyblue-500/50',
+    'bg-lilac-400/75',
+    'border-lilac-500/50',
+    'bg-raspberry-400/75',
+    'border-raspberry-500/50',
+    'bg-lime-400/75',
+    'border-lime-500/50',
+    'bg-emerald-400/75',
+    'border-emerald-500/50',
+
+  ],
   theme: {
     extend: {
       colors: {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useCallback } from 'react';
 import { CardStackPageClass } from '../components/CardStackPageClass.js';
+import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 
@@ -47,13 +48,13 @@ export function Info() {
         setExpandedBox((current) => (current === id ? null : id)); // Toggle expansion
     }
 
-    console.log(pageMainClass)
+    // console.log(pageMainClass)
 
     return (
 
-        <CardStackPageClass class="card-stack" pageMainClass={pageMainClass} 
-        pageSecondaryClass={pageSecondaryClass}
-        pageTertiaryClass={pageTertiaryClass}
+        <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
+        pageSecondaryColor={pageSecondaryColor}
+        pageTertiaryColor={pageTertiaryColor}
         pageSection={pageSection}>
             <h1>Info</h1>
             <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
@@ -119,7 +120,7 @@ export function Info() {
 
                 </div>
             </div>
-        </CardStackPageClass>
+        </CardStackPage>
         // this card stack page is missing the top child, and puts the third child as a nav bar card
         // </>
     )

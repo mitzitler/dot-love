@@ -2,6 +2,7 @@ import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { CardStackPageClass } from '../../components/CardStackPageClass';
+import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
@@ -11,7 +12,7 @@ import { storeCompletedRSVP } from '../../features/guest/rsvpCompletedSlice.js'
 
 // on desktop all the information is pushed down too far
 
-export function RSVPFormSubmit({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection}) {
+export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const dispatch = useDispatch();
 
@@ -40,8 +41,8 @@ export function RSVPFormSubmit({pageMainClass, pageSecondaryClass, pageTertiaryC
 
   return(
     <>
-        <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
-                pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
             <h1 id="submit-header1">Does this all look right, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
             <p>{rsvpString}</p>
@@ -67,11 +68,12 @@ export function RSVPFormSubmit({pageMainClass, pageSecondaryClass, pageTertiaryC
             </div>
             :<></>}
 
-        </CardStackPageClass>
-        <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
+        </CardStackPage>
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} >
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
-            {rsvpCode.toUpperCase() === 'FZO'
+            {rsvpCode.toUpperCase() === 'FZN'
             ? <NavLink className='btn-23' id="vers1" to='/rsvp/confirmation' onClick={()=>{
                 dispatch(storeCompletedRSVP([`${firstName}_${lastName}`, fullGuestInfo]));
                 dispatch(clearForm())

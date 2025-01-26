@@ -9,6 +9,7 @@ import { drinkAlcoholToggle, eatMeatToggle, eatDairyToggle,
 import { RedX } from   '../../components/RedX';
 import { GreenO } from '../../components/GreenO';
 import { CardStackPageClass } from '../../components/CardStackPageClass';
+import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter'
 
 import "../../assets/dietary-restrictions/alcohol_1.png" 
@@ -29,7 +30,7 @@ const Meat = require("../../assets/dietary-restrictions/meat.png")
 const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
 const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
 
-export function RSVPFormDietary({pageMainClass, pageSecondaryClass, pageTertiaryClass, pageSection}) {
+export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const [animation, setAnimation] = useState(null)
     const dispatch = useDispatch();
@@ -55,8 +56,8 @@ export function RSVPFormDietary({pageMainClass, pageSecondaryClass, pageTertiary
 
   return(
     <>
-        <CardStackPageClass pageMainClass={pageMainClass} pageSecondaryClass={pageSecondaryClass}
-                pageTertiaryClass={pageTertiaryClass} pageSection={pageSection}>  
+        <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>  
                     <h1 >... and any dietary restrictions, please!</h1> 
                     <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
                         dietary restrictions</h2>
@@ -141,8 +142,9 @@ export function RSVPFormDietary({pageMainClass, pageSecondaryClass, pageTertiary
                         // is this format right?
                         onChange={(e)=>dispatch(moreRestrictionsInput(e.target.value))}/> 
                     </div>
-        </CardStackPageClass>
-        <CardStackFooter pageMainColor="amber" pageSecondaryColor="amber" pageTertiaryColor="amber">
+        </CardStackPage>
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} >
                 <NavLink className='btn-23' to='/rsvp/contact' end>
                     <marquee>Return</marquee>
                 </NavLink> 
