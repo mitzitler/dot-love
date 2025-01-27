@@ -1,30 +1,26 @@
-import os
 import json
+import os
+
 import boto3
-from aws_cdk import (
-    Stack,
-    RemovalPolicy,
-    Duration,
-    aws_certificatemanager as cert_manager,
-    aws_lambda as lambdaFx,
-    aws_dynamodb as dynamodb,
-    aws_s3 as s3,
-    aws_iam as iam,
-    aws_ses as ses,
-    aws_sns as sns,
-    aws_cloudfront as cloudfront,
-    aws_cloudfront_origins as origins,
-    aws_sns_subscriptions as subscriptions,
-    aws_apigatewayv2_alpha as apigw,
-    CfnOutput,
+from aws_cdk import CfnOutput, Duration, RemovalPolicy, Stack
+from aws_cdk import aws_apigatewayv2_alpha as apigw
+from aws_cdk import aws_certificatemanager as cert_manager
+from aws_cdk import aws_cloudfront as cloudfront
+from aws_cdk import aws_cloudfront_origins as origins
+from aws_cdk import aws_dynamodb as dynamodb
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_lambda as lambdaFx
+from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_ses as ses
+from aws_cdk import aws_sns as sns
+from aws_cdk import aws_sns_subscriptions as subscriptions
+from aws_cdk.aws_apigatewayv2_authorizers_alpha import (
+    HttpLambdaAuthorizer,
+    HttpLambdaResponseType,
 )
 from aws_cdk.aws_apigatewayv2_integrations_alpha import (
     HttpLambdaIntegration,
     HttpUrlIntegration,
-)
-from aws_cdk.aws_apigatewayv2_authorizers_alpha import (
-    HttpLambdaResponseType,
-    HttpLambdaAuthorizer,
 )
 from constructs import Construct
 
@@ -108,7 +104,7 @@ class DotLoveCoreStack(Stack):
         self.dot_love_registry_claim_table = self.create_dot_love_registry_claim_table()
 
         ###################################################
-        # DOT LOVE API GATEWAY
+        # DOT LOVE API GATEWAY 🖥
         ###################################################
         # Create global dependency layer
         self.create_global_dependency_layer()
@@ -119,7 +115,7 @@ class DotLoveCoreStack(Stack):
         )
 
         ###################################################
-        # GIZMO USER SERVICE
+        # GIZMO USER SERVICE 🐱
         ###################################################
         # Create Gizmo Service Lambda and associate w/ API Gateway
         self.dot_love_gizmo_lambda = self.create_dot_love_gizmo_lambda(
@@ -138,7 +134,7 @@ class DotLoveCoreStack(Stack):
         )
 
         ###################################################
-        # SPECTACULO REGISTRY SERVICE
+        # SPECTACULO REGISTRY SERVICE 🌠
         ###################################################
         # Create Spectaculo Service Lambda and associate w/ API Gateway
         self.dot_love_spectaculo_lambda = self.create_dot_love_spectaculo_lambda(
@@ -154,7 +150,7 @@ class DotLoveCoreStack(Stack):
         self.create_dot_love_registry_item_img_s3()
 
         ###################################################
-        # DOT LOVE EMAIL HANDLING (SES, SNS, S3, Lambda)
+        # DOT LOVE EMAIL HANDLING (SES, SNS, S3, Lambda) 📧
         ###################################################
         # Create S3 to store bounce and complaints
         self.dot_love_ses_s3 = self.create_dot_love_ses_s3()
@@ -168,7 +164,7 @@ class DotLoveCoreStack(Stack):
         )
 
         ###################################################
-        # DOT LOVE MEDIA ETC S3
+        # DOT LOVE MEDIA ETC S3 📷
         ###################################################
         # Create S3 to store bounce and complaints
         self.dot_love_website_media_s3 = self.create_dot_love_website_media_etc_s3()
