@@ -18,13 +18,14 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
         <>
             <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-                { submitted === null ? <h1>Repondez S'il Vous Plait!</h1> : <h1>Please RSVP For the Second Guest...</h1> }
+                { rsvpCode.toUpperCase() === "UNF" & submitted != null ? 
+                    <h1>Please RSVP For the Second Guest...</h1> : 
+                    <h1>Repondez S'il Vous Plait!</h1> }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
                         November 7th, 2025 in Brooklyn, NY?</h2>
                     <p>If need be, you can change this, but please let us know soon!</p>
                 </div>
-              {/* TODO: revisit this */}
                 <div id="rsvp-radio">
                     <div id="radio-item">
                         <input id="rsvp-yes" name="rsvp" type="radio" value={rsvpStatus}

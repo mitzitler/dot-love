@@ -77,7 +77,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
             </div>
             
             {/* conditional case for open plus ones */}
-            {rsvpCode.toUpperCase() === 'DEF' 
+            {rsvpCode.toUpperCase() === 'UNF' 
             ? 
             <div class="conditional-plusone">
                 <h2>Are you planning on bringing a guest?</h2>
