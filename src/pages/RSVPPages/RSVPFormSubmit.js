@@ -1,7 +1,6 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
@@ -77,7 +76,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
             </div>
             
             {/* conditional case for open plus ones */}
-            {rsvpCode.toUpperCase() === 'DEF' 
+            {rsvpCode.toUpperCase() === 'UNF' 
             ? 
             <div class="conditional-plusone">
                 <h2>Are you planning on bringing a guest?</h2>

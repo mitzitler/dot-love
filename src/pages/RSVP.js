@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React from 'react';
 import { GenericHeader } from '../components/GenericHeader';
 import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
@@ -29,11 +29,8 @@ export function RSVP() {
     const pageSecondaryColor = "lime"
     const pageTertiaryColor = "raspberry"
 
-    // const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
-    // const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
-    // const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
-
     const pageSection = "rsvp"
+
     // fzn - single
     // unf - open plus one
     // nzu - closed plus one
@@ -62,8 +59,6 @@ export function RSVP() {
         <div classname="container">
             <main className="card-stack">
                 
-                {/* <div className={`section-content swipe-card flex-grow bg-lime-400/45 border-lime-500/50 border-1 backdrop-blur-md`}/> */}
-
                 <Routes>
                     <Route path="/" element={
                         <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
@@ -100,7 +95,3 @@ export function RSVP() {
         
     )
 }
-
-// and maybe next what i do is, scrolltrigger to make the circle size down as it slides up
-// and then it lives at the top of the screen at 0.25 scale
-// and the other cars on the screen are slighly smaller

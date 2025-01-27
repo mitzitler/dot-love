@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../App.css';
-import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackPage } from '../../components/CardStackPage';
 
 export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {

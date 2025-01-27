@@ -2,8 +2,7 @@
 
 
 .rsvp #main {
-    margin: 5%;
-    /* min-height: 600; */
+    margin: 2em;
     color: red;
 }
   
@@ -11,8 +10,6 @@
   color: greenyellow;
   font-size: large;
   font-family: gambetta;
-  /* margin-bottom: 10% */
-  /* this was super frustrating ^ where else will it effect? */
 }
 
 .rsvp #rsvp-radio {
@@ -20,15 +17,8 @@
   display: flex;
   flex-direction: column;
   align-items: left;
-  margin: 12% 0% 8% 0%
+  margin-top: 3em
 }
-
-/* this does nothing */
-/* .rsvp #radio-item {
-  color: rgba(0, 0, 0, 0.566);
-  font-family: gambetta;
-  margin-bottom: 3%;
-} */
 
 #radio-item {
   display: flex;
@@ -39,8 +29,6 @@
 #radio-item label {
   color: maroon;
   font-size: larger;
-  /* margin-bottom: 10em; */
-
 }
 
 .rsvp input {
@@ -51,15 +39,14 @@
   font-size: x-large;
   font-family: Bonbance;
   color: rgb(85, 7, 7);
-  /* background-color: aqua; */
-  margin-bottom: 5%
+  margin-bottom: 1.5em
 }
 
 .rsvp h2 {
   font-size: large;
   font-family: gambetta;
   color: rgba(0, 0, 0, 0.566);
-  margin-bottom: 2%
+  margin-bottom: 1em
 }
 
 .rsvp h3 {
@@ -67,8 +54,9 @@
   color: rgba(0, 0, 0, 0.566);
   font-size: small;
   font-family: elanor;
-  margin-bottom: 4%;
+  margin-bottom: 2em
 }
+
 .rsvp span {
   font-size: large;
   font-family: gambetta;
@@ -80,13 +68,13 @@
   color: rgba(0, 0, 0, 0.566);
   font-size: medium;
   font-family: elanor;
-  margin-bottom: 4%;
+  margin-bottom: 2em
 }
 
 .rsvp .name-info, .contact-num, .contact-info, .other-restrictions {
   display: flex;
   flex-direction: row;
-  margin-bottom: 5%;
+  margin-bottom: 1.5em
 }
 
 .rsvp .state-country {
@@ -103,9 +91,9 @@
   font-family: elanor;
   font-size: medium;
   border-radius: 7px;
-  margin: 0% 1%;
+  margin: 0 0.2em;
   height: 28px;
-  padding: 0% 1%
+  padding: 0 0.5em
 }
 
 .rsvp #country-code {
@@ -136,12 +124,12 @@
 }
 
 #contact-bottom {
-  margin-top: 15%;
+  margin-top: 9em;
 }
 
 .dietary-grid {
-  padding: 1% 6% 2%;
-  margin-bottom: 2%
+  padding: 0.5em 1em 1em;
+  margin-bottom: 0.5em
 }
 
 .diet-image, .diet-image-clicked {
@@ -157,22 +145,19 @@
 }
 
 .rsvp .diet-image-clicked {
-  /* transform: brightness(0.5);
-  transform: saturate(0%);
-  filter: grayscale(50%); */
-  filter: brightness(0.4);
+  filter: brightness(0.6);
   filter: saturate(0%);
-  /* animation: redx 3s linear; */
+  scale: 0.8
 }
 
 .submit-div {
-  padding: 0% 1%
+  padding: 0
 }
 
 .submit-card-left, .submit-card-right {
   border-radius: 15px;
-  margin: 10% 10% 0% 10%;
-  /* padding: 3% 2%; */
+  margin: 0.5em 0.5em 0 0.5em;
+  padding: 1em 1em;
   height: 95%;
   opacity: 90%;
   filter: blur(0.5px);
@@ -196,9 +181,8 @@
 }
 
 .conditional-plusone h2 {
-  margin-top: 17%
+  margin-top: 2em
 }
-
 
 #submit-header1, #submit-header2 {
   display: flex;
@@ -207,30 +191,15 @@
 }
 
 #submit-header1 {
-  margin-top: 5%;
-  margin-bottom: 0%;
+  margin-top: 1em;
+  margin-bottom: 0;
 }
 
 #submit-header2 {
-  padding-top: 0%;
-  margin-top: 0%;
-  margin-bottom: 5%
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: 1em
 }
-
-/* .next-btn {
-  border-radius: 27px;
-  font-family: Bonbance;
-  border: 1px solid #b79c05;
-  color: maroon;
-  width: 240px;
-  padding: 8px 20px;
-  margin: 15px 8px;
-  opacity: 60%;
-}
-
-.next-btn:hover {
-  background-color: #ee7fdb;
-} */
 
 /* this needs a max width */
 .btn-23 {
@@ -246,7 +215,6 @@
   text-transform: uppercase;
   border-radius: 27px;
   border: 1px solid #b79c05;
-  /* transition: opacity 5s ease; */
 }
 
 .btn-23[disabled]:hover {
@@ -292,14 +260,13 @@
 .checkbox-guest {
   display: block;
   position: relative;
-  margin: 0% 2% 1% 2%;
+  margin: 0 0.5em 0.2em 0.5em;
   cursor: pointer;
   color: rgb(69, 50, 50);
   font-size: large;
-  padding-left: 4%
+  padding-left: 2em
 }
 
-/* Hide the browser's default checkbox */
 .checkbox-guest input {
   position: absolute;
   opacity: 0;
@@ -308,7 +275,6 @@
   width: 0;
 }
 
-/* Create a custom checkbox */
 .checkmark {
   position: absolute;
   top: 0;
@@ -320,29 +286,20 @@
   background-color: #db568f
 }
 
-/* On mouse-over, add a grey background color */
-/* .checkbox-guest:hover input ~ .checkmark {
-  background-color: rgb(23, 245, 60)
-} */
-
-/* When the checkbox is checked, add a blue background */
 .checkbox-guest input:checked ~ .checkmark {
   background-color: #f32121;
 }
 
-/* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
 
-/* Show the checkmark when checked */
 .checkbox-guest input:checked ~ .checkmark:after {
   display: block;
 }
 
-/* Style the checkmark/indicator */
 .checkbox-guest .checkmark:after {
   left: 9px;
   top: 5px;
