@@ -8,7 +8,6 @@ import { drinkAlcoholToggle, eatMeatToggle, eatDairyToggle,
     eatShellfishToggle, moreRestrictionsInput} from '../../features/guest/rsvpSlice';
 import { RedX } from   '../../components/RedX';
 import { GreenO } from '../../components/GreenO';
-import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter'
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState, useCallback } from 'react';
-import { CardStackPageClass } from '../components/CardStackPageClass.js';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';

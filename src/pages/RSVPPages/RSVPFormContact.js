@@ -1,7 +1,6 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
-import { CardStackPageClass } from '../../components/CardStackPageClass';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
