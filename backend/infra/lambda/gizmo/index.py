@@ -1,19 +1,20 @@
-import os
-import boto3
-from twilio.rest import Client
-import traceback
-import uuid
 import json
+import os
 import random
 import string
+import traceback
+import uuid
 from enum import Enum
+
+import boto3
 from aws_lambda_powertools import Logger
-from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.event_handler.api_gateway import (
     APIGatewayHttpResolver,
     ProxyEventType,
 )
+from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
+from twilio.rest import Client
 
 # Environment Variables
 USER_TABLE_NAME = os.environ["user_table_name"]
@@ -33,6 +34,7 @@ CONTACT_INFO = {
         "email": os.environ["matthew_email"],
     },
 }
+RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
 # Powertools logger
 log = Logger(service="gizmo")
@@ -591,14 +593,11 @@ class User:
         )
 
     @staticmethod
-    def extract_users_from_payload(json_body):
-        rsvps = json_body["rsvps"]
+    def extract_users_from_rsvps(rsvps):
         users = []
-        for rsvp in rsvps:
-            first_last = (
-                rsvp["guestInfo"]["firstName"] + "_" + rsvp["guestInfo"]["lastName"]
-            )
-            users.append(Users.from_guest_info(rsvp["guestInfo"]))
+        for rsvp in rsvps
+            first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
+            users.append(Users.from_guest_info(rsvp))
         return users
 
     @staticmethod
@@ -681,14 +680,11 @@ class User:
             "phone": self.address.phone,
         }
 
-        res = dynamo_client.create(
+        dynamo_client.create(
             USER_TABLE_NAME,
             key_expression,
             field_value_map,
         )
-
-        # TODO: Parse res for errors as str
-        return None
 
     def update_db(self, dynamo_client):
         key_expression = {"first_last": {"S": self.first + "_" + self.last}}
@@ -974,8 +970,12 @@ def get_user_by_guest_link():
 
 @app.post("/gizmo/user")
 def register():
-    guest_link = app.current_event.json_body.get("guest_link", "")
+    rsvps = app.current_event.json_body
+
+    # If a guest link is included, we need to verify it and
+    # link the associated user.
     our_actual_friend = None
+    guest_link = rsvps[0]["guestCode"]
     if guest_link:
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
@@ -985,7 +985,7 @@ def register():
             log.append_keys(our_actual_friend=our_actual_friend)
 
             # attach the real friend to their guest
-            app.current_event.json_body["guest_info"]["pair_first_last"] = (
+            rsvps[0]["pair_first_last"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -995,17 +995,16 @@ def register():
                 "message": "failed lookup of our actual friend",
             }
 
-    # we might get more than one rsvp
-    users = User.from_guest_info(
-        app.context["first_last"],
-        app.current_event.json_body["guest_info"],
-    )
+    # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
+    #       users with a "Closed Plus One" will fill out two rsvps at once.
+    users = extract_users_from_rsvps(rsvps)
 
     # register user(s) in db
+    log_users = []
     for user in users:
-        err = None
         try:
-            err = user.register_db(CW_DYNAMO_CLIENT)
+            user.register_db(CW_DYNAMO_CLIENT)
+            log_users.append(user.as_map())
         except Exception as e:
             err_msg = "failed to register user in db"
             log.exception(err_msg)
@@ -1013,30 +1012,27 @@ def register():
                 "code": 500,
                 "message": err_msg,
             }
-        if err:
-            log.error(f"encountered error registering user in dynamo err={err}")
-            return {"code": 400, "message": err}
-        log.append_keys(user=user.__repr__())
-        log.info("succeeded registering user in db")
+    log.append_keys(users=log_users)
+    log.info("succeeded registering user in db")
 
-        if guest_link:
-            try:
-                our_actual_friend.guest_details.pair_first_last = app.context[
-                    "first_last"
-                ]
-                our_actual_friend.update_db(CW_DYNAMO_CLIENT)
-            except Exception as e:
-                log.exception("failed updating guest_first_last of our actual friend")
-                return {
-                    "code": 500,
-                    "message": "failed lookup of our actual friend",
-                }
+    # link our friend to the new account made from their guest link
+    if guest_link:
+        try:
+            our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
+            our_actual_friend.update_db(CW_DYNAMO_CLIENT)
+        except Exception as e:
+            log.exception("failed updating guest_first_last of our actual friend")
+            return {
+                "code": 500,
+                "message": "failed lookup of our actual friend",
+            }
 
     # notify user(s) of registration success
     for user in users:
         try:
-            has_guest = app.current_event.json_body["guest_info"]["rsvp_code"] == "GHI"
-            email_registration_success(user, has_guest)
+            email_registration_success(
+                user=user, has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE
+            )
         except Exception as e:
             err_msg = "failed to send user registration success email"
             log.exception(err_msg)
@@ -1046,16 +1042,13 @@ def register():
             err_msg = "failed to send user registration success text"
             log.exception(err_msg)
 
-    users_registered = {}
-    for user in users:
-        users_registered[user.first] = user.as_map()
-
+    users_registered = [user.as_map() for user in users]
     return {"code": 200, "message": "success", "body": users_registered}
 
 
 @app.patch("/gizmo/user")
 def update():
-    user = extract_users_from_payload(app.current_event.json_body)[0]
+    user = extract_users_from_rsvps(app.current_event.json_body)[0]
 
     err = None
     try:
@@ -1157,7 +1150,7 @@ def handler(event, context):
         }
 
 
-# NOTE: Doing this at the top level so the dynamo connection is preserved b/t lambda calls
+# NOTE: Doing this at the top level so the client connections are preserved b/t lambda calls
 # Initialize clients
 CW_DYNAMO_CLIENT = CWDynamoClient()
 TWILIO_CLIENT = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
