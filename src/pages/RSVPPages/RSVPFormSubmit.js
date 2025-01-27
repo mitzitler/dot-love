@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearForm } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
+import { store } from '../../store'
 
 // TODO: on desktop all the information is pushed down too far
 
@@ -22,30 +23,36 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const firstName = useSelector((state) => state.rsvp.firstName) 
     const lastName = useSelector((state) => state.rsvp.lastName)
     const pronouns = useSelector((state) => state.rsvp.pronouns)
-    const submitted = useSelector((state) => state.rsvp.submitted)
     const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
     const fullGuestInfo = useSelector((state) => state.rsvp)
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
+    const submitted = useSelector((state) => state.rsvpCompleted.submitted)
 
     const handleSubmit = async (makeApiCall) => {
         // Step 1: Update Redux state
-        const submissionKey = `${firstName}_${lastName}`;
-        dispatch(storeCompletedRSVP({submissionKey, fullGuestInfo}));
-        dispatch(clearForm())
+        dispatch(storeCompletedRSVP({fullGuestInfo}));
+        const updatedCompletedRsvps = store.getState().rsvpCompleted.completedRsvps;
+
+        console.log(completedRsvps)
 
         // Step 2: Make the API call
         if (!makeApiCall) return;
 
         try {
+            console.log(completedRsvps)
+            const firstLast = `${firstName}_${lastName}`;
             const result = await registerRSVP({
-            headers: { 'X-First-Last': submissionKey },
-            rsvpData: { 'rsvps': completedRsvps },
+                headers: { 'X-First-Last': firstLast },
+                rsvpData: completedRsvps,
             }).unwrap();
 
-            console.log('RSVP(s) registered successfully:', result);
+            console.log('RSVP(s) api call succeeded:', result);
         } catch (err) {
-            console.error('Error registering RSVP(s):', err);
+            console.error('RSVP(s) api call failed:', err);
         }
+
+
+        dispatch(clearForm())
     };
 
     console.log(fullGuestInfo)
@@ -104,11 +111,11 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
              ? <NavLink className='btn-23' id="vers2" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
                 <marquee>Submit</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'NZU' & submitted === null)
+             : (rsvpCode.toUpperCase() === 'NZU' && !submitted)
              ? <NavLink className='btn-23' id="vers3" to='/rsvp' onClick={() => handleSubmit(false)}>
                 <marquee>Continue</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'NZU' & submitted != null)
+            : (rsvpCode.toUpperCase() === 'NZU' && submitted)
              ? <NavLink className='btn-23' id="vers4" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
                 <marquee>Submit</marquee></NavLink>
 

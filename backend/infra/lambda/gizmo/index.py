@@ -34,6 +34,7 @@ CONTACT_INFO = {
         "email": os.environ["matthew_email"],
     },
 }
+RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
 # Powertools logger
 log = Logger(service="gizmo")
@@ -592,14 +593,11 @@ class User:
         )
 
     @staticmethod
-    def extract_users_from_payload(json_body):
-        rsvps = json_body["rsvps"]
+    def extract_users_from_rsvps(rsvps):
         users = []
-        for rsvp in rsvps:
-            first_last = (
-                rsvp["guestInfo"]["firstName"] + "_" + rsvp["guestInfo"]["lastName"]
-            )
-            users.append(Users.from_guest_info(rsvp["guestInfo"]))
+        for rsvp in rsvps
+            first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
+            users.append(Users.from_guest_info(rsvp))
         return users
 
     @staticmethod
@@ -972,12 +970,12 @@ def get_user_by_guest_link():
 
 @app.post("/gizmo/user")
 def register():
-    rsvps = app.current_event.json_body["rsvps"]
+    rsvps = app.current_event.json_body
 
     # If a guest link is included, we need to verify it and
     # link the associated user.
     our_actual_friend = None
-    guest_link = app.current_event.json_body.get("guest_link", "")
+    guest_link = rsvps[0]["guestCode"]
     if guest_link:
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
@@ -987,7 +985,7 @@ def register():
             log.append_keys(our_actual_friend=our_actual_friend)
 
             # attach the real friend to their guest
-            guest_infos[] = (
+            rsvps[0]["pair_first_last"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -999,7 +997,7 @@ def register():
 
     # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
     #       users with a "Closed Plus One" will fill out two rsvps at once.
-    users = extract_users_from_payload(guest_infos)
+    users = extract_users_from_rsvps(rsvps)
 
     # register user(s) in db
     log_users = []
@@ -1033,7 +1031,7 @@ def register():
     for user in users:
         try:
             email_registration_success(
-                user=user, has_guest=guest_info["rsvp_code"].lower() == "unf"
+                user=user, has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE
             )
         except Exception as e:
             err_msg = "failed to send user registration success email"
@@ -1050,7 +1048,7 @@ def register():
 
 @app.patch("/gizmo/user")
 def update():
-    user = extract_users_from_payload(app.current_event.json_body)[0]
+    user = extract_users_from_rsvps(app.current_event.json_body)[0]
 
     err = None
     try:

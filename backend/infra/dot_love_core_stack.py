@@ -300,6 +300,8 @@ class DotLoveCoreStack(Stack):
                 "mitzi_phone": contact_info["mitzi"]["phone"],
                 "matthew_email": contact_info["matthew"]["email"],
                 "matthew_phone": contact_info["matthew"]["phone"],
+                # for plus-one guest checking
+                "open_plus_one_code": "unf",
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
