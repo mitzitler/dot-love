@@ -9,7 +9,9 @@ from enum import Enum
 import boto3
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.event_handler.api_gateway import (
-    APIGatewayHttpResolver, ProxyEventType)
+    APIGatewayHttpResolver,
+    ProxyEventType,
+)
 from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 from twilio.rest import Client
@@ -970,6 +972,8 @@ def get_user_by_guest_link():
 
 @app.post("/gizmo/user")
 def register():
+    rsvps = app.current_event.json_body["rsvps"]
+
     # If a guest link is included, we need to verify it and
     # link the associated user.
     our_actual_friend = None
@@ -983,7 +987,7 @@ def register():
             log.append_keys(our_actual_friend=our_actual_friend)
 
             # attach the real friend to their guest
-            app.current_event.json_body["guest_info"]["pair_first_last"] = (
+            guest_infos[] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -995,8 +999,7 @@ def register():
 
     # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
     #       users with a "Closed Plus One" will fill out two rsvps at once.
-    guest_info = app.current_event.json_body["guest_info"]
-    users = extract_users_from_payload(guest_info)
+    users = extract_users_from_payload(guest_infos)
 
     # register user(s) in db
     log_users = []
