@@ -371,11 +371,11 @@ class RsvpStatus(Enum):
 
 
 class Pronouns(Enum):
-    SHEHER = 1
-    HEHIM = 2
-    THEYTHEM = 3
-    SHETHEY = 4
-    HETHEY = 5
+    SHE_HER = 1
+    HE_HIM = 2
+    THEY_THEM = 3
+    SHE_THEY = 4
+    HE_THEY = 5
 
     def __str__(self):
         return self.name
@@ -454,11 +454,11 @@ class User:
             "pronouns": "Pronouns",
         }
         pronoun_map = {
-            Pronouns.SHEHER: "she/her",
-            Pronouns.HEHIM: "he/him",
-            Pronouns.THEYTHEM: "they/them",
-            Pronouns.SHETHEY: "she/they",
-            Pronouns.HETHEY: "he/they",
+            Pronouns.SHE_HER: "she/her",
+            Pronouns.HE_HIM: "he/him",
+            Pronouns.THEY_THEM: "they/them",
+            Pronouns.SHE_THEY: "she/they",
+            Pronouns.HE_THEY: "he/they",
         }
 
         # Add each attribute as a row
@@ -595,22 +595,22 @@ class User:
     @staticmethod
     def extract_users_from_rsvps(rsvps):
         users = []
-        for rsvp in rsvps
+        for rsvp in rsvps:
             first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
-            users.append(Users.from_guest_info(rsvp))
+            users.append(User.from_client_rsvp(rsvp))
         return users
 
     @staticmethod
-    def from_guest_info(guest_info):
-        first = guestName["firstName"]
-        last = guestName["lastName"]
+    def from_client_rsvp(guest_info):
+        first = guest_info["firstName"]
+        last = guest_info["lastName"]
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
         phone = "+" + guest_info["phoneNumberCountryCode"] + guest_info["phoneNumber"]
 
-        rsvp_status = RsvpStatus[guest_info["rsvp_status"]]
-        pronouns = Pronouns[guest_info["pronouns"]]
+        rsvp_status = RsvpStatus[guest_info["rsvpStatus"].upper()]
+        pronouns = Pronouns[guest_info["pronouns"].replace("/", "_").upper()]
         address = UserAddress(
             guest_info["streetAddress"],
             guest_info["secondAddress"],
@@ -634,7 +634,7 @@ class User:
         )
         guest_details = GuestDetails(
             link=guest_link_string,
-            pair_first_last=guest_info["pair_first_last"],
+            pair_first_last="",  # NOTE: This is always set after the fact
         )
 
         return User(
@@ -975,7 +975,7 @@ def register():
     # If a guest link is included, we need to verify it and
     # link the associated user.
     our_actual_friend = None
-    guest_link = rsvps[0]["guestCode"]
+    guest_link = rsvps[0].get("guestCode")
     if guest_link:
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
@@ -997,7 +997,7 @@ def register():
 
     # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
     #       users with a "Closed Plus One" will fill out two rsvps at once.
-    users = extract_users_from_rsvps(rsvps)
+    users = User.extract_users_from_rsvps(rsvps)
 
     # register user(s) in db
     log_users = []
@@ -1007,6 +1007,7 @@ def register():
             log_users.append(user.as_map())
         except Exception as e:
             err_msg = "failed to register user in db"
+            log.append_keys(failed_user=user.first)
             log.exception(err_msg)
             return {
                 "code": 500,
@@ -1015,9 +1016,9 @@ def register():
     log.append_keys(users=log_users)
     log.info("succeeded registering user in db")
 
-    # link our friend to the new account made from their guest link
     if guest_link:
         try:
+            # link our friend to the new account made from their guest link
             our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
             our_actual_friend.update_db(CW_DYNAMO_CLIENT)
         except Exception as e:
@@ -1028,19 +1029,21 @@ def register():
             }
 
     # notify user(s) of registration success
-    for user in users:
-        try:
-            email_registration_success(
-                user=user, has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE
-            )
-        except Exception as e:
-            err_msg = "failed to send user registration success email"
-            log.exception(err_msg)
-        try:
-            text_registration_success(user)
-        except Exception as e:
-            err_msg = "failed to send user registration success text"
-            log.exception(err_msg)
+    if user.rsvp_status == RsvpStatus.ATTENDING:
+        for user in users:
+            try:
+                email_registration_success(
+                    user=user,
+                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                )
+            except Exception as e:
+                err_msg = "failed to send user registration success email"
+                log.exception(err_msg)
+            try:
+                text_registration_success(user)
+            except Exception as e:
+                err_msg = "failed to send user registration success text"
+                log.exception(err_msg)
 
     users_registered = [user.as_map() for user in users]
     return {"code": 200, "message": "success", "body": users_registered}
@@ -1048,7 +1051,7 @@ def register():
 
 @app.patch("/gizmo/user")
 def update():
-    user = extract_users_from_rsvps(app.current_event.json_body)[0]
+    user = User.extract_users_from_rsvps(app.current_event.json_body)[0]
 
     err = None
     try:
