@@ -1,5 +1,6 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
+import { GenericHeader2 } from '../components/GenericHeader2';
 import { Info } from './Info';
 import { AboutUs } from './AboutUs';
 import { Routes, Route } from 'react-router-dom';
@@ -10,7 +11,7 @@ import '../App.css';
 export function Home() {
 
     const dispatch = useDispatch();
-
+    const [entryValue, setEntryValue] = useState("")
     const fullNameCode = useSelector((state) => state.user.fullNameCode) 
     // this needs to be a api lookup
     const acceptableNames = ['TEST NAME']
@@ -38,15 +39,10 @@ export function Home() {
     return (
 
         <>
-        <GenericHeader classname="h-screen transfom-scale-5">
-
-            <div class= "egg backdrop-blur-xl" />
-            <input placeholder="Full name?"
-               value={fullNameCode}
-               onInput={(e)=>dispatch(fullNameCodeInput(e.target.value))}
-                />
-
-        </GenericHeader>
+        <GenericHeader2 classname="h-screen transfom-scale-5" 
+            placeholder={"Full name?"} entryValue={entryValue} 
+            setEntryValue={setEntryValue}
+            />
         { acceptableNames.includes(fullNameCode.toUpperCase()) ?
         <div classname="container">
             <main className="card-stack">
