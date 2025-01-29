@@ -38,21 +38,38 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
         // Step 2: Make the API call
         if (!makeApiCall) return;
 
+        let result = null;
         try {
             console.log(completedRsvps)
             const firstLast = `${firstName}_${lastName}`;
-            const result = await registerRSVP({
+            result = await registerRSVP({
                 headers: { 'X-First-Last': firstLast },
                 rsvpData: completedRsvps,
             }).unwrap();
 
+            if (result.code !== 200) {
+                console.log("Something went wrong with Gizmo!");
+                console.log(result);
+                dispatch(clearForm());
+                dispatch(clearCompleteRSVPs())
+                return
+            }
             console.log('RSVP(s) api call succeeded:', result);
         } catch (err) {
             console.error('RSVP(s) api call failed:', err);
+            dispatch(clearForm())
+            dispatch(clearCompleteRSVPs())
+            return
         }
 
+        console.log("Registered the following users:");
+        result.body.forEach((user) => {
+            console.log(user);
+        })
 
-        dispatch(clearForm())
+
+        dispatch(clearForm());
+        dispatch(clearCompleteRSVPs())
     };
 
     console.log(fullGuestInfo)
