@@ -9,7 +9,6 @@ import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpCodeInput } from '../features/guest/rsvpSlice';
 import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
-import dotLoveImg from '../assets/light_mode_wedding_logo.png';
 import '../App.css';
 
 export function RSVP() {
@@ -21,7 +20,7 @@ export function RSVP() {
             toast.info(input, {
                 theme: "dark",
                 position: "top-right",
-                icon: <img src='../assets/light_mode_wedding_logo.png' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
+                icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
             })
         }
     }

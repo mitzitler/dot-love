@@ -11,24 +11,6 @@ import { GreenO } from '../../components/GreenO';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter'
 
-import "../../assets/dietary-restrictions/alcohol_1.png" 
-import "../../assets/dietary-restrictions/dairy.png";
-import "../../assets/dietary-restrictions/eggs.png";
-import "../../assets/dietary-restrictions/fish.png";
-import "../../assets/dietary-restrictions/gluten.png";
-import "../../assets/dietary-restrictions/meat.png";
-import "../../assets/dietary-restrictions/peanuts.png";
-import "../../assets/dietary-restrictions/shellfish.png";
-
-const Alcohol = require("../../assets/dietary-restrictions/alcohol_1.png")
-const Dairy = require("../../assets/dietary-restrictions/dairy.png")
-const Eggs = require("../../assets/dietary-restrictions/eggs.png")
-const Fish = require("../../assets/dietary-restrictions/fish.png")
-const Gluten = require("../../assets/dietary-restrictions/gluten.png")
-const Meat = require("../../assets/dietary-restrictions/meat.png")
-const Peanuts = require("../../assets/dietary-restrictions/peanuts.png")
-const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
-
 export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
 
     const [animation, setAnimation] = useState(null)
@@ -77,56 +59,56 @@ export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiary
                             />
                         )}
 
-                        <img src={Alcohol} id="alcohol" alt="I drink alcohol" 
+                      <img src="https://cdn.mitzimatthew.love/alcohol_1.png" id="alcohol" alt="I drink alcohol"
                         className={drinkAlcohol ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(drinkAlcoholToggle(e.target.value));
                             handleClickAnimation(e, !drinkAlcohol)}
                         }/> 
 
-                        <img src={Meat} id="meat" alt="I eat meat" 
+                      <img src="https://cdn.mitzimatthew.love/meat.png" id="meat" alt="I eat meat"
                         className={eatMeat ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatMeatToggle());
                             handleClickAnimation(e, !eatMeat)}
                         }/>
 
-                        <img src={Dairy} id="dairy" alt="I eat dairy" 
+                      <img src="https://cdn.mitzimatthew.love/dairy.png" id="dairy" alt="I eat dairy"
                         className={eatDairy ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatDairyToggle());
                             handleClickAnimation(e, !eatDairy)}
                         }/>
 
-                        <img src={Fish} id="fish" alt="I eat fish" 
+                      <img src="https://cdn.mitzimatthew.love/fish.png" id="fish" alt="I eat fish"
                         className={eatFish ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatFishToggle());
                             handleClickAnimation(e, !eatFish)}
                         }/>  
 
-                        <img src={Eggs} id="eggs" alt="I eat eggs" 
+                      <img src="https://cdn.mitzimatthew.love/eggs.png" id="eggs" alt="I eat eggs"
                         className={eatEggs ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatEggsToggle());
                             handleClickAnimation(e, !eatEggs)}
                         }/>
 
-                        <img src={Gluten} id="gluten" alt="I eat gluten" 
+                      <img src="https://cdn.mitzimatthew.love/gluten.png" id="gluten" alt="I eat gluten"
                         className={eatGluten ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatGlutenToggle());
                             handleClickAnimation(e, !eatGluten)}
                         }/>
 
-                        <img src={Peanuts} id="peanuts" alt="I eat peanuts" 
+                      <img src="https://cdn.mitzimatthew.love/peanuts.png" id="peanuts" alt="I eat peanuts"
                         className={eatPeanuts ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatPeanutsToggle());
                             handleClickAnimation(e, !eatPeanuts)}
                         }/>
 
-                        <img src={Shellfish} id="shellfish" alt="I eat shellfish" 
+                      <img src="https://cdn.mitzimatthew.love/shellfish.png" id="shellfish" alt="I eat shellfish"
                         className={eatShellfish ? "diet-image" : "diet-image-clicked"}
                         onClick={(e)=>{
                             dispatch(eatShellfishToggle());
