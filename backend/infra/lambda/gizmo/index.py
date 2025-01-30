@@ -69,15 +69,23 @@ def email_registration_success(user, has_guest):
 def text_registration_success(user):
     text_body = f"""
 Thank you so much for RSVP'ing to our wedding, { user.first }!
-We are so excited for you to be there with us on our special day.
+We are so excited for you to be there with us on our special day 💒💕
 
-We will be sure to reach out over text and email whenever we have updates to share.
-Please note, responses to this phone number are not being recorded and we will not see them!
+Please save this number into your contacts, as we will continue to use it to communicate important information regarding our wedding!📢
+
+We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share.
+
+Please note, responses to this phone number are not being recorded and we will not see them! 🙈
 
 If you wish to contact us, please reach out directly via one of the following methods:
 
-EMAIL: themattsaucedo@gmail.com, mitzitler@gmail.com
-PHONE: (matthew) 352-789-4244, (mitzi) 504-638-7943
+Matthew:
+📨 themattsaucedo@gmail.com
+📱 +1 (352) 789-4244
+
+Mitzi:
+📨 mitzitler@gmail.com
+📱 +1 (504) 638-7943
 """
 
     TWILIO_CLIENT.messages.create(
@@ -607,7 +615,15 @@ class User:
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
-        phone = "+" + guest_info["phoneNumberCountryCode"] + guest_info["phoneNumber"]
+        phone = (
+            "+"
+            + guest_info["phoneNumberCountryCode"].replace("+", "")
+            + guest_info["phoneNumber"]
+            .replace(" ", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("-", "")
+        )
 
         rsvp_status = RsvpStatus[guest_info["rsvpStatus"].upper()]
         pronouns = Pronouns[guest_info["pronouns"].replace("/", "_").upper()]
