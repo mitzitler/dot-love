@@ -66,12 +66,12 @@ def email_registration_success(user, has_guest):
     )
 
 
-def text_registration_success(user):
-    text_body = f"""
+def text_registration_success(user, has_guest):
+    rsvp_text_body = f"""
 Thank you so much for RSVP'ing to our wedding, { user.first }!
 We are so excited for you to be there with us on our special day 💒💕
 
-Please save this number into your contacts, as we will continue to use it to communicate important information regarding our wedding!📢
+Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
 
 We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share.
 
@@ -88,9 +88,40 @@ Mitzi:
 📱 +1 (504) 638-7943
 """
 
+    admin_text_body = f"""
+{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
+"""
+
     TWILIO_CLIENT.messages.create(
-        body=text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
+        body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
     )
+
+    plus_one_text_body = f"""
+🌟 Plus-One Alert! 🌟
+
+Hey {user.first}, we have some exciting news! 🎉 You get to bring a +1 to our wedding! 💃🕺💕
+
+To make it official, your guest just needs to RSVP at this custom link we made just for you!:
+👉 www.mitzimatthew.love/rsvp?code=abc
+
+Can’t wait to celebrate with you! 🥂🎶💒
+"""
+
+    if has_guest:
+        admin_text_body = f"""
+{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
+They also have a PLUS ONE! 😁
+"""
+        TWILIO_CLIENT.messages.create(
+            body=plus_one_text_body.strip(),
+            from_=TWILIO_SENDER_NUMBER,
+            to=user.address.phone,
+        )
+        TWILIO_CLIENT.messages.create(
+            body=rsvp_text_body.strip(),
+            from_=TWILIO_SENDER_NUMBER,
+            to=CONTACT_INFO["mitzi"]["phone"],
+        )
 
 
 ########################################################

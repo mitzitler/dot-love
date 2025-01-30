@@ -1,6 +1,6 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
@@ -14,71 +14,67 @@ import { store } from '../../store'
 // TODO: on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
-
     const dispatch = useDispatch();
     const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
 
-    const rsvpCode = useSelector((state) => state.rsvp.rsvpCode)
-    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-    const firstName = useSelector((state) => state.rsvp.firstName) 
-    const lastName = useSelector((state) => state.rsvp.lastName)
-    const pronouns = useSelector((state) => state.rsvp.pronouns)
-    const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
-    const fullGuestInfo = useSelector((state) => state.rsvp)
+    const rsvpCode = useSelector((state) => state.rsvp.rsvpCode);
+    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus);
+    const firstName = useSelector((state) => state.rsvp.firstName);
+    const lastName = useSelector((state) => state.rsvp.lastName);
+    const pronouns = useSelector((state) => state.rsvp.pronouns);
+    const fullGuestInfo = useSelector((state) => state.rsvp);
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
-    const submitted = useSelector((state) => state.rsvpCompleted.submitted)
+    const submitted = useSelector((state) => state.rsvpCompleted.submitted);
+
+    const [isReadyToSubmit, setIsReadyToSubmit] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (isReadyToSubmit && completedRsvps.length > 0) {
+            submitRSVP(completedRsvps);
+        }
+    }, [completedRsvps, isReadyToSubmit]);
 
     const handleSubmit = async (makeApiCall) => {
-        // Step 1: Update Redux state
-        dispatch(storeCompletedRSVP({fullGuestInfo}));
-        const updatedCompletedRsvps = store.getState().rsvpCompleted.completedRsvps;
-
-        console.log(completedRsvps)
-
-        // Step 2: Make the API call
         if (!makeApiCall) return;
 
-        let result = null;
+        setIsSubmitting(true);
+        setIsReadyToSubmit(true);
+        dispatch(storeCompletedRSVP({ fullGuestInfo }));
+    };
+
+    const submitRSVP = async (guestInfo) => {
         try {
-            console.log(completedRsvps)
             const firstLast = `${firstName}_${lastName}`;
-            result = await registerRSVP({
+            const result = await registerRSVP({
                 headers: { 'X-First-Last': firstLast },
-                rsvpData: completedRsvps,
+                rsvpData: guestInfo,
             }).unwrap();
 
             if (result.code !== 200) {
-                console.log("Something went wrong with Gizmo!");
-                console.log(result);
-                dispatch(clearForm());
-                dispatch(clearCompleteRSVPs())
-                return
+                console.error("Something went wrong with Gizmo!", result);
+                return cleanup();
             }
-            console.log('RSVP(s) api call succeeded:', result);
+
+            console.log("Submitted RSVP(s) to the Gizmo, result:", result);
+            cleanup();
         } catch (err) {
-            console.error('RSVP(s) api call failed:', err);
-            dispatch(clearForm())
-            dispatch(clearCompleteRSVPs())
-            return
+            console.error("RSVP(s) API call failed:", err);
+            cleanup();
         }
+    }
 
-        console.log("Registered the following users:");
-        result.body.forEach((user) => {
-            console.log(user);
-        })
-
-
+    const cleanup = () => {
         dispatch(clearForm());
-        dispatch(clearCompleteRSVPs())
+        dispatch(clearCompleteRSVPs());
+        setIsReadyToSubmit(false);
+        setIsSubmitting(false);
     };
 
-    console.log(fullGuestInfo)
 
     const name = firstName + " " + lastName
-
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-
     const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
     function handleDateLinkRequested() {
