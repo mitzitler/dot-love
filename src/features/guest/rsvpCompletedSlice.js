@@ -8,16 +8,18 @@ const rsvpCompletedSlice = createSlice({
   },
   reducers: {
     storeCompletedRSVP(state, action) {
-      state.submitted = true;
-      state.completedRsvps.push(action.payload.fullGuestInfo);
+      state.completedRsvps.push(action.payload);
     },
     clearCompleteRSVPs(state) {
       state.submitted = false;
       state.completedRsvps = [];
+    },
+    setSubmitted: (state, action) => {
+      state.submitted = action.payload;
     }
   }
 })
 
-export const { storeCompletedRSVP, clearCompleteRSVPs } = rsvpCompletedSlice.actions
+export const { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } = rsvpCompletedSlice.actions
   
 export default rsvpCompletedSlice.reducer

@@ -7,7 +7,7 @@ import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearForm } from '../../features/guest/rsvpSlice';
-import { storeCompletedRSVP, clearCompleteRSVPs } from '../../features/guest/rsvpCompletedSlice.js'
+import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 import { store } from '../../store'
 
@@ -26,29 +26,39 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
     const submitted = useSelector((state) => state.rsvpCompleted.submitted);
 
-    const [isReadyToSubmit, setIsReadyToSubmit] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    useEffect(() => {
-        if (isReadyToSubmit && completedRsvps.length > 0) {
-            submitRSVP(completedRsvps);
-        }
-    }, [completedRsvps, isReadyToSubmit]);
-
     const handleSubmit = async (makeApiCall) => {
-        if (!makeApiCall) return;
+        // Update the completed set of RSVPs with the latest rsvp
+        dispatch(storeCompletedRSVP(fullGuestInfo));
 
-        setIsSubmitting(true);
-        setIsReadyToSubmit(true);
-        dispatch(storeCompletedRSVP({ fullGuestInfo }));
-    };
+        // We submitted an rsvp, so mark this so we remember if there are two for this call
+        dispatch(setSubmitted(true));
 
-    const submitRSVP = async (guestInfo) => {
+        // Clear the form that gets filled out
+        dispatch(clearForm());
+
+        // If this is the second RSVP submitted, we will make the API call,
+        // if this is the first, we may or may not
+        if (!makeApiCall || isLoading) return;
+
+        // NOTE: Since redux is async, we don't know if completedRsvps
+        //       is updated or not. To account for this, combine it with
+        //       the lastest rsvp and then just remove duplicates if present.
+        console.log("completed rsvps", completedRsvps) // info from first time filling out form TODO: Remove
+        console.log("full guest info", fullGuestInfo) // info from second time filling out form TODO: Remove
+        const uniqueRsvpsToSubmit = Array.from(
+            new Map(
+                [...completedRsvps, fullGuestInfo].map(rsvp => [rsvp.firstName, rsvp])
+            ).values()
+        );
+        console.log("api rsvps", uniqueRsvpsToSubmit) // info from first time filling out form TODO: Remove
+
+        // Make the API call
         try {
             const firstLast = `${firstName}_${lastName}`;
             const result = await registerRSVP({
                 headers: { 'X-First-Last': firstLast },
-                rsvpData: guestInfo,
+                // NOTE: so we don't run into a
+                rsvpData: uniqueRsvpsToSubmit,
             }).unwrap();
 
             if (result.code !== 200) {
@@ -67,8 +77,6 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const cleanup = () => {
         dispatch(clearForm());
         dispatch(clearCompleteRSVPs());
-        setIsReadyToSubmit(false);
-        setIsSubmitting(false);
     };
 
 

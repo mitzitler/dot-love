@@ -86,11 +86,11 @@ Matthew:
 Mitzi:
 📨 mitzitler@gmail.com
 📱 +1 (504) 638-7943
-"""
+    """
 
     admin_text_body = f"""
 {user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
-"""
+    """
 
     TWILIO_CLIENT.messages.create(
         body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
@@ -105,23 +105,25 @@ To make it official, your guest just needs to RSVP at this custom link we made j
 👉 www.mitzimatthew.love/rsvp?code=abc
 
 Can’t wait to celebrate with you! 🥂🎶💒
-"""
+    """
 
     if has_guest:
         admin_text_body = f"""
 {user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
 They also have a PLUS ONE! 😁
-"""
+        """
         TWILIO_CLIENT.messages.create(
             body=plus_one_text_body.strip(),
             from_=TWILIO_SENDER_NUMBER,
             to=user.address.phone,
         )
-        TWILIO_CLIENT.messages.create(
-            body=rsvp_text_body.strip(),
-            from_=TWILIO_SENDER_NUMBER,
-            to=CONTACT_INFO["mitzi"]["phone"],
-        )
+
+    # alert Mitzi!
+    TWILIO_CLIENT.messages.create(
+        body=admin_text_body.strip(),
+        from_=TWILIO_SENDER_NUMBER,
+        to=CONTACT_INFO["mitzi"]["phone"],
+    )
 
 
 ########################################################
@@ -1075,6 +1077,11 @@ def register():
                 "message": "failed lookup of our actual friend",
             }
 
+    # tether users if two are included
+    if len(users) == 2:
+        users[0].guest_details.pair_first_last = users[1].first + "_" + users[1].last
+        users[1].guest_details.pair_first_last = users[0].first + "_" + users[0].last
+
     # notify user(s) of registration success
     if user.rsvp_status == RsvpStatus.ATTENDING:
         for user in users:
@@ -1087,7 +1094,10 @@ def register():
                 err_msg = "failed to send user registration success email"
                 log.exception(err_msg)
             try:
-                text_registration_success(user)
+                text_registration_success(
+                    user,
+                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                )
             except Exception as e:
                 err_msg = "failed to send user registration success text"
                 log.exception(err_msg)
