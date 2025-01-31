@@ -68,6 +68,8 @@ def email_registration_success(user, has_guest):
 
 def text_registration_success(user, has_guest):
     rsvp_text_body = f"""
+🎉 RSVP Confirmed! 🎉
+
 Thank you so much for RSVP'ing to our wedding, { user.first }!
 We are so excited for you to be there with us on our special day 💒💕
 
