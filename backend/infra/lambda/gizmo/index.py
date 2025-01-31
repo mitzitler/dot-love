@@ -73,7 +73,7 @@ We are so excited for you to be there with us on our special day 💒💕
 
 Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
 
-We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share.
+We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
 
 Please note, responses to this phone number are not being recorded and we will not see them! 🙈
 
@@ -102,7 +102,7 @@ Mitzi:
 Hey {user.first}, we have some exciting news! 🎉 You get to bring a +1 to our wedding! 💃🕺💕
 
 To make it official, your guest just needs to RSVP at this custom link we made just for you!:
-👉 www.mitzimatthew.love/rsvp?code=abc
+👉 www.mitzimatthew.love/rsvp/guest?code={user.guest_details.link}
 
 Can’t wait to celebrate with you! 🥂🎶💒
     """
@@ -477,7 +477,6 @@ class User:
             f"address={self.address!r}, diet={self.diet!r}, guest_details={self.guest_details!r})"
         )
 
-    # TODO: Improve copy for user friendliness
     def as_html_table(self, has_guest):
         # Start the table with a title row
         table_html = (
