@@ -1,19 +1,20 @@
-import os
-import boto3
-from twilio.rest import Client
-import traceback
-import uuid
 import json
+import os
 import random
 import string
+import traceback
+import uuid
 from enum import Enum
+
+import boto3
 from aws_lambda_powertools import Logger
-from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.event_handler.api_gateway import (
     APIGatewayHttpResolver,
     ProxyEventType,
 )
+from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
+from twilio.rest import Client
 
 # Environment Variables
 USER_TABLE_NAME = os.environ["user_table_name"]
@@ -33,6 +34,7 @@ CONTACT_INFO = {
         "email": os.environ["matthew_email"],
     },
 }
+RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
 # Powertools logger
 log = Logger(service="gizmo")
@@ -64,22 +66,65 @@ def email_registration_success(user, has_guest):
     )
 
 
-def text_registration_success(user):
-    text_body = f"""
-Thank you so much for RSVP'ing to our wedding, { user.first }!
-We are so excited for you to be there with us on our special day.
+def text_registration_success(user, has_guest):
+    rsvp_text_body = f"""
+🎉 RSVP Confirmed! 🎉
 
-We will be sure to reach out over text and email whenever we have updates to share.
-Please note, responses to this phone number are not being recorded and we will not see them!
+Thank you so much for RSVP'ing to our wedding, { user.first }!
+We are so excited for you to be there with us on our special day 💒💕
+
+Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
+
+We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
+
+Please note, responses to this phone number are not being recorded and we will not see them! 🙈
 
 If you wish to contact us, please reach out directly via one of the following methods:
 
-EMAIL: themattsaucedo@gmail.com, mitzitler@gmail.com
-PHONE: (matthew) 352-789-4244, (mitzi) 504-638-7943
-"""
+Matthew:
+📨 themattsaucedo@gmail.com
+📱 +1 (352) 789-4244
+
+Mitzi:
+📨 mitzitler@gmail.com
+📱 +1 (504) 638-7943
+    """
+
+    admin_text_body = f"""
+{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
+    """
 
     TWILIO_CLIENT.messages.create(
-        body=text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
+        body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
+    )
+
+    plus_one_text_body = f"""
+🌟 Plus-One Alert! 🌟
+
+Hey {user.first}, we have some exciting news! 🎉 You get to bring a +1 to our wedding! 💃🕺💕
+
+To make it official, your guest just needs to RSVP at this custom link we made just for you!:
+👉 www.mitzimatthew.love/rsvp/guest?code={user.guest_details.link}
+
+Can’t wait to celebrate with you! 🥂🎶💒
+    """
+
+    if has_guest:
+        admin_text_body = f"""
+{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
+They also have a PLUS ONE! 😁
+        """
+        TWILIO_CLIENT.messages.create(
+            body=plus_one_text_body.strip(),
+            from_=TWILIO_SENDER_NUMBER,
+            to=user.address.phone,
+        )
+
+    # alert Mitzi!
+    TWILIO_CLIENT.messages.create(
+        body=admin_text_body.strip(),
+        from_=TWILIO_SENDER_NUMBER,
+        to=CONTACT_INFO["mitzi"]["phone"],
     )
 
 
@@ -369,11 +414,11 @@ class RsvpStatus(Enum):
 
 
 class Pronouns(Enum):
-    SHEHER = 1
-    HEHIM = 2
-    THEYTHEM = 3
-    SHETHEY = 4
-    HETHEY = 5
+    SHE_HER = 1
+    HE_HIM = 2
+    THEY_THEM = 3
+    SHE_THEY = 4
+    HE_THEY = 5
 
     def __str__(self):
         return self.name
@@ -434,7 +479,6 @@ class User:
             f"address={self.address!r}, diet={self.diet!r}, guest_details={self.guest_details!r})"
         )
 
-    # TODO: Improve copy for user friendliness
     def as_html_table(self, has_guest):
         # Start the table with a title row
         table_html = (
@@ -452,11 +496,11 @@ class User:
             "pronouns": "Pronouns",
         }
         pronoun_map = {
-            Pronouns.SHEHER: "she/her",
-            Pronouns.HEHIM: "he/him",
-            Pronouns.THEYTHEM: "they/them",
-            Pronouns.SHETHEY: "she/they",
-            Pronouns.HETHEY: "he/they",
+            Pronouns.SHE_HER: "she/her",
+            Pronouns.HE_HIM: "he/him",
+            Pronouns.THEY_THEM: "they/them",
+            Pronouns.SHE_THEY: "she/they",
+            Pronouns.HE_THEY: "he/they",
         }
 
         # Add each attribute as a row
@@ -591,27 +635,32 @@ class User:
         )
 
     @staticmethod
-    def extract_users_from_payload(json_body):
-        rsvps = json_body["rsvps"]
+    def extract_users_from_rsvps(rsvps):
         users = []
         for rsvp in rsvps:
-            first_last = (
-                rsvp["guestInfo"]["firstName"] + "_" + rsvp["guestInfo"]["lastName"]
-            )
-            users.append(Users.from_guest_info(rsvp["guestInfo"]))
+            first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
+            users.append(User.from_client_rsvp(rsvp))
         return users
 
     @staticmethod
-    def from_guest_info(guest_info):
-        first = guestName["firstName"]
-        last = guestName["lastName"]
+    def from_client_rsvp(guest_info):
+        first = guest_info["firstName"]
+        last = guest_info["lastName"]
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
-        phone = "+" + guest_info["phoneNumberCountryCode"] + guest_info["phoneNumber"]
+        phone = (
+            "+"
+            + guest_info["phoneNumberCountryCode"].replace("+", "")
+            + guest_info["phoneNumber"]
+            .replace(" ", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("-", "")
+        )
 
-        rsvp_status = RsvpStatus[guest_info["rsvp_status"]]
-        pronouns = Pronouns[guest_info["pronouns"]]
+        rsvp_status = RsvpStatus[guest_info["rsvpStatus"].upper()]
+        pronouns = Pronouns[guest_info["pronouns"].replace("/", "_").upper()]
         address = UserAddress(
             guest_info["streetAddress"],
             guest_info["secondAddress"],
@@ -635,7 +684,7 @@ class User:
         )
         guest_details = GuestDetails(
             link=guest_link_string,
-            pair_first_last=guest_info["pair_first_last"],
+            pair_first_last="",  # NOTE: This is always set after the fact
         )
 
         return User(
@@ -681,14 +730,11 @@ class User:
             "phone": self.address.phone,
         }
 
-        res = dynamo_client.create(
+        dynamo_client.create(
             USER_TABLE_NAME,
             key_expression,
             field_value_map,
         )
-
-        # TODO: Parse res for errors as str
-        return None
 
     def update_db(self, dynamo_client):
         key_expression = {"first_last": {"S": self.first + "_" + self.last}}
@@ -974,8 +1020,12 @@ def get_user_by_guest_link():
 
 @app.post("/gizmo/user")
 def register():
-    guest_link = app.current_event.json_body.get("guest_link", "")
+    rsvps = app.current_event.json_body
+
+    # If a guest link is included, we need to verify it and
+    # link the associated user.
     our_actual_friend = None
+    guest_link = rsvps[0].get("guestCode")
     if guest_link:
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
@@ -985,7 +1035,7 @@ def register():
             log.append_keys(our_actual_friend=our_actual_friend)
 
             # attach the real friend to their guest
-            app.current_event.json_body["guest_info"]["pair_first_last"] = (
+            rsvps[0]["pair_first_last"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -995,67 +1045,71 @@ def register():
                 "message": "failed lookup of our actual friend",
             }
 
-    # we might get more than one rsvp
-    users = User.from_guest_info(
-        app.context["first_last"],
-        app.current_event.json_body["guest_info"],
-    )
+    # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
+    #       users with a "Closed Plus One" will fill out two rsvps at once.
+    users = User.extract_users_from_rsvps(rsvps)
 
     # register user(s) in db
+    log_users = []
     for user in users:
-        err = None
         try:
-            err = user.register_db(CW_DYNAMO_CLIENT)
+            user.register_db(CW_DYNAMO_CLIENT)
+            log_users.append(user.as_map())
         except Exception as e:
             err_msg = "failed to register user in db"
+            log.append_keys(failed_user=user.first)
             log.exception(err_msg)
             return {
                 "code": 500,
                 "message": err_msg,
             }
-        if err:
-            log.error(f"encountered error registering user in dynamo err={err}")
-            return {"code": 400, "message": err}
-        log.append_keys(user=user.__repr__())
-        log.info("succeeded registering user in db")
+    log.append_keys(users=log_users)
+    log.info("succeeded registering user in db")
 
-        if guest_link:
-            try:
-                our_actual_friend.guest_details.pair_first_last = app.context[
-                    "first_last"
-                ]
-                our_actual_friend.update_db(CW_DYNAMO_CLIENT)
-            except Exception as e:
-                log.exception("failed updating guest_first_last of our actual friend")
-                return {
-                    "code": 500,
-                    "message": "failed lookup of our actual friend",
-                }
+    if guest_link:
+        try:
+            # link our friend to the new account made from their guest link
+            our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
+            our_actual_friend.update_db(CW_DYNAMO_CLIENT)
+        except Exception as e:
+            log.exception("failed updating guest_first_last of our actual friend")
+            return {
+                "code": 500,
+                "message": "failed lookup of our actual friend",
+            }
+
+    # tether users if two are included
+    if len(users) == 2:
+        users[0].guest_details.pair_first_last = users[1].first + "_" + users[1].last
+        users[1].guest_details.pair_first_last = users[0].first + "_" + users[0].last
 
     # notify user(s) of registration success
-    for user in users:
-        try:
-            has_guest = app.current_event.json_body["guest_info"]["rsvp_code"] == "GHI"
-            email_registration_success(user, has_guest)
-        except Exception as e:
-            err_msg = "failed to send user registration success email"
-            log.exception(err_msg)
-        try:
-            text_registration_success(user)
-        except Exception as e:
-            err_msg = "failed to send user registration success text"
-            log.exception(err_msg)
+    if user.rsvp_status == RsvpStatus.ATTENDING:
+        for user in users:
+            try:
+                email_registration_success(
+                    user=user,
+                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                )
+            except Exception as e:
+                err_msg = "failed to send user registration success email"
+                log.exception(err_msg)
+            try:
+                text_registration_success(
+                    user,
+                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                )
+            except Exception as e:
+                err_msg = "failed to send user registration success text"
+                log.exception(err_msg)
 
-    users_registered = {}
-    for user in users:
-        users_registered[user.first] = user.as_map()
-
+    users_registered = [user.as_map() for user in users]
     return {"code": 200, "message": "success", "body": users_registered}
 
 
 @app.patch("/gizmo/user")
 def update():
-    user = extract_users_from_payload(app.current_event.json_body)[0]
+    user = User.extract_users_from_rsvps(app.current_event.json_body)[0]
 
     err = None
     try:
@@ -1157,7 +1211,7 @@ def handler(event, context):
         }
 
 
-# NOTE: Doing this at the top level so the dynamo connection is preserved b/t lambda calls
+# NOTE: Doing this at the top level so the client connections are preserved b/t lambda calls
 # Initialize clients
 CW_DYNAMO_CLIENT = CWDynamoClient()
 TWILIO_CLIENT = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)

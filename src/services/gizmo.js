@@ -41,7 +41,11 @@ export const gizmoApi = createApi({
 
     // Get user by guest link
     getUserByGuestLink: builder.query({
-      query: (code) => `/user/guest?code=${code}`,
+      query: (code) => ({
+        url: `/user/guest?code=${code}`,
+        method: 'GET',
+        headers: { 'X-First-Last': 'plus_one' }
+      }),
     }),
 
     // Email a user

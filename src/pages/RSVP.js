@@ -4,6 +4,7 @@ import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
 import { RSVPFormDietary } from './RSVPPages/RSVPFormDietary.js';
 import { RSVPFormSubmit } from  './RSVPPages/RSVPFormSubmit.js'; // ignore error
+import { RSVPFormPlusOne } from  './RSVPPages/RSVPFormPlusOne.js';
 import { RSVPFormConfirmation } from  './RSVPPages/RSVPFormConfirmation.js'; // ignore error
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,12 +16,13 @@ export function RSVP() {
 
     const dispatch = useDispatch();
 
+    // Function to emit toast 🍞
     const notify = (input, success) => {
         if (success) {
             toast.info(input, {
                 theme: "dark",
                 position: "top-right",
-                icon: ({theme, type}) =>  <img src=""/>
+                icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
             })
         }
     }
@@ -58,10 +60,17 @@ export function RSVP() {
         { acceptableCodes.includes(rsvpCode.toUpperCase()) ?
         <div classname="container">
             <main className="card-stack">
-                
+                { notify("Code accepted! Please Scroll down", true) }
                 <Routes>
+                    {/* Entrypoint for normal guests */}
                     <Route path="/" element={
                         <RSVPFormResponse rsvpCode={rsvpCode} pageMainColor={pageMainColor} 
+                        pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
+                        pageSection={pageSection} />} />
+
+                    {/* Entrypoint for plus-ones */}
+                    <Route path="/guest" element={
+                        <RSVPFormPlusOne pageMainColor={pageMainColor}
                         pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor}
                         pageSection={pageSection} />} />
 

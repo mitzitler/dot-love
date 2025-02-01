@@ -2,7 +2,6 @@
 import os
 
 import aws_cdk as cdk
-
 from infra.dot_love_core_stack import DotLoveCoreStack
 
 app = cdk.App()

@@ -1,18 +1,16 @@
-import os
-import json
-import traceback
-import stripe
-import boto3
 import hashlib
+import json
 import logging
+import os
+import traceback
 from enum import Enum
+
+import boto3
+import stripe
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.utilities.idempotency import (
-    DynamoDBPersistenceLayer,
-    IdempotencyConfig,
-    idempotent_function,
-)
+    DynamoDBPersistenceLayer, IdempotencyConfig, idempotent_function)
 
 ########################################################
 # Controller Action Handler

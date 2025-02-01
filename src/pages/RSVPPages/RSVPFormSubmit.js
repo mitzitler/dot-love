@@ -1,60 +1,88 @@
 import '../../App.css';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearForm } from '../../features/guest/rsvpSlice';
-import { storeCompletedRSVP, clearCompleteRSVPs } from '../../features/guest/rsvpCompletedSlice.js'
+import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
+import { store } from '../../store'
 
 // TODO: on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
-
     const dispatch = useDispatch();
     const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
 
-    const rsvpCode = useSelector((state) => state.rsvp.rsvpCode)
-    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-    const firstName = useSelector((state) => state.rsvp.firstName) 
-    const lastName = useSelector((state) => state.rsvp.lastName)
-    const pronouns = useSelector((state) => state.rsvp.pronouns)
-    const submitted = useSelector((state) => state.rsvp.submitted)
-    const rsvpSubmission = useSelector((state) => state.rsvp.rsvpSubmission)
-    const fullGuestInfo = useSelector((state) => state.rsvp)
+    const rsvpCode = useSelector((state) => state.rsvp.rsvpCode);
+    const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus);
+    const firstName = useSelector((state) => state.rsvp.firstName);
+    const lastName = useSelector((state) => state.rsvp.lastName);
+    const pronouns = useSelector((state) => state.rsvp.pronouns);
+    const fullGuestInfo = useSelector((state) => state.rsvp);
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
+    const submitted = useSelector((state) => state.rsvpCompleted.submitted);
 
     const handleSubmit = async (makeApiCall) => {
-        // Step 1: Update Redux state
-        const submissionKey = `${firstName}_${lastName}`;
-        dispatch(storeCompletedRSVP({submissionKey, fullGuestInfo}));
-        dispatch(clearForm())
+        // Update the completed set of RSVPs with the latest rsvp
+        dispatch(storeCompletedRSVP(fullGuestInfo));
 
-        // Step 2: Make the API call
-        if (!makeApiCall) return;
+        // We submitted an rsvp, so mark this so we remember if there are two for this call
+        dispatch(setSubmitted(true));
 
+        // Clear the form that gets filled out
+        dispatch(clearForm());
+
+        // If this is the second RSVP submitted, we will make the API call,
+        // if this is the first, we may or may not
+        if (!makeApiCall || isLoading) return;
+
+        // NOTE: Since redux is async, we don't know if completedRsvps
+        //       is updated or not. To account for this, combine it with
+        //       the lastest rsvp and then just remove duplicates if present.
+        console.log("completed rsvps", completedRsvps) // info from first time filling out form TODO: Remove
+        console.log("full guest info", fullGuestInfo) // info from second time filling out form TODO: Remove
+        const uniqueRsvpsToSubmit = Array.from(
+            new Map(
+                [...completedRsvps, fullGuestInfo].map(rsvp => [rsvp.firstName, rsvp])
+            ).values()
+        );
+        console.log("api rsvps", uniqueRsvpsToSubmit) // info from first time filling out form TODO: Remove
+
+        // Make the API call
         try {
+            const firstLast = `${firstName}_${lastName}`;
             const result = await registerRSVP({
-            headers: { 'X-First-Last': submissionKey },
-            rsvpData: { 'rsvps': completedRsvps },
+                headers: { 'X-First-Last': firstLast },
+                // NOTE: so we don't run into a
+                rsvpData: uniqueRsvpsToSubmit,
             }).unwrap();
 
-            console.log('RSVP(s) registered successfully:', result);
+            if (result.code !== 200) {
+                console.error("Something went wrong with Gizmo!", result);
+                return cleanup();
+            }
+
+            console.log("Submitted RSVP(s) to the Gizmo, result:", result);
+            cleanup();
         } catch (err) {
-            console.error('Error registering RSVP(s):', err);
+            console.error("RSVP(s) API call failed:", err);
+            cleanup();
         }
+    }
+
+    const cleanup = () => {
+        dispatch(clearForm());
+        dispatch(clearCompleteRSVPs());
     };
 
-    console.log(fullGuestInfo)
 
     const name = firstName + " " + lastName
-
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-
     const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
     function handleDateLinkRequested() {
@@ -104,11 +132,11 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
              ? <NavLink className='btn-23' id="vers2" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
                 <marquee>Submit</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'NZU' & submitted === null)
+             : (rsvpCode.toUpperCase() === 'NZU' && !submitted)
              ? <NavLink className='btn-23' id="vers3" to='/rsvp' onClick={() => handleSubmit(false)}>
                 <marquee>Continue</marquee></NavLink>
             
-            : (rsvpCode.toUpperCase() === 'NZU' & submitted != null)
+            : (rsvpCode.toUpperCase() === 'NZU' && submitted)
              ? <NavLink className='btn-23' id="vers4" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
                 <marquee>Submit</marquee></NavLink>
 
