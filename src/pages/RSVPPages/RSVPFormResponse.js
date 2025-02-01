@@ -27,7 +27,7 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
         <>
             <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-                { rsvpCode.toUpperCase() === "UNF" & submitted != null ? 
+                { rsvpCode.toUpperCase() === "NZU" & submitted != null ? 
                     <h1>Please RSVP For the Second Guest...</h1> : 
                     <h1>Repondez S'il Vous Plait!</h1> }
 
