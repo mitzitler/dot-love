@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
 import { RSVPFormResponse } from './RSVPPages/RSVPFormResponse.js'; //RSVP.js  /RSVPPages/RSVPFormResponse.js
 import { RSVPFormContact } from './RSVPPages/RSVPFormContact.js';
@@ -36,9 +37,36 @@ export function RSVP() {
     const acceptableCodes = ['FZN', 'UNF', 'NZU']
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode) 
+    const isAllowed = acceptableCodes.includes(rsvpCode.toUpperCase()) || code
 
     console.log("code is:", code)
     console.log("guestcode is:", guestCode)
+
+    useEffect(() => {
+        const preventScroll = (event) => {
+          event.preventDefault();
+        };
+    
+        if (!isAllowed) {
+          window.addEventListener("wheel", preventScroll, { passive: false });
+          window.addEventListener("touchmove", preventScroll, { passive: false });
+          window.addEventListener("keydown", (event) => {
+            if (["ArrowUp", "ArrowDown", "Space", "PageUp", "PageDown"].includes(event.key)) {
+              preventScroll(event);
+            }
+          });
+        } else {
+          window.removeEventListener("wheel", preventScroll);
+          window.removeEventListener("touchmove", preventScroll);
+          window.removeEventListener("keydown", preventScroll);
+        }
+    
+        return () => {
+          window.removeEventListener("wheel", preventScroll);
+          window.removeEventListener("touchmove", preventScroll);
+          window.removeEventListener("keydown", preventScroll);
+        };
+      }, [isAllowed]);
 
     return (
 
@@ -61,14 +89,15 @@ export function RSVP() {
              <div class= "egg backdrop-blur-xl" />
              <input placeholder="RSVP code?"
                  value={rsvpCode} pattern="[A-Za-z]*"
-                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}/>
+                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))
+                 }/>
  
              {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
              </GenericHeader>
         }
 
 
-        { acceptableCodes.includes(rsvpCode.toUpperCase()) || code ?
+        { isAllowed ?
         <div classname="container">
             <main className="card-stack">
                 <Routes>
