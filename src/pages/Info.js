@@ -1,8 +1,9 @@
 import React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
+import '../App.css';
 
 // import { MapBox } from '../components/MapBox.js'; // this doesnt work rn
 // import {Loader, LoaderOptions} from 'google-maps';
@@ -31,6 +32,10 @@ export function Info() {
     const pageSecondaryColor = "lilac" 
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
+    
+    // useEffect(() => {
+    //     window.scrollTo(0, 0); 
+    // }, []);
 
     const diety = {
         name: 'Diety Events',

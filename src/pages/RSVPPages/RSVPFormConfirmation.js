@@ -21,7 +21,7 @@ export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTer
 
                 {/* for some reason this routes at the same position, not to the top */}
                 {/* there are a million responses here: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition */}
-                <NavLink to='/'>
+                <NavLink to='/' onClick={window.scrollTo(0,0)}>
                     <button class="btn-generic">On to the main site!</button>
                 </NavLink>
 

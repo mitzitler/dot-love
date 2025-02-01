@@ -1,5 +1,5 @@
 import '../../App.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import React from 'react';
 import { useState, useEffect, setShow } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,6 +34,11 @@ export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiary
 
         dispatch({ type: `${id}Toggle` });
     };
+
+    const location = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0); 
+    }, [location.pathname]);
 
   return(
     <>

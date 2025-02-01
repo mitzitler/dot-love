@@ -10436,6 +10436,11 @@ react-smooth@^4.0.0:
     prop-types "^15.8.1"
     react-transition-group "^4.4.5"
 
+react-swipeable@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.npmjs.org/react-swipeable/-/react-swipeable-7.0.2.tgz"
+  integrity sha512-v1Qx1l+aC2fdxKa9aKJiaU/ZxmJ5o98RMoFwUqAAzVWUcxgfHFXDDruCKXhw6zIYXm6V64JiHgP9f6mlME5l8w==
+
 react-tippy@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/react-tippy/-/react-tippy-1.4.0.tgz"
@@ -10460,7 +10465,7 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18 || ^19", "react@^18.0 || ^19", react@^18.0.0, react@^18.2.0, react@^18.3.1, "react@>= 16", "react@>= 16.14.0 < 19.0.0", react@>=16, react@>=16.6.0, react@>=16.8:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.3 || ^17 || ^18 || ^19.0.0 || ^19.0.0-rc", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18 || ^19", "react@^18.0 || ^19", react@^18.0.0, react@^18.2.0, react@^18.3.1, "react@>= 16", "react@>= 16.14.0 < 19.0.0", react@>=16, react@>=16.6.0, react@>=16.8:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
