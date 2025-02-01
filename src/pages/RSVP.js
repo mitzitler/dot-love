@@ -89,7 +89,8 @@ export function RSVP() {
              <div class= "egg backdrop-blur-xl" />
              <input placeholder="RSVP code?"
                  value={rsvpCode} pattern="[A-Za-z]*"
-                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}/>
+                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))
+                 }/>
  
              {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
              </GenericHeader>
