@@ -1,5 +1,5 @@
 import '../../App.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
@@ -17,6 +17,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const dispatch = useDispatch();
     const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
 
+    const guestCode = useSelector((state) => state.rsvp.guestCode) 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode);
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus);
     const firstName = useSelector((state) => state.rsvp.firstName);
@@ -124,7 +125,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                 pageTertiaryColor={pageTertiaryColor} >
             <NavLink className='btn-23' to='/rsvp/dietary' end><marquee>Return</marquee></NavLink> 
 
-            {rsvpCode.toUpperCase() === 'FZN'
+            {rsvpCode.toUpperCase() === 'FZN' || guestCode
              ? <NavLink className='btn-23' id="vers1" to='/rsvp/confirmation' onClick={() => handleSubmit(true)}>
                 <marquee>Submit</marquee></NavLink>
 

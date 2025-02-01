@@ -5,6 +5,7 @@ import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
+import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
 
 export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
@@ -13,6 +14,15 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
     const submitted = useSelector((state) => state.rsvp.submitted)
 
+    // Function to emit toast 🍞
+    const notify = (input) => {
+        toast.info(input, {
+            theme: "dark",
+            position: "top-right",
+            icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
+        })
+    }
+
     return (
         <>
             <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
@@ -20,6 +30,9 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
                 { rsvpCode.toUpperCase() === "UNF" & submitted != null ? 
                     <h1>Please RSVP For the Second Guest...</h1> : 
                     <h1>Repondez S'il Vous Plait!</h1> }
+
+                { notify("Code accepted! Please Scroll down")}
+                {console.log('toasty') }
                 <div>
                     <h2>May we expect your presence at our wedding on <br></br>
                         November 7th, 2025 in Brooklyn, NY?</h2>

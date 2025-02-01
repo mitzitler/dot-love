@@ -8,7 +8,8 @@ import { RSVPFormPlusOne } from  './RSVPPages/RSVPFormPlusOne.js';
 import { RSVPFormConfirmation } from  './RSVPPages/RSVPFormConfirmation.js'; // ignore error
 import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { rsvpCodeInput } from '../features/guest/rsvpSlice';
+import { useSearchParams } from 'react-router-dom';
+import { rsvpCodeInput, guestCodeInput } from '../features/guest/rsvpSlice';
 import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
 import '../App.css';
 
@@ -16,16 +17,12 @@ export function RSVP() {
 
     const dispatch = useDispatch();
 
-    // Function to emit toast 🍞
-    const notify = (input, success) => {
-        if (success) {
-            toast.info(input, {
-                theme: "dark",
-                position: "top-right",
-                icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
-            })
-        }
-    }
+    // handle guest code query param
+    const [searchParams] = useSearchParams();
+    const guestCode = useSelector((state) => state.rsvp.guestCode) 
+    const code = guestCode ? guestCode : searchParams.get('code') 
+    console.log("ahhhhhhhhhhhhhhh", code);
+    dispatch(guestCodeInput(code))
 
     const pageMainColor = "amber"
     const pageSecondaryColor = "lime"
@@ -40,6 +37,9 @@ export function RSVP() {
 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode) 
 
+    console.log("code is:", code)
+    console.log("guestcode is:", guestCode)
+
     return (
 
         <>
@@ -48,19 +48,29 @@ export function RSVP() {
             position="top-right"
             toastStyle={{}}/>
 
-        <GenericHeader classname="h-screen transfom-scale-5">
-            <div class= "egg backdrop-blur-xl" />
-            <input placeholder="RSVP code?"
-                value={rsvpCode} pattern="[A-Za-z]*"
-                onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}/>
+        {code ?
+             <GenericHeader classname="h-screen transfom-scale-5">
+             <div class= "egg backdrop-blur-xl" />
+             <input placeholder="Welcome" />
+ 
+             {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
+             </GenericHeader>
+             
+             : 
+             <GenericHeader classname="h-screen transfom-scale-5">
+             <div class= "egg backdrop-blur-xl" />
+             <input placeholder="RSVP code?"
+                 value={rsvpCode} pattern="[A-Za-z]*"
+                 onInput={(e)=>dispatch(rsvpCodeInput(e.target.value))}/>
+ 
+             {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
+             </GenericHeader>
+        }
 
-            {/* i cant tell why, but when theres an input, it jumps a few pixels to the left */}
-        </GenericHeader>
 
-        { acceptableCodes.includes(rsvpCode.toUpperCase()) ?
+        { acceptableCodes.includes(rsvpCode.toUpperCase()) || code ?
         <div classname="container">
             <main className="card-stack">
-                { notify("Code accepted! Please Scroll down", true) }
                 <Routes>
                     {/* Entrypoint for normal guests */}
                     <Route path="/" element={

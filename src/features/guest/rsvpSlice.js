@@ -33,10 +33,14 @@ const rsvpSlice = createSlice({
     submitted: null,
     dateLinkRequested: false,
     rsvpSubmission: "",
+    guestCode: ''
   },
   reducers: {
     rsvpCodeInput(state, action) {
       state.rsvpCode = action.payload
+    },
+    guestCodeInput(state, action) {
+      state.guestCode = action.payload
     },
     rsvpStatusInput(state, action) {
       state.rsvpStatus = action.payload
@@ -77,7 +81,7 @@ const rsvpSlice = createSlice({
     stateProvinceInput(state, action) {
       state.stateProvince = action.payload
     },
-    continueDietary(state, action) {
+    continueDietary(state, action) { // TODO: should add a check on phone number length
     // is this okay?
       { 
         console.log("can i continue? ", state.canContinueDietary);
@@ -169,7 +173,7 @@ const rsvpSlice = createSlice({
   }
 })
 
-export const { rsvpCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, phoneNumberCountryCodeInput,
+export const { rsvpCodeInput, guestCodeInput, rsvpStatusInput, firstNameInput, lastNameInput, pronounsInput, phoneNumberCountryCodeInput,
   phoneNumberInput, emailInput, streetAddressInput, secondAddressInput, cityInput, zipcodeInput, countryInput, stateProvinceInput,
   continueDietary, drinkAlcoholToggle, eatMeatToggle, eatDairyToggle, eatFishToggle, eatShellfishToggle,
   eatEggsToggle, eatGlutenToggle, eatPeanutsToggle, moreRestrictionsInput, clearForm,
