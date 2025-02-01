@@ -30,11 +30,6 @@ export function Info() {
     const pageMainColor = "babyblue" 
     const pageSecondaryColor = "lilac" 
     const pageTertiaryColor = "amber" 
-
-    const pageMainClass = 'section-content swipe-card flex-grow bg-' + pageMainColor + '-400/75 border-' + pageMainColor + '-500/50 border-1 backdrop-blur-md'
-    const pageSecondaryClass = 'section-content swipe-card flex-grow bg-' + pageSecondaryColor + '-400/75 border-' + pageSecondaryColor + '-500/50 border-1 backdrop-blur-md'
-    const pageTertiaryClass = 'section-content swipe-card flex-grow bg-' + pageTertiaryColor + '-400/75 border-' + pageTertiaryColor + '-500/50 border-1 backdrop-blur-md'
-
     const pageSection = "info"
 
     const diety = {

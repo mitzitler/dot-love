@@ -12,9 +12,9 @@ export function InfoBox({children, collapsable, onClickExpand, id, expandedBox})
         )
     } else if (collapsable) { {/* InfoBoxExpanded will be the component that displays when its selected, and that will live on the Info.js page */}
         return(
-            <div class='info-box'>
+            <div class='info-box' onClick={() => onClickExpand(id)}>
                 <span> 
-                    <button class='info-box-button' onClick={() => onClickExpand(id)}>
+                    <button class='info-box-button' >
                         {/* i am getting slightly frustrated lol that the spacing jumps when the button is clicked lol */}
                         {expandedBox === id ? '-' : '+'}
                     </button>
