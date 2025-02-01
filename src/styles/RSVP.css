@@ -209,9 +209,9 @@
   font-size: 90%;
   opacity: 60%;
   width: 35%;
-  padding: 1% 0;
-  margin: 2% 1% 0;
-  height: 2%;
+  padding: 0.6em 0em;
+  margin: 1em 0em;
+  height: 3em;
   text-transform: uppercase;
   border-radius: 27px;
   border: 1px solid #b79c05;
