@@ -6,6 +6,7 @@ import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserByGuestLinkQuery } from '../../services/gizmo.js'
 import { toast } from 'react-toastify'; // Toast (yum!)
 
@@ -53,7 +54,8 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
 
 
         { notify("Guest link accepted! Please Scroll down")}
-                {console.log('toasty') }
+        /* HACK: Technically there is no rsvpCode for a plus one, but we use fzn to note they do not get a plus 1 */
+        { dispatch(rsvpCodeInput('fzn') }
         <div>
             <h2>May we expect your presence at our wedding on <br></br>
                 November 7th, 2025 in Brooklyn, NY?</h2>

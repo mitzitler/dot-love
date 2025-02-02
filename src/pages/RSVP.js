@@ -21,7 +21,6 @@ export function RSVP() {
     const [searchParams] = useSearchParams();
     const guestCode = useSelector((state) => state.rsvp.guestCode) 
     const code = guestCode ? guestCode : searchParams.get('code') 
-    console.log("ahhhhhhhhhhhhhhh", code);
     dispatch(guestCodeInput(code))
 
     const pageMainColor = "amber"
