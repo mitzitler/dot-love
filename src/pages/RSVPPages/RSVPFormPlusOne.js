@@ -42,7 +42,7 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     // handle return
     if (isLoading) {
         console.log(isLoading)
-        return <p>Loading guest details...</p>;
+        return (<p>Loading guest details...</p>);
     }
     else {
         console.log(isLoading)
