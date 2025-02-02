@@ -47,7 +47,7 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     else {
         console.log(isLoading)
 
-        return <><CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+        return (<><CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
         <h1>Hello, guest of {data.body.user.first} {data.body.user.last}!</h1>
 
@@ -87,10 +87,6 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
                     {/* and there needs to be an error message too */}
             </CardStackFooter> 
             </>
-    }
-    if (error) {
-      return <p>Error validating code. Please try again.</p>;
-    }
-        
-              
+               )}
+
 }
