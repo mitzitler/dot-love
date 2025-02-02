@@ -5,7 +5,7 @@ import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
-import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
+import { toast } from 'react-toastify'; // Toast (yum!)
 
 export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
