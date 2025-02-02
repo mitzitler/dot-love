@@ -37,6 +37,16 @@ CONTACT_INFO = {
 RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
 # Twilio texts
+RSVP_NO_TEXT = """
+⛔ RSVP Confirmed ⛔
+
+Thank you so much for filling out your RSVP form for our wedding!
+We are sorry you won't be able to attend, but we hope to see you soon anyway!
+
+We will be updating our website, www.mitzimatthew.love, soon with our registry! 🎁
+We'll send an update to all those invited once that's done 😁
+"""
+
 RSVP_CONFIRMED_TEXT = """
 🎉 RSVP Confirmed! 🎉
 
@@ -98,6 +108,9 @@ app = APIGatewayHttpResolver()
 # Controller Helper Methods
 ########################################################
 def email_registration_success(user, has_guest):
+    if user.rsvp_status is rsvp_status.NOTATTENDING:
+        return
+
     if has_guest:
         return DOT_LOVE_MESSAGE_CLIENT.email(
             DotLoveMessageType.REGISTRATION_SUCCESS_EMAIL_WITH_GUEST,
@@ -107,7 +120,7 @@ def email_registration_success(user, has_guest):
             },
             user.email,
         )
-    return DOT_LOVE_MESSAGE_CLIENT.email(
+    DOT_LOVE_MESSAGE_CLIENT.email(
         DotLoveMessageType.REGISTRATION_SUCCESS_EMAIL_NO_GUEST,
         {
             "first": user.first,
@@ -115,6 +128,7 @@ def email_registration_success(user, has_guest):
         },
         user.email,
     )
+    return
 
 
 def text_admins(message):
@@ -130,7 +144,16 @@ def text_admins(message):
     )
 
 
-def text_registration_success(user, has_guest, inviter):
+def text_registration_success(user, has_guest, inviter, rsvp_status):
+    if user.rsvp_status is rsvp_status.NOTATTENDING:
+        TWILIO_CLIENT.messages.create(
+            body=plus_one_text_body.strip(),
+            from_=TWILIO_SENDER_NUMBER,
+            to=user.address.phone,
+        )
+        text_admins(f"{user.first} {user.last} isn't coming 🖕🙄🖕")
+        return
+
     admin_text_body = ADMIN_RSVP_ALERT_TEXT.format(first=user.first, last=user.last)
     rsvp_text_body = RSVP_CONFIRMED_TEXT.format(first_name=user.first)
 
@@ -1119,25 +1142,24 @@ def register():
         users[1].guest_details.pair_first_last = users[0].first + "_" + users[0].last
 
     # notify user(s) of registration success
-    if user.rsvp_status == RsvpStatus.ATTENDING:
-        for user in users:
-            try:
-                email_registration_success(
-                    user=user,
-                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
-                )
-            except Exception as e:
-                err_msg = "failed to send user registration success email"
-                log.exception(err_msg)
-            try:
-                text_registration_success(
-                    user,
-                    has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
-                    inviter=our_actual_friend,
-                )
-            except Exception as e:
-                err_msg = "failed to send user registration success text"
-                log.exception(err_msg)
+    for user in users:
+        try:
+            email_registration_success(
+                user=user,
+                has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+            )
+        except Exception as e:
+            err_msg = "failed to send user registration success email"
+            log.exception(err_msg)
+        try:
+            text_registration_success(
+                user,
+                has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                inviter=our_actual_friend,
+            )
+        except Exception as e:
+            err_msg = "failed to send user registration success text"
+            log.exception(err_msg)
 
     users_registered = [user.as_map() for user in users]
     return {"code": 200, "message": "success", "body": users_registered}

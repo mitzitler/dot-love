@@ -29,11 +29,6 @@ const store = configureStore({
                 ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
             },
         }).concat(gizmoApi.middleware)
-    // reducer: { // old reducer set up
-    //     rsvp: rsvpReducer,
-    //     [gizmoApi.reducerPath]: gizmoApi.reducer,
-
-    // }
 })
 
 const persistor = persistStore(store)
