@@ -36,6 +36,57 @@ CONTACT_INFO = {
 }
 RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
+# Twilio texts
+RSVP_CONFIRMED_TEXT = """
+🎉 RSVP Confirmed! 🎉
+
+Thank you so much for RSVP'ing to our wedding, {first_name}!
+We are so excited for you to be there with us on our special day 💒💕
+
+Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
+
+We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
+
+Please note, responses to this phone number are not being recorded and we will not see them! 🙈
+
+If you wish to contact us, please reach out directly via one of the following methods:
+
+Matthew:
+📨 themattsaucedo@gmail.com
+📱 +1 (352) 789-4244
+
+Mitzi:
+📨 mitzitler@gmail.com
+📱 +1 (504) 638-7943
+"""
+
+ADMIN_RSVP_ALERT_TEXT = """
+{first} {last} has RSVP'd to the wedding! ⭐🎉
+"""
+
+PLUS_ONE_TEXT = """
+🌟 Plus-One Alert! 🌟
+
+Hey {first_name}, we have some exciting news! 🎉 You get to bring a +1 to our wedding! 💃🕺💕
+
+To make it official, your guest just needs to RSVP at this custom link we made just for you!:
+👉 www.mitzimatthew.love/rsvp/guest?code={guest_code}
+
+Can’t wait to celebrate with you! 🥂🎶💒
+"""
+
+ADMIN_RSVP_ALERT_PLUS_ONE_TEXT = """
+{first} {last} has RSVP'd to the wedding! ⭐🎉
+They also have a PLUS ONE! 😁
+"""
+
+INVITER_GUEST_RSVPD_TEXT = """
+👭 Your Guest has RSVP'd! 👬
+
+Hey {inviter_first}, great news! Your guest, {invitee_first}, has successfully RSVP'd to Mitzi and Matthew's wedding!
+🕺🏻💃
+"""
+
 # Powertools logger
 log = Logger(service="gizmo")
 
@@ -66,66 +117,50 @@ def email_registration_success(user, has_guest):
     )
 
 
-def text_registration_success(user, has_guest):
-    rsvp_text_body = f"""
-🎉 RSVP Confirmed! 🎉
+def text_admins(message):
+    TWILIO_CLIENT.messages.create(
+        body=message.strip(),
+        from_=TWILIO_SENDER_NUMBER,
+        to=CONTACT_INFO["mitzi"]["phone"],
+    )
+    TWILIO_CLIENT.messages.create(
+        body=message.strip(),
+        from_=TWILIO_SENDER_NUMBER,
+        to=CONTACT_INFO["matthew"]["phone"],
+    )
 
-Thank you so much for RSVP'ing to our wedding, { user.first }!
-We are so excited for you to be there with us on our special day 💒💕
 
-Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
-
-We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
-
-Please note, responses to this phone number are not being recorded and we will not see them! 🙈
-
-If you wish to contact us, please reach out directly via one of the following methods:
-
-Matthew:
-📨 themattsaucedo@gmail.com
-📱 +1 (352) 789-4244
-
-Mitzi:
-📨 mitzitler@gmail.com
-📱 +1 (504) 638-7943
-    """
-
-    admin_text_body = f"""
-{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
-    """
+def text_registration_success(user, has_guest, inviter):
+    admin_text_body = ADMIN_RSVP_ALERT_TEXT.format(first=user.first, last=user.last)
+    rsvp_text_body = RSVP_CONFIRMED_TEXT.format(first_name=user.first)
 
     TWILIO_CLIENT.messages.create(
         body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
     )
 
-    plus_one_text_body = f"""
-🌟 Plus-One Alert! 🌟
-
-Hey {user.first}, we have some exciting news! 🎉 You get to bring a +1 to our wedding! 💃🕺💕
-
-To make it official, your guest just needs to RSVP at this custom link we made just for you!:
-👉 www.mitzimatthew.love/rsvp/guest?code={user.guest_details.link}
-
-Can’t wait to celebrate with you! 🥂🎶💒
-    """
-
+    plus_one_text_body = PLUS_ONE_TEXT.format(
+        first_name=user.first, guest_code=user.guest_details.link
+    )
     if has_guest:
-        admin_text_body = f"""
-{user.first} {user.last} has RSVP'd to the wedding! ⭐🎉
-They also have a PLUS ONE! 😁
-        """
+        admin_text_body = ADMIN_RSVP_ALERT_PLUS_ONE_TEXT.format(
+            first=user.first, last=user.last
+        )
         TWILIO_CLIENT.messages.create(
             body=plus_one_text_body.strip(),
             from_=TWILIO_SENDER_NUMBER,
             to=user.address.phone,
         )
+    if inviter:
+        inviter_text_body = INVITER_GUEST_RSVPD_TEXT.format(
+            inviter_first=inviter.first, invitee_first=user.first
+        )
+        TWILIO_CLIENT.messages.create(
+            body=plus_one_text_body.strip(),
+            from_=TWILIO_SENDER_NUMBER,
+            to=inviter.address.phone,
+        )
 
-    # alert Mitzi!
-    TWILIO_CLIENT.messages.create(
-        body=admin_text_body.strip(),
-        from_=TWILIO_SENDER_NUMBER,
-        to=CONTACT_INFO["mitzi"]["phone"],
-    )
+    text_admins(admin_text_body)
 
 
 ########################################################
@@ -1098,6 +1133,7 @@ def register():
                 text_registration_success(
                     user,
                     has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
+                    inviter=our_actual_friend,
                 )
             except Exception as e:
                 err_msg = "failed to send user registration success text"
