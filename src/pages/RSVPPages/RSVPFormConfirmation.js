@@ -16,7 +16,7 @@ export function RSVPFormConfirmation({pageMainColor, pageSecondaryColor, pageTer
                     <p><em><b>www.mitzimatthew.love</b></em></p>
                     <p>Log into the site from here on by typing in your full name (as on your RSVP). Then scroll to see our site!</p>
                     <p>Our site will give you the directions, the schedule, the dress code - and even has the registry.</p>
-                    <p>We will be updating this main site over the next few weeks, so check back regularly!</p>
+                    {/* <p>We will be updating this main site over the next few weeks, so check back regularly!</p> */}
                 </div>
 
                 {/* for some reason this routes at the same position, not to the top */}
