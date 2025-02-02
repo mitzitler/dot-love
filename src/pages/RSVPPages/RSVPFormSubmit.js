@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearForm } from '../../features/guest/rsvpSlice';
+import { clearForm, phoneNumberInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 import { store } from '../../store'
@@ -23,6 +23,8 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const firstName = useSelector((state) => state.rsvp.firstName);
     const lastName = useSelector((state) => state.rsvp.lastName);
     const pronouns = useSelector((state) => state.rsvp.pronouns);
+    const email = useSelector((state) => state.rsvp.email);
+    const phoneNumber = useSelector((state) => state.rsvp.phoneNumber);
     const fullGuestInfo = useSelector((state) => state.rsvp);
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
     const submitted = useSelector((state) => state.rsvpCompleted.submitted);
@@ -92,8 +94,9 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     <>
         <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-            <h1 id="submit-header1">Does this all look right, {name}?</h1>
+            <h1 id="submit-header1">How's this, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
+            <p id="submit-header3">{phoneNumber} - {email}</p>
             <p>{rsvpString}</p>
             <div className="submit-div grid grid-cols-2">
                 <FormSubmitLeft />

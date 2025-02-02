@@ -26,15 +26,22 @@ export function GenericHeader2({placeholder, entryValue, setEntryValue}) {
   }
     
   const adjustFontSize = () => {
-    const fontSize = 1.2 - entryValue.length*0.05
-    document.getElementById("genericheader2").style.fontSize = fontSize + 'vw'
+    let fontSize = 1;
+    if (entryValue.length <= 10) {
+      fontSize = fontSize*0.55
+    } else {
+      fontSize = fontSize*0.55 - (entryValue.length-10)*0.05
+     }
+
+    document.getElementById("genericheader2").style.fontSize = fontSize + 'em'
+    console.log("font size: ", fontSize)
   } 
 
   useEffect(() => {
     adjustFontSize()
   }, [entryValue])
 
-  // for rsvp, placeholder = "RSVP Code?"
+  // for rsvp, placeholder = "RSVP Code?
   // entryValue = rsvpCode // the variable
   // inputHandler = (e)=>dispatch(rsvpCodeInput(e.target.value))
 
@@ -42,7 +49,8 @@ export function GenericHeader2({placeholder, entryValue, setEntryValue}) {
       <div class = "header-main">
           <NavIcon>
             <div class= "egg backdrop-blur-xl" />
-            <form className="border-2 border-black h-13 w-13" onSubmit={handleSubmit}>
+            <form  
+            onSubmit={handleSubmit}>
               <input placeholder={placeholder} type="text"
                   id="genericheader2"
                   value={entryValue} // pattern="[A-Za-z]*"

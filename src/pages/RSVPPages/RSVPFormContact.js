@@ -227,11 +227,11 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
 
 
 const pronouns_list = {
-    ff: "she/her",
-    mm: "he/him",
-    nn: "they/them",
-    fn: "she/they",
-    mn: "he/they"
+    ff: "she/ her",
+    mm: "he/ him",
+    nn: "they/ them",
+    fn: "she/ they",
+    mn: "he/ they"
   }
   
 const countries = {
