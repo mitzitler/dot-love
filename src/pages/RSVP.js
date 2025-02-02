@@ -11,7 +11,6 @@ import { Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { rsvpCodeInput, guestCodeInput } from '../features/guest/rsvpSlice';
-import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
 import '../App.css';
 
 export function RSVP() {
@@ -71,11 +70,6 @@ export function RSVP() {
     return (
 
         <>
-        {/* Toast */}
-        <ToastContainer
-            position="top-right"
-            toastStyle={{}}/>
-
         {code ?
              <GenericHeader classname="h-screen transfom-scale-5">
              <div class= "egg backdrop-blur-xl" />

@@ -44,14 +44,11 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
         // NOTE: Since redux is async, we don't know if completedRsvps
         //       is updated or not. To account for this, combine it with
         //       the lastest rsvp and then just remove duplicates if present.
-        console.log("completed rsvps", completedRsvps) // info from first time filling out form TODO: Remove
-        console.log("full guest info", fullGuestInfo) // info from second time filling out form TODO: Remove
         const uniqueRsvpsToSubmit = Array.from(
             new Map(
                 [...completedRsvps, fullGuestInfo].map(rsvp => [rsvp.firstName, rsvp])
             ).values()
         );
-        console.log("api rsvps", uniqueRsvpsToSubmit) // info from first time filling out form TODO: Remove
 
         // Make the API call
         try {

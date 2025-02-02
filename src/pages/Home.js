@@ -1,48 +1,92 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import { GenericHeader2 } from '../components/GenericHeader2';
+
 import { HomePageRoutes } from '../routes/HomePageRoutes';
+import React, { useState, useEffect } from 'react';
+import { GenericHeader } from '../components/GenericHeader';
 import { Info } from './Info';
 import { AboutUs } from './AboutUs';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { Routes, Route } from 'react-router-dom';
+import { useGetUserQuery } from '../services/gizmo.js';
+import { toast } from 'react-toastify'; // Toast (yum!)
 import '../App.css';
 
 export function Home() {
-
-    const dispatch = useDispatch();
     const [entryValue, setEntryValue] = useState("")
-    const fullNameCode = useSelector((state) => state.user.fullNameCode) 
-    // this needs to be a api lookup
-    const acceptableNames = ['TEST NAME']
+    const entryValuePlaceholder = "First Last"
+    const [loginHeader, setLoginHeader] = useState(null);
+    const [loginSuccess, setLoginSuccess] = useState(false);
 
-    console.log(fullNameCode)
-    console.log(acceptableNames)
+    // Function to emit toast 🍞
+    const notify = (input) => {
+        toast.info(input, {
+            theme: "dark",
+            position: "top-right",
+            icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30 }} alt='💕' />
+        })
+    }
 
     const location = useLocation();
     useEffect(() => {
         window.scrollTo(0, 0); 
     }, [location.pathname]);
 
-    if (acceptableNames.includes(fullNameCode.toUpperCase()))
-        console.log('name accepted')
-    else 
-        console.log('name not accepted')
+    // API Call - triggers only when loginHeader changes
+    const { data, error, isLoading } = useGetUserQuery(loginHeader, {
+        skip: !loginHeader, // Skip API call if header is null
+    });
+
+    useEffect(() => {
+        if (data && data.code === 200) {
+            setLoginSuccess(true);
+            console.log("Gizmo login success, result:", data);
+            notify(`Welcome, ${data.body.user.first}! Please scroll down`)
+        }
+        if (error) {
+            console.error("Login API call failed:", error);
+        }
+    }, [data, error]);
+
+    const handleNameChange = (e) => {
+        const value = e.target.value;
+        setEntryValue(value);
+
+        const [first, last] = value.trim().split(" ");
+        if (first && last) {
+            const firstLast = `${first}_${last}`;
+            setLoginHeader({ 'X-First-Last': firstLast });
+        } else {
+            setLoginHeader(null); // Prevent invalid API calls
+        }
+    };
+
+    const handleClearField = () => {
+        setEntryValue("");
+        setLoginHeader(null);
+    };
 
     return (
-
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader2 classname="h-screen transfom-scale-5" 
-            placeholder={"Full name"} entryValue={entryValue} 
-            setEntryValue={setEntryValue}/>
-        { acceptableNames.includes(fullNameCode.toUpperCase()) ?
-        <div classname="container">
-            <main className="card-stack">
+        <GenericHeader classname="h-screen transfom-scale-5"
+            placeholder={"Full name?"} entryValue={entryValue} 
+            setEntryValue={setEntryValue}>
+            <div class= "egg backdrop-blur-xl" />
+            <form>
+              <input placeholder={entryValuePlaceholder} type="text"
+                  id="genericheader"
+                  value={entryValue}
+                  onFocus={handleClearField}
+                  onInput={handleNameChange}/>
+            </form>
+        </GenericHeader>
+        { loginSuccess ?
+            <div classname="container">
+                <main className="card-stack">
                 
-                    {/* <Route path="/" element={<Info/>}/> */}
-                    <HomePageRoutes/>
-            </main>
-        </div>
+                {/* <Route path="/" element={<Info/>}/> */}
+                <HomePageRoutes/>
+
+                </main>
+            </div>
         : <></>
         }
         </>
