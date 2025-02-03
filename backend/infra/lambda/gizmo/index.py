@@ -108,7 +108,7 @@ app = APIGatewayHttpResolver()
 # Controller Helper Methods
 ########################################################
 def email_registration_success(user, has_guest):
-    if user.rsvp_status is rsvp_status.NOTATTENDING:
+    if user.rsvp_status is RsvpStatus.NOTATTENDING:
         return
 
     if has_guest:
@@ -144,8 +144,8 @@ def text_admins(message):
     )
 
 
-def text_registration_success(user, has_guest, inviter, rsvp_status):
-    if user.rsvp_status is rsvp_status.NOTATTENDING:
+def text_registration_success(user, has_guest, inviter):
+    if user.rsvp_status is RsvpStatus.NOTATTENDING:
         TWILIO_CLIENT.messages.create(
             body=plus_one_text_body.strip(),
             from_=TWILIO_SENDER_NUMBER,
