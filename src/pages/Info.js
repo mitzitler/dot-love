@@ -61,55 +61,55 @@ export function Info() {
                 <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
 
                     <InfoBox id="time" class="schedule" collapsable={false}>
-                        <p>Schedule</p>
-                        {/* <ul> */}
+                        <h4>Schedule</h4>
+                        <ul>
                             <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
                             <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Diety Events</li>
                             <li class="text-sm text-left pl-1.5"> 7.00pm - Drinks</li>
                             <li class="text-sm text-left pl-1.5"> 8.00pm - Dinner</li>
                             <li class="text-sm text-left pl-1.5"> 9.00pm - Dancing</li>
                             <li class="text-sm text-left">12.00am - Afters</li>
-                        {/* </ul> */}
+                        </ul>
                     </InfoBox>
 
                     <InfoBox id="stay" class="lodging" collapsable={true} onClickExpand={onClickExpand} 
                         expandedBox={expandedBox}>
-                        <p>Where should I stay?</p>
+                        <h3>Where should I stay?</h3>
                     </InfoBox>
                         {expandedBox === "stay" && (
                             <InfoBoxExpanded>
-                                {/* <ul> */}
+                                <ul>
                                     <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
                                     <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
-                                {/* </ul> */}
+                                </ul>
                             </InfoBoxExpanded>
                         )}
 
                     <InfoBox id="wear" class="dress-code" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <p>What should I wear?</p>
+                        <h3>What should I wear?</h3>
                     </InfoBox>
                         {expandedBox === "wear" && (
                             <InfoBoxExpanded>
-                                {/* <ul> */}
+                                <ul>
                                     <li>🟡 Dress code is semi-formal</li>
                                     <li>🟡 Wedding colors to come soon!!!</li>
                                     <li>🟡 Pinterest board to come soon!!!</li>
-                                {/* </ul>     */}
+                                </ul>    
                             </InfoBoxExpanded>
                         )}
                     
                     <InfoBox id="faq" class="faq" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <p>What else should I know?</p>
+                        <h3>What else should I know?</h3>
                     </InfoBox>
                         {expandedBox === "faq" && (
                             <InfoBoxExpanded>
-                                {/* <ul> */}
+                                <ul>
                                     <li>🟡 This venue has stairs, so please let us know as soon as you can if you have mobility issues</li>
                                     <li>🟡 We'll text whenever we have updates with more information!</li>
                                     <li></li>
-                                {/* </ul> */}
+                                </ul>
                             </InfoBoxExpanded>
                         )}
                     
