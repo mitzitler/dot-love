@@ -63,10 +63,10 @@ export function Home() {
         }
     };
 
-    // const handleClearField = () => {
-    //     setEntryValue("");
-    //     setLoginHeader(null);
-    // };
+    const handleClearField = () => {
+        setEntryValue("");
+        setLoginHeader(null);
+    };
 
 
 
@@ -74,18 +74,18 @@ export function Home() {
         <>
         {/* TODO: only letters can be accepted */}
         <GenericHeader classname="h-screen transfom-scale-5"
-            placeholder={"Full name?"} entryValue={entryValue} 
+            placeholder={entryValuePlaceholder} entryValue={entryValue}
             setEntryValue={setEntryValue}>
             <div class= "egg backdrop-blur-xl" />
             <form>
               <input placeholder={entryValuePlaceholder} type="text"
-                  id="genericheader"
+                     id="genericheader"
                   value={entryValue}
-                //   onFocus={handleClearField}
+                  onFocus={handleClearField}
                   onInput={handleNameChange}/>
             </form>
         </GenericHeader>
-        {/* { loginSuccess ? */}
+         { loginSuccess ?
             <div classname="container">
                 <main className="card-stack">
 
@@ -97,8 +97,8 @@ export function Home() {
 
                 </main>
             </div>
-        {/* : <></> */}
-        {/* } */}
+         : <></>
+           }
         </>
     )
 }
