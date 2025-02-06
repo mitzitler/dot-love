@@ -660,6 +660,7 @@ class User:
             ExpressionAttributeValues={":value": {"S": guest_link}},
         ).get("Items", [None])
         if not db_user:
+            log.warning(f"guest with link code {guest_link} not found")
             return None
         db_user = db_user[0]
 
@@ -748,7 +749,7 @@ class User:
         )
         guest_details = GuestDetails(
             link=guest_link_string,
-            pair_first_last="",  # NOTE: This is always set after the fact
+            pair_first_last=guest_info.get("pairFirstLast", ""),
             date_link_requested=guest_info.get("dateLinkRequested", False),
         )
 
@@ -952,7 +953,7 @@ class CWDynamoClient:
             else field_value
         )
         if dynamoType == "BOOL":
-            dynamoValue = dynamoType == "True"
+            dynamoValue = dynamoValue == "True"
 
         return {field_name: {dynamoType: dynamoValue}}
 
@@ -1100,12 +1101,14 @@ def register():
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
         try:
-            log.info("looking up our actual friend")
+            log.info(f"looking up our actual friend with guest code {guest_link}")
             our_actual_friend = User.from_guest_link_db(guest_link, CW_DYNAMO_CLIENT)
-            log.append_keys(our_actual_friend=our_actual_friend)
+            if our_actual_friend:
+                log.append_keys(our_actual_friend=our_actual_friend.as_map())
+                log.info("found our friend")
 
             # attach the real friend to their guest
-            rsvps[0]["pair_first_last"] = (
+            rsvps[0]["pairFirstLast"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -1139,7 +1142,9 @@ def register():
     if guest_link:
         try:
             # link our friend to the new account made from their guest link
-            our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
+            our_actual_friend.guest_details.pair_first_last = (
+                users[0].first.lower() + "_" + users[0].last.lower()
+            )
             our_actual_friend.update_db(CW_DYNAMO_CLIENT)
         except Exception as e:
             log.exception("failed updating guest_first_last of our actual friend")
