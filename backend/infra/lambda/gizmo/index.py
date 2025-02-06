@@ -107,24 +107,25 @@ app = APIGatewayHttpResolver()
 ########################################################
 # Controller Helper Methods
 ########################################################
-def email_registration_success(user, has_guest):
+def email_registration_success(user):
     if user.rsvp_status is RsvpStatus.NOTATTENDING:
         return
 
-    if has_guest:
-        return DOT_LOVE_MESSAGE_CLIENT.email(
+    if user.guest_details.date_link_requested:
+        DOT_LOVE_MESSAGE_CLIENT.email(
             DotLoveMessageType.REGISTRATION_SUCCESS_EMAIL_WITH_GUEST,
             {
                 "first": user.first,
-                "user_info_table": user.as_html_table(has_guest),
+                "user_info_table": user.as_html_table(has_guest=True),
             },
             user.email,
         )
+        return
     DOT_LOVE_MESSAGE_CLIENT.email(
         DotLoveMessageType.REGISTRATION_SUCCESS_EMAIL_NO_GUEST,
         {
             "first": user.first,
-            "user_info_table": user.as_html_table(has_guest),
+            "user_info_table": user.as_html_table(has_guest=False),
         },
         user.email,
     )
@@ -144,7 +145,7 @@ def text_admins(message):
     )
 
 
-def text_registration_success(user, has_guest, inviter):
+def text_registration_success(user, inviter):
     if user.rsvp_status is RsvpStatus.NOTATTENDING:
         TWILIO_CLIENT.messages.create(
             body=plus_one_text_body.strip(),
@@ -164,7 +165,7 @@ def text_registration_success(user, has_guest, inviter):
     plus_one_text_body = PLUS_ONE_TEXT.format(
         first_name=user.first, guest_code=user.guest_details.link
     )
-    if has_guest:
+    if user.guest_details.date_link_requested:
         admin_text_body = ADMIN_RSVP_ALERT_PLUS_ONE_TEXT.format(
             first=user.first, last=user.last
         )
@@ -442,14 +443,16 @@ class UserDiet:
 
 
 class GuestDetails:
-    def __init__(self, link, pair_first_last):
+    def __init__(self, link, pair_first_last, date_link_requested):
         self.link = link
         self.pair_first_last = pair_first_last
+        self.date_link_requested = date_link_requested
 
     def as_map(self):
         return {
             "link": self.link,
             "pair_first_last": self.pair_first_last,
+            "date_link_requested": self.date_link_requested,
         }
 
     def __str__(self):
@@ -641,6 +644,7 @@ class User:
             guest_details=GuestDetails(
                 link=db_user["guest_link"]["S"],
                 pair_first_last=db_user["guest_pair_first_last"]["S"],
+                date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
         )
 
@@ -689,6 +693,7 @@ class User:
             guest_details=GuestDetails(
                 link=db_user["guest_link"]["S"],
                 pair_first_last=db_user["guest_pair_first_last"]["S"],
+                date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
         )
 
@@ -718,7 +723,9 @@ class User:
         )
 
         rsvp_status = RsvpStatus[guest_info["rsvpStatus"].upper()]
-        pronouns = Pronouns[guest_info["pronouns"].replace("/", "_").upper()]
+        pronouns = Pronouns[
+            guest_info["pronouns"].replace("/", "_").replace(" ", "").upper()
+        ]
         address = UserAddress(
             guest_info["streetAddress"],
             guest_info["secondAddress"],
@@ -743,6 +750,7 @@ class User:
         guest_details = GuestDetails(
             link=guest_link_string,
             pair_first_last="",  # NOTE: This is always set after the fact
+            date_link_requested=guest_info.get("dateLinkRequested", False),
         )
 
         return User(
@@ -1144,19 +1152,12 @@ def register():
     # notify user(s) of registration success
     for user in users:
         try:
-            email_registration_success(
-                user=user,
-                has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
-            )
+            email_registration_success(user=user)
         except Exception as e:
             err_msg = "failed to send user registration success email"
             log.exception(err_msg)
         try:
-            text_registration_success(
-                user,
-                has_guest=user.rsvp_code.lower() == RSVP_CODE_OPEN_PLUS_ONE,
-                inviter=our_actual_friend,
-            )
+            text_registration_success(user, inviter=our_actual_friend)
         except Exception as e:
             err_msg = "failed to send user registration success text"
             log.exception(err_msg)
