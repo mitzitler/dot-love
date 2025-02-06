@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearForm, phoneNumberInput } from '../../features/guest/rsvpSlice';
+import { clearForm, phoneNumberInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 import { store } from '../../store'
@@ -83,11 +83,9 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const name = firstName + " " + lastName
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-    const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
     function handleDateLinkRequested() {
-        setDateLinkRequested(!dateLinkRequested);
-        console.log('text me a link: ' + !dateLinkRequested)
+        dispatch(dateLinkRequestedInput())
     }
 
   return(
@@ -113,7 +111,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                     <label className='checkbox-guest' for="guest-yes">
                         Check this box to be sent a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
                         <input id="guest-yes" name="guest-yes" type="checkbox"
-                            onClick={()=>handleDateLinkRequested()}/>
+                            onClick={(e)=>dispatch(dateLinkRequestedInput())}/>
                         <span class="checkmark"></span>
                     </label>
                 </div>
