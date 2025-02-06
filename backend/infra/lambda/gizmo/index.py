@@ -785,6 +785,7 @@ class User:
             "restrictions": self.diet.restrictions,
             # guest info
             "guest_link": self.guest_details.link,
+            "date_link_requested": self.guest_details.date_link_requested,
             "guest_pair_first_last": self.guest_details.pair_first_last,
             # address
             "street": self.address.street,
