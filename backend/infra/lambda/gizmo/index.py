@@ -612,11 +612,11 @@ class User:
 
     @staticmethod
     def from_first_last_db(first_last, dynamo_client):
-        key_expression = {"first_last": {"S": first_last}}
+        key_expression = {"first_last": {"S": first_last.lower()}}
         db_user = dynamo_client.get(USER_TABLE_NAME, key_expression)
         return User(
-            first=first_last.split("_")[0],
-            last=first_last.split("_")[1],
+            first=first_last.split("_")[0].lower(),
+            last=first_last.split("_")[1].lower(),
             rsvp_code=db_user["rsvp_code"]["S"],
             rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
             pronouns=Pronouns[db_user["pronouns"]["S"]],
@@ -701,14 +701,13 @@ class User:
     def extract_users_from_rsvps(rsvps):
         users = []
         for rsvp in rsvps:
-            first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
             users.append(User.from_client_rsvp(rsvp))
         return users
 
     @staticmethod
     def from_client_rsvp(guest_info):
-        first = guest_info["firstName"]
-        last = guest_info["lastName"]
+        first = guest_info["firstName"].lower()
+        last = guest_info["lastName"].lower()
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
@@ -766,7 +765,9 @@ class User:
         )
 
     def register_db(self, dynamo_client):
-        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        key_expression = {
+            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
+        }
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
@@ -804,7 +805,9 @@ class User:
         )
 
     def update_db(self, dynamo_client):
-        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        key_expression = {
+            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
+        }
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
