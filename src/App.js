@@ -14,6 +14,7 @@ export default function App() {
       {/* 🍞 Toast 🍞 */}
       <ToastContainer
           position="top-right"
+          zIndex={9999}
           toastStyle={{}}/>
       <Routes>
         <Route path="rsvp/*" element={<RSVP/>} />

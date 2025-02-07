@@ -11,7 +11,7 @@ const rsvpSlice = createSlice({
     firstName: "", 
     lastName: "", 
     pronouns: "", 
-    phoneNumberCountryCode: "",
+    phoneNumberCountryCode: "1",
     phoneNumber: "", 
     email: "", 
     streetAddress: "", 
@@ -81,17 +81,25 @@ const rsvpSlice = createSlice({
     stateProvinceInput(state, action) {
       state.stateProvince = action.payload
     },
-    continueDietary(state, action) { // TODO: should add a check on phone number length
-    // is this okay?
-      { 
-        console.log("can i continue? ", state.canContinueDietary);
-        if (!state.firstName || !state.lastName || !state.pronouns || !state.phoneNumberCountryCode ||
-          !state.phoneNumber || !state.email || !state.streetAddress || 
-          !state.city || !state.zipcode || !state.country || !state.stateProvince)
+    continueDietary(state, action) { 
+      console.log("can i continue? ", state.canContinueDietary);
+      const isPhoneValid = state.phoneNumber.length === 10;
+      const isCountryCodeValid = state.phoneNumberCountryCode === 1 || 
+                                 (state.phoneNumberCountryCode?.toString().length <= 2);
+      if (!state.firstName || 
+          !state.lastName || 
+          !state.pronouns || 
+          !isPhoneValid || 
+          !state.email || 
+          !state.streetAddress || 
+          !state.city || 
+          !state.zipcode || 
+          !state.country || 
+          !state.stateProvince || 
+          !isCountryCodeValid)
       return {...state, canContinueDietary: false} 
       else return {...state, canContinueDietary: true}
      // only allow this action if the items on the page are ready
-    };
     },
     drinkAlcoholToggle(state) {
       state.drinkAlcohol = !state.drinkAlcohol

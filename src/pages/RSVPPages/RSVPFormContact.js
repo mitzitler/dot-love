@@ -8,6 +8,7 @@ import { firstNameInput, lastNameInput, pronounsInput,
     phoneNumberCountryCodeInput, phoneNumberInput, emailInput,
     streetAddressInput, secondAddressInput, cityInput, zipcodeInput,
     countryInput, stateProvinceInput, continueDietary } from '../../features/guest/rsvpSlice';
+import { toast } from 'react-toastify'; // Toast (yum!)
 
 export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiaryColor, opacity, pageSection}) {
 
@@ -25,11 +26,16 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
     const zipcode = useSelector((state) => state.rsvp.zipcode)
     const country = useSelector((state) => state.rsvp.country)
     const stateProvince = useSelector((state) => state.rsvp.stateProvince)
-    const canContinueDietary = useSelector((state) => state.rsvp.canContinueDietary)
-
-    // const handleInputChange = (e) => {
-    //     dispatch(firstNameInput(e.target.value)); // Dispatch the action with the input value
-    //   };
+    const canContinueDietary = useSelector((state) => state.rsvp.canContinueDietary)    
+    
+    // Function to emit toast 🍞
+    const notify = (input) => {
+        toast.info(input, {
+            theme: "dark",
+            position: "top-right",
+            icon: <img src='' style={{ paddingLeft: 16,  width: 30, height: 30, zIndex: 1000}} alt='💕' />
+        })
+    }
 
     return (
         <>
@@ -84,6 +90,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                         <input label="country_code"
                             id="country-code"
                             value={phoneNumberCountryCode}
+                            placeholder='1'
                             onChange={(e)=>
                                 {dispatch(phoneNumberCountryCodeInput(e.target.value));
                                 dispatch(continueDietary())
@@ -217,7 +224,12 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                 <NavLink className='btn-23' 
                     // maybe theres something to having an onhover here dispatch the continueDietary?
                     disabled={!canContinueDietary}
-                    to={!canContinueDietary ? '/rsvp/contact' : '/rsvp/dietary'} 
+                    to={!canContinueDietary ? '/rsvp/contact' : '/rsvp/dietary'} onClick={(e) => {
+                        if (!canContinueDietary) {
+                            e.preventDefault(); // Prevent navigation
+                            notify(`Ah! Please make sure you fill out all the fields - pronouns, address, city, state, phone number and country code, etc.`);
+                        }
+                    }}
                     end><marquee>Continue</marquee></NavLink> 
 
             </CardStackFooter>

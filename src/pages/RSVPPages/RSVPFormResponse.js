@@ -12,7 +12,7 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
     const dispatch = useDispatch();
 
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-    const submitted = useSelector((state) => state.rsvp.submitted)
+    const submitted = useSelector((state) => state.rsvpCompleted.submitted)
 
     // Function to emit toast 🍞
     const notify = (input) => {
