@@ -116,7 +116,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                     <label className='checkbox-guest' for="guest-yes">
                         Check this box to be sent a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
                         <input id="guest-yes" name="guest-yes" type="checkbox"
-                            onClick={()=>handleDateLinkRequested()}/>
+                            onClick={(e)=>dispatch(dateLinkRequestedInput())}/>
                         <span class="checkmark"></span>
                     </label>
                 </div>

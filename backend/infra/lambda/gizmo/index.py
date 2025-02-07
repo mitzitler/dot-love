@@ -612,11 +612,11 @@ class User:
 
     @staticmethod
     def from_first_last_db(first_last, dynamo_client):
-        key_expression = {"first_last": {"S": first_last}}
+        key_expression = {"first_last": {"S": first_last.lower()}}
         db_user = dynamo_client.get(USER_TABLE_NAME, key_expression)
         return User(
-            first=first_last.split("_")[0],
-            last=first_last.split("_")[1],
+            first=first_last.split("_")[0].lower(),
+            last=first_last.split("_")[1].lower(),
             rsvp_code=db_user["rsvp_code"]["S"],
             rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
             pronouns=Pronouns[db_user["pronouns"]["S"]],
@@ -660,6 +660,7 @@ class User:
             ExpressionAttributeValues={":value": {"S": guest_link}},
         ).get("Items", [None])
         if not db_user:
+            log.warning(f"guest with link code {guest_link} not found")
             return None
         db_user = db_user[0]
 
@@ -701,14 +702,13 @@ class User:
     def extract_users_from_rsvps(rsvps):
         users = []
         for rsvp in rsvps:
-            first_last = rsvp["firstName"] + "_" + rsvp["lastName"]
             users.append(User.from_client_rsvp(rsvp))
         return users
 
     @staticmethod
     def from_client_rsvp(guest_info):
-        first = guest_info["firstName"]
-        last = guest_info["lastName"]
+        first = guest_info["firstName"].lower()
+        last = guest_info["lastName"].lower()
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
@@ -749,7 +749,7 @@ class User:
         )
         guest_details = GuestDetails(
             link=guest_link_string,
-            pair_first_last="",  # NOTE: This is always set after the fact
+            pair_first_last=guest_info.get("pairFirstLast", ""),
             date_link_requested=guest_info.get("dateLinkRequested", False),
         )
 
@@ -766,7 +766,9 @@ class User:
         )
 
     def register_db(self, dynamo_client):
-        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        key_expression = {
+            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
+        }
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
@@ -785,6 +787,7 @@ class User:
             "restrictions": self.diet.restrictions,
             # guest info
             "guest_link": self.guest_details.link,
+            "date_link_requested": self.guest_details.date_link_requested,
             "guest_pair_first_last": self.guest_details.pair_first_last,
             # address
             "street": self.address.street,
@@ -803,7 +806,9 @@ class User:
         )
 
     def update_db(self, dynamo_client):
-        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+        key_expression = {
+            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
+        }
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
@@ -948,7 +953,7 @@ class CWDynamoClient:
             else field_value
         )
         if dynamoType == "BOOL":
-            dynamoValue = dynamoType == "True"
+            dynamoValue = dynamoValue == "True"
 
         return {field_name: {dynamoType: dynamoValue}}
 
@@ -1096,12 +1101,14 @@ def register():
         log.append_keys(guest_link=guest_link)
         log.info("handling guest registration")
         try:
-            log.info("looking up our actual friend")
+            log.info(f"looking up our actual friend with guest code {guest_link}")
             our_actual_friend = User.from_guest_link_db(guest_link, CW_DYNAMO_CLIENT)
-            log.append_keys(our_actual_friend=our_actual_friend)
+            if our_actual_friend:
+                log.append_keys(our_actual_friend=our_actual_friend.as_map())
+                log.info("found our friend")
 
             # attach the real friend to their guest
-            rsvps[0]["pair_first_last"] = (
+            rsvps[0]["pairFirstLast"] = (
                 our_actual_friend.first + "_" + our_actual_friend.last
             )
         except Exception as e:
@@ -1135,7 +1142,9 @@ def register():
     if guest_link:
         try:
             # link our friend to the new account made from their guest link
-            our_actual_friend.guest_details.pair_first_last = app.context["first_last"]
+            our_actual_friend.guest_details.pair_first_last = (
+                users[0].first.lower() + "_" + users[0].last.lower()
+            )
             our_actual_friend.update_db(CW_DYNAMO_CLIENT)
         except Exception as e:
             log.exception("failed updating guest_first_last of our actual friend")

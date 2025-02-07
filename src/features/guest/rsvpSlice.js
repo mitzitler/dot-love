@@ -180,6 +180,7 @@ const rsvpSlice = createSlice({
       state.eatPeanuts = true
       state.moreRestrictions = ""
       state.dateLinkRequested = false
+      state.guestCode = ""
     }  
   }
 })
