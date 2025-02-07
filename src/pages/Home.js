@@ -50,11 +50,21 @@ export function Home() {
         }
     }, [data, error]);
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+        }
+      };
+
     const handleNameChange = (e) => {
         const value = e.target.value;
         setEntryValue(value);
 
         const [first, last] = value.trim().split(" ");
+        if(e.keyCode == 13){ 
+            e.preventDefault();
+         }
+
         if (first && last) {
             const firstLast = `${first}_${last}`;
             setLoginHeader({ 'X-First-Last': firstLast });
@@ -63,26 +73,18 @@ export function Home() {
         }
     };
 
-    const handleClearField = () => {
-        setEntryValue("");
-        setLoginHeader(null);
-    };
-
-
-
     return (
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader classname="h-screen transfom-scale-5"
-            placeholder={entryValuePlaceholder} entryValue={entryValue}
-            setEntryValue={setEntryValue}>
+        <GenericHeader classname="h-screen transfom-scale-5">
             <div class= "egg backdrop-blur-xl" />
             <form>
               <input placeholder={entryValuePlaceholder} type="text"
                      id="genericheader"
                   value={entryValue}
-                  onFocus={handleClearField}
-                  onInput={handleNameChange}/>
+                  onInput={handleNameChange}
+                  onKeyDown={handleKeyDown}
+                  />
             </form>
         </GenericHeader>
          { loginSuccess ?
