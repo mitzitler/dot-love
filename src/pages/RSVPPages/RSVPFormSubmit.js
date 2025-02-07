@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearForm, phoneNumberInput } from '../../features/guest/rsvpSlice';
+import { clearForm, phoneNumberInput, phoneNumberCountryCodeInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 import { store } from '../../store'
@@ -24,6 +24,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const lastName = useSelector((state) => state.rsvp.lastName);
     const pronouns = useSelector((state) => state.rsvp.pronouns);
     const email = useSelector((state) => state.rsvp.email);
+    const phoneNumberCountryCode = useSelector((state) => state.rsvp.phoneNumberCountryCode);
     const phoneNumber = useSelector((state) => state.rsvp.phoneNumber);
     const fullGuestInfo = useSelector((state) => state.rsvp);
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
@@ -83,11 +84,13 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const name = firstName + " " + lastName
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-    const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
     function handleDateLinkRequested() {
-        setDateLinkRequested(!dateLinkRequested);
-        console.log('text me a link: ' + !dateLinkRequested)
+        dispatch(dateLinkRequestedInput())
+    }
+
+    if (phoneNumberCountryCode == null || phoneNumberCountryCode == "") {
+        dispatch(phoneNumberCountryCodeInput('1'))
     }
 
   return(
