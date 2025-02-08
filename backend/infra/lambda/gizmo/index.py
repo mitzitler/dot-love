@@ -614,6 +614,9 @@ class User:
     def from_first_last_db(first_last, dynamo_client):
         key_expression = {"first_last": {"S": first_last.lower()}}
         db_user = dynamo_client.get(USER_TABLE_NAME, key_expression)
+        if not db_user:
+            return None
+
         return User(
             first=first_last.split("_")[0].lower(),
             last=first_last.split("_")[1].lower(),
