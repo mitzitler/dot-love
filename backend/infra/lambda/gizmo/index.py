@@ -712,9 +712,16 @@ class User:
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
+
+        # paranoid country code checks
+        country_code = guest_info["phoneNumberCountryCode"]
+        if country_code.lower() in ["united states", "canada"]:
+            country_code = "1"
+        country_code = country_code.replace("+", "")
+
         phone = (
             "+"
-            + guest_info["phoneNumberCountryCode"].replace("+", "")
+            + country_code
             + guest_info["phoneNumber"]
             .replace(" ", "")
             .replace("(", "")
