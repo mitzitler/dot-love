@@ -717,12 +717,14 @@ class User:
         )
 
         # paranoid country code checks
-        country_code = guest_info["phoneNumberCountryCode"]
+        country_code = (
+            guest_info["phoneNumberCountryCode"]
             .replace(" ", "")
             .replace("(", "")
             .replace(")", "")
             .replace("-", "")
             .replace("+", "")
+        )
         if not country_code.isdigit():
             logger.info("how, literally how")
             country_code = "1"
