@@ -718,9 +718,14 @@ class User:
 
         # paranoid country code checks
         country_code = guest_info["phoneNumberCountryCode"]
-        if country_code.lower() in ["united states", "canada"]:
+            .replace(" ", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("-", "")
+            .replace("+", "")
+        if not country_code.isdigit():
+            logger.info("how, literally how")
             country_code = "1"
-        country_code = country_code.replace("+", "")
 
         phone = (
             "+"
