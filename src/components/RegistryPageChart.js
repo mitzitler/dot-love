@@ -186,8 +186,9 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
     console.log(displayedId)
     return (
         <div>
-            <Tooltip title="hello world" position="bottom" trigger="click">
-            </Tooltip>
+            {/* tooltip looks very bad with this whole set up */}
+            {/* <Tooltip title="hello world" position="bottom" trigger="click">
+            </Tooltip> */}
             <svg ref={chartRef} width={800} height={500}> {/* need more css here */}
             </svg>
         </div>

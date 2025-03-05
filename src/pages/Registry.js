@@ -1,15 +1,24 @@
 import React from 'react';
+import { CardStackPage } from '../components/CardStackPage.js';
 import { RegistryPage } from '../components/RegistryPage';
 
 
 export function Registry() {
 
-    const pageMainColor = "blue" 
+    const pageMainColor = "khaki"  // temp colors
+    const pageSecondaryColor = "lime"
+    const pageTertiaryColor = "babyblue"
+
     const pageSection = "registry"
 
     return (
-        <main className="section-content w-full flex-grow bg-pink-400/75 border-pink-500/50 border-2">
+    
+        <CardStackPage pageMainColor={pageMainColor} 
+            pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
+            pageSection={pageSection}>
             <RegistryPage />
-        </main>
+        </CardStackPage>
     )
+
 }
+

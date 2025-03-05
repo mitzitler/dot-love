@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Info } from './Info.js';
 import { AboutUs } from './AboutUs.js';
+import { Registry } from './Registry.js';
 import { useGetUserQuery } from '../services/gizmo.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
 import '../App.css';
@@ -95,6 +96,7 @@ export function Home() {
                         <Route path="/" element={<Info/>} />
                         <Route path="/info" element={<Info/>} />
                         <Route path="/aboutus" element={<AboutUs/>} />
+                        <Route path="/registry" element={<Registry/>} />
                     </Routes>
 
                 </main>

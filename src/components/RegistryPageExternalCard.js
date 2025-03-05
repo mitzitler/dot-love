@@ -17,30 +17,31 @@ export function RegistryPageExternalCard({Data, displayedId}) {
             {!giftData
             ?
             <div>
-                <p>Humor me - this wedding registry is a <em>chart</em>. On the x axis, you have size, from small to large.
-                    On the y axis, we have function - from most practical to most artsy. 
-                    A massive mural would be in the top right, a single fork in the bottom left. 
-                    </p>
-                </div>
+                <p>
+                    This is a graph measuring function versus size. A small practical item will be totally opposite diagonally to a large piece of art.
+                    Please remember to click the popup when you buy an item so that we can remove it from the registry!
+                </p>
+            </div>
             :
-            <div>
-                <p className="gift title">
-                    {giftData.name}
-                    </p>
-                    <br></br>
-                <p className="gift info">
-                    {giftData.description}
-                    </p>
-                {/* <div> 
+            <div class="relative m-auto grid grid-cols-4" >
+                <div class="col-span-1"> 
                      <img className="gift image" href={giftData.image_link} alt="Image of gift" /> 
-                    </div> */}
-                    <br></br>
-                <a href={giftData.link}>Buy me!</a>
                 </div>
+                <div class="col-span-3">
+                    <span>
+                        <p className="gift info">
+                            {giftData.description}
+                        </p>
+                        <a href={giftData.link}>
+                            Buy me!
+                            {/* the giftData clicks are recorded to the users data */}
+                        </a>
+                        {/* checkbox for if you buy it. if you click it it opens a modal */}
+                    </span>
+                </div>
+            </div>
             }
         </div> 
     )
 }
-
-
 

@@ -1,0 +1,31 @@
+/* registry styles */
+
+.registry h1 {
+    font-size: x-large;
+    //font-family: 'boxing';
+    font-family: 'harmond';
+    font-weight: 'extra-bold-italic';
+    color: rgb(85, 27, 53);
+    margin-top: 0.75em;
+    //margin-bottom: 0.5em;
+    text-align: center;
+    transition: all 0.5s ease-in-out;
+}
+
+.registry h2 {
+    margin-bottom: 5%;
+    text-align: center;
+}
+
+.registry p {
+    //font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'bocalupo';
+    text-align: left;
+    padding-left: 3em;
+    padding-right: 3em;
+    font-size: medium;
+}
+
+.registry a {
+    color: red
+}

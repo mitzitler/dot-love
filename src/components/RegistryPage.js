@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RegistryPageChart } from "./RegistryPageChart";
+import { RegistryPageExternalTitle } from "./RegistryPageExternalTitle";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard";
 import '../App.css';
 
@@ -71,18 +72,22 @@ export function RegistryPage() {
     const [displayedId, setDisplayedId] = useState(null)
     return ( 
         <div>
-            {/* <GenericHeader ref={div => (this.header = div)} handleNavClick={handleNavClick} leftSide={leftSide} rightSide={rightSide} /> */}
-            <div class=" relative m-auto grid grid-cols-3 ">
-                <div class="card col-span-2 width-500 static" style = {{position: "static"}}>
+            <RegistryPageExternalTitle Data={Data}
+                        displayedId = {displayedId} 
+                        setDisplayedId={setDisplayedId} />
+            <div class="relative grid grid-cols-8 ">
+                <div class="col-span-1"></div>
+                <div class="card col-span-6 p-8 my-1 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
                     <RegistryPageChart Data={Data}
                         displayedId = {displayedId} 
                         setDisplayedId={setDisplayedId}/>
                 </div>
-                <RegistryPageExternalCard class="card col-span-1 width-200 static"
+                <div class="col-span-1"></div>
+            </div>
+            <RegistryPageExternalCard class="card col-span-1 static"
                 displayedId = {displayedId}
                 Data={Data}  
                 />
-            </div> 
         </div>
     )
 }
