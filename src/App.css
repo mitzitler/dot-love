@@ -303,9 +303,10 @@ header {
   border-radius: 15px;
 }
 
+// height here gets overwritten by swipe-card below
 .section-content {
   border-radius: 15px; 
-  height: 600px
+  height: 600px 
 }
 
 .header-content {
@@ -379,7 +380,7 @@ header {
 
 .swipe-card {
   margin: auto;
-  height: 650px;
+  height: 750px;
   width: 90%
 }
 

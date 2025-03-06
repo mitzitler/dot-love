@@ -2,7 +2,6 @@
 
 .registry h1 {
     font-size: x-large;
-    //font-family: 'boxing';
     font-family: 'harmond';
     font-weight: 'extra-bold-italic';
     color: rgb(85, 27, 53);
@@ -26,6 +25,53 @@
     font-size: medium;
 }
 
-.registry a {
-    color: red
+.registry button {
+    font-size: medium;
+    border-width: 2px;
+    font-size: 20px;
+    font-family: 'harmond';
+    color: red;
+    background-color: antiquewhite;
+    border-color: red;
+}
+
+.registry button:hover {
+    color: antiquewhite;
+    background-color: red;
+    border-color: antiquewhite
+}
+
+.registry img {
+    transition: all 2s ease-in-out;
+    box-shadow:
+        -1px 2px 2px rgba(0, 0, 0, 0.2),
+        -2px 4px 4px rgba(0, 0, 0, 0.2),
+        -4px 8px 8px rgba(0, 0, 0, 0.2)
+}
+
+.registry img:hover {
+    transform: scale(1.4);
+    transition: all 2s ease-in-out;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    padding: 4px;
+    margin-left: 15px;
+    transform: translateY(-50%);
+}
+
+/* Add an arrow */
+.tooltip:after {
+    content: "";
+    position:absolute;
+    border-width: 5px;  /* Arrow width */
+    left: -10px;  /* Arrow width * 2 */
+    top:50%;
+    transform:translateY(-50%);
+    border-color: transparent black transparent transparent;
 }

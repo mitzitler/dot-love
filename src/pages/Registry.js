@@ -1,6 +1,6 @@
 import React from 'react';
 import { CardStackPage } from '../components/CardStackPage.js';
-import { RegistryPage } from '../components/RegistryPage';
+import { NewRegistryPage } from '../components/NewRegistryPage.tsx';
 
 
 export function Registry() {
@@ -16,7 +16,7 @@ export function Registry() {
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <RegistryPage />
+            <NewRegistryPage />
         </CardStackPage>
     )
 

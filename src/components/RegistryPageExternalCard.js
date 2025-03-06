@@ -6,9 +6,7 @@ export function RegistryPageExternalCard({Data, displayedId}) {
     const [giftData, setGiftData] = useState({})
 
     useEffect(() => {
-        console.log(Data.find(gift => gift.id === displayedId))
         const gift_name = Data.find(gift => gift.id === displayedId)
-        console.log(gift_name)
         setGiftData(gift_name)
     }, [displayedId])
 
@@ -25,18 +23,22 @@ export function RegistryPageExternalCard({Data, displayedId}) {
             :
             <div class="relative m-auto grid grid-cols-4" >
                 <div class="col-span-1"> 
-                     <img className="gift image" href={giftData.image_link} alt="Image of gift" /> 
+                    <img className="gift image w-24 h-24 my-4 mx-24 rounded-2xl flex justify-center items-center" src={giftData.image_link} alt="Image of gift" /> 
                 </div>
                 <div class="col-span-3">
                     <span>
+                        <button className="rounded-lg text-lg pt-1 my-2">
+                            <a href={giftData.link} >
+                                🪩  🌸  🪐   Buy me for $ {giftData.price} !   🪐  🌸  🪩
+                                {/* the giftData clicks are recorded to the users data */}
+                            </a>
+                        </button>
+                        <br/>
                         <p className="gift info">
                             {giftData.description}
                         </p>
-                        <a href={giftData.link}>
-                            Buy me!
-                            {/* the giftData clicks are recorded to the users data */}
-                        </a>
                         {/* checkbox for if you buy it. if you click it it opens a modal */}
+
                     </span>
                 </div>
             </div>

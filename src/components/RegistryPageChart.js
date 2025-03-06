@@ -27,9 +27,9 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
             svgGiftRef.selectAll("*").remove()
 
             let dimensions = {
-                w: 500,
-                h: 500,
-                margins: 60
+                w: 450,
+                h: 450,
+                margins: 50
             };
 
             let tooltip = d3
@@ -39,18 +39,18 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
                 .style("line-height", 1.1)
                 .style("border-radius", "0.4em")
                 .style("box-shadow", "0em 0em .5em rgb(165, 163, 163)")
-                .style("font-size", "10px") // all of this are fucked up
+                .style("font-size", "10px") 
                 .style("text-align", "center")
-                .style("width", "50px") // all of this are fucked up
-                .style("height", "40px") // all of this are fucked up
+                .style("width", "50px") 
+                .style("height", "40px") 
                 .style("background", "white")
                 .style("color", "#9cb3c3")
                 .style("top", 0)
                 .style("left", 0)
                 .style("display", "none")
 
-            const width = dimensions.w - (dimensions.margins * 2);
-            const height = dimensions.h - (dimensions.margins * 2);
+            const width = dimensions.w - (dimensions.margins * 1.5);
+            const height = dimensions.h - (dimensions.margins * 1.5);
 
             const svg2 = svgGiftRef.append("g")
                 .attr("tranform","translate("+dimensions.margins+","+dimensions.margins+")")
@@ -67,6 +67,12 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
                 .domain([-10, 10])
                 .range([dimensions.margins, width])
                 .nice()
+            const allGroups = dataset.map((d) => String(d.price_cat));
+            const colorScale = d3
+                  .scaleOrdinal()
+                  .domain(allGroups)
+                  .range(["#32a852", "#e052eb", "#5eb4ff", "#8037b8", "#e35954"]);
+              
             
             const xAxis = d3 
                 .axisBottom(xScale)
@@ -145,20 +151,20 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
                 .attr("cx", d => xScale(d.x))
                 .attr("cy", d => yScale(d.y))
                 .attr("r", 5)
-                .attr("fill", "#78416f")
-                .attr("stroke", "#78416f")
-                .attr("fill-opacity", 0.2)
+                .attr("fill", d => colorScale(d.price_cat))
+                .attr("stroke", d => colorScale(d.price_cat))
+                .attr("fill-opacity", 0.5)
                 .on("mouseover", (mouseEvent, d) => {
                     d3.select(mouseEvent.target).transition().attr("r", 8)
-                    // tooltip.transition().duration(0).style("display", "block")
+                    tooltip.transition().duration(0).style("display", "block")
                     tooltip
                         .style("display", "block")
                         .html(`<div><span>My name is ${d.name}</span></div>`)
                         .style("left", (mouseEvent.pageX + 5) + "px")
                         .style("top", (mouseEvent.pageY - 24) + "px")
-                    // const [x,y] = d3.pointer(mouseEvent);
-                    // const dataset = d
-                    // console.log("i am recognizing gift id " + dataset.id)
+                    const [x,y] = d3.pointer(mouseEvent);
+                    const dataset = d
+                    console.log("i am recognizing gift id " + dataset.id)
                     // setTooltipData({x, y, dataset: d})
                     console.log(`<div><span>${d.name}</span></div>`)
                     console.log(mouseEvent.x, mouseEvent.y)
@@ -177,7 +183,7 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
                     const dataset = d
                     setDisplayedId(d.id)
                     console.log("gift id is " + dataset.id + 
-                            //    " and my index is " + dataset.index +
+                               " and my index is " + dataset.index +
                                 " and name is " + dataset.name)
                 })
 
@@ -189,7 +195,8 @@ export function RegistryPageChart({Data, displayedId, setDisplayedId}) {
             {/* tooltip looks very bad with this whole set up */}
             {/* <Tooltip title="hello world" position="bottom" trigger="click">
             </Tooltip> */}
-            <svg ref={chartRef} width={800} height={500}> {/* need more css here */}
+            {/* <svg ref={chartRef} width={500} height={500}> */}
+            <svg ref={chartRef} width={400} height={450}> {/* need more css here */}
             </svg>
         </div>
     )

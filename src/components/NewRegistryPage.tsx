@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { RegistryPageChart } from "./RegistryPageChart";
+import { NewRegistryPageChart } from "./NewRegistryPageChart";
 import { RegistryPageExternalTitle } from "./RegistryPageExternalTitle";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard";
 import '../App.css';
 
 // NOTE: LINK TO BUY OBJECTS NEEDS TO CREATE A NEW TAB
-// const Shellfish = require("../../assets/dietary-restrictions/shellfish.png")
-// this is the ultimate source of all data, so the data will be read in on this page
 // price_cat = ['0-50', '50-100', '100-150', '150+', '??']
 
 const Data = [
@@ -76,23 +74,28 @@ const Data = [
      },
 ]
 
-//  ALL of this css needs to go into the App.css file
-
-export function RegistryPage() {
-    const [displayedId, setDisplayedId] = useState(null)
+export function NewRegistryPage() {
+    const [displayedId, setDisplayedId] = useState<number | null>()
     return ( 
         <div>
-            <RegistryPageExternalTitle Data={Data}
+            <RegistryPageExternalTitle
+                Data={Data}
+                displayedId = {displayedId} 
+                setDisplayedId={setDisplayedId} />
+            <div className="relative grid grid-cols-9 ">
+                <div className="col-span-1"></div>
+                <div className="card col-span-7 place-self-center p-2 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
+
+                    <NewRegistryPageChart 
+                        data={Data}
                         displayedId = {displayedId} 
-                        setDisplayedId={setDisplayedId} />
-            <div class="relative grid grid-cols-8 ">
-                <div class="col-span-1"></div>
-                <div class="card col-span-6 p-8 my-1 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
-                    <RegistryPageChart Data={Data}
-                        displayedId = {displayedId} 
-                        setDisplayedId={setDisplayedId}/>
+                        height={400} width={400}
+                        margins={[40, 40, 45, 50]} // clock: top, right, bottom, left
+                        setDisplayedId={setDisplayedId}
+                        />
+
                 </div>
-                <div class="col-span-1"></div>
+                <div className="col-span-1"></div>
             </div>
             <RegistryPageExternalCard class="card col-span-1 static"
                 displayedId = {displayedId}
