@@ -82,20 +82,14 @@ export function NewRegistryPage() {
                 Data={Data}
                 displayedId = {displayedId} 
                 setDisplayedId={setDisplayedId} />
-            <div className="relative grid grid-cols-9 ">
-                <div className="col-span-1"></div>
-                <div className="card col-span-7 place-self-center p-2 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
-
-                    <NewRegistryPageChart 
-                        data={Data}
-                        displayedId = {displayedId} 
-                        height={400} width={400}
-                        margins={[40, 40, 45, 50]} // clock: top, right, bottom, left
-                        setDisplayedId={setDisplayedId}
-                        />
-
-                </div>
-                <div className="col-span-1"></div>
+            <div className="card place-self-center p-2 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
+                <NewRegistryPageChart 
+                    data={Data}
+                    displayedId = {displayedId} 
+                    height={400} width={400}
+                    margins={[40, 40, 45, 50]} // clock: top, right, bottom, left
+                    setDisplayedId={setDisplayedId}
+                    />
             </div>
             <RegistryPageExternalCard class="card col-span-1 static"
                 displayedId = {displayedId}

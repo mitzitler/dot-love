@@ -1,5 +1,24 @@
 /* registry styles */
 
+// https://stackoverflow.com/questions/13847755/css-media-queries-for-screen-sizes
+/* Super laarge screens ----------- */
+@media only screen 
+and (min-width : 3000px) {
+  /* Styles */
+}
+
+/* Large screens ----------- */
+@media only screen 
+and (max-width : 1300px) {
+  /* Styles */
+}
+
+/* Small screens ----------- */
+@media only screen 
+and (max-width : 550px) {
+  /* Styles */
+}
+
 .registry h1 {
     font-size: x-large;
     font-family: 'harmond';
