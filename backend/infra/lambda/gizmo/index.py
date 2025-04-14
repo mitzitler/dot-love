@@ -4,6 +4,7 @@ import random
 import string
 import traceback
 from functools import wraps
+from boto3.dynamodb.types import TypeDeserializer
 import uuid
 from enum import Enum
 
@@ -418,6 +419,8 @@ class DotLoveMessageClient:
 
         :param message_type: The type of message to send.
         :param template_input: A dictionary with template variables for interpolation.
+        # TODO: Validate this is oneof registered user
+        :param recipient_phone: Phone number to text.
         :return: None
         """
         template = self._get_text_template(message_type)
@@ -428,6 +431,27 @@ class DotLoveMessageClient:
             from_=TWILIO_SENDER_NUMBER,
             to=recipient_phone,
         )
+
+    def text_blast(self, message_type, template_input, numbers):
+        """
+        Send a text blast based on the message type and template input.
+
+        :param message_type: The type of message to send.
+        :param template_input: A dictionary with template variables for interpolation.
+        :param recipient_phone: Number list.
+        :return: None
+        """
+        template = self._get_text_template(message_type)
+        text_body = template.format(**template_input).strip()
+
+        for number in numbers:
+            try:
+                TWILIO_CLIENT.messages.create(
+                    body=text_body, from_=TWILIO_SENDER_NUMBER, to=number
+                )
+            except Exception as e:
+                log.exception("failed to send text to number=" + number)
+                continue
 
 
 class UserAddress:
@@ -987,6 +1011,15 @@ class CWDynamoClient:
     def get_all(self, table_name):
         return self.client.scan(TableName=table_name)["Items"]
 
+    # NOTE: This only works for 1mb of data atm (need to add logic for pagination)
+    def get_all_of_col(self, table_name, col_name):
+        deserializer = TypeDeserializer()
+        response = self.client.scan(TableName=table_name, ProjectionExpression=col_name)
+        return [
+            {k: deserializer.deserialize(v) for k, v in item.items()}
+            for item in response["Items"]
+        ]
+
     def create(
         self,
         table_name,
@@ -1322,6 +1355,24 @@ def send_email():
 @app.post("/gizmo/text")
 def send_text():
     payload = app.current_event.json_body
+
+    # handle text blasts
+    is_blast = payload["is_blast"]
+    if is_blast:
+        numbers_dynamo_res = CW_DYNAMO_CLIENT.get_all_of_col(
+            table_name=USER_TABLE_NAME, col_name="phone"
+        )
+        numbers = []
+        for dynamo_res in numbers_dynamo_res:
+            numbers.append(dynamo_res["phone"])
+
+        res = DOT_LOVE_MESSAGE_CLIENT.text_blast(
+            message_type=payload["template_type"],
+            template_input=payload["template_details"],
+            numbers=numbers,
+        )
+        return {"code": 200, "data": res}
+
     res = DOT_LOVE_MESSAGE_CLIENT.text(
         message_type=payload["template_type"],
         template_input=payload["template_details"],
