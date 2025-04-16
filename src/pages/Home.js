@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { GenericHeader2 } from '../components/GenericHeader2';
-import { HomePageRoutes } from '../routes/HomePageRoutes';
+import { Router } from '../routes/Router'
+import { HeaderHome } from './HeaderHome';
+// import { HomePageRoutes } from '../routes/HomePageRoutes';
 import { Info } from './Info';
 import { AboutUs } from './AboutUs';
 import { Routes, Route, useLocation } from 'react-router-dom';
@@ -13,7 +15,7 @@ export function Home() {
     const [entryValue, setEntryValue] = useState("")
     const fullNameCode = useSelector((state) => state.user.fullNameCode) 
     // this needs to be a api lookup
-    const acceptableNames = ['TEST NAME']
+    const acceptableNames = ['BEN BURKE']
 
     console.log(fullNameCode)
     console.log(acceptableNames)
@@ -32,7 +34,10 @@ export function Home() {
 
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader2 classname="h-screen transfom-scale-5" 
+        {/* <GenericHeader2 classname="h-screen transfom-scale-5" 
+            placeholder={"Full name"} entryValue={entryValue} 
+            setEntryValue={setEntryValue}/> */}
+        <HeaderHome classname="h-screen transfom-scale-5" 
             placeholder={"Full name"} entryValue={entryValue} 
             setEntryValue={setEntryValue}/>
         { acceptableNames.includes(fullNameCode.toUpperCase()) ?
@@ -40,7 +45,8 @@ export function Home() {
             <main className="card-stack">
                 
                     {/* <Route path="/" element={<Info/>}/> */}
-                    <HomePageRoutes/>
+                    {/* <HomePageRoutes/> */}
+                    <Router />
             </main>
         </div>
         : <></>
