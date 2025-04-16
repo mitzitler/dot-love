@@ -18,6 +18,7 @@ type DataPoint = {
     price_cat: string;
     name: string;
     description: string;
+    claimed: boolean;
   };
   
   type ScatterplotProps = {
@@ -31,8 +32,37 @@ type DataPoint = {
 
 export const NewRegistryPageChart = ({ width, height, margins, data, displayedId, setDisplayedId }: ScatterplotProps) => {
 
-    const boundsWidth = width - margins[1] - margins[3]
-    const boundsHeight = height - margins[0] - margins[2]
+    const [chartWidth, setChartWidth] = useState(width)
+    const [chartHeight, setChartHeight] = useState(height)
+
+    useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 450) {
+          // im not picky, it could also be 
+          console.log('the window innerwidth is less than or equal to 450')
+          // setChartWidth(window.innerWidth - margins[1] - margins[3]);
+          // setChartHeight(window.innerWidth - margins[1] - margins[3])
+          setChartWidth(340)
+          setChartHeight(340)
+          console.log('new width', chartWidth)
+          console.log('new height', chartHeight)
+        } else {
+          setChartWidth(width)
+          setChartHeight(height)
+        }
+      }
+
+      window.addEventListener("resize", handleResize)
+
+      // this is an initial check ?
+      handleResize()
+
+      return () => window.removeEventListener("resize", handleResize)
+
+    }, [width, height, margins])
+
+    const boundsWidth = chartWidth - margins[1] - margins[3]
+    const boundsHeight = chartHeight - margins[0] - margins[2]
 
     const [hovered, setHovered] = useState<InteractionData | null>(null)
     // const [displayedID, setDisplayedId] = useState<Number | null>()
@@ -51,7 +81,7 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
         return (
           <circle
             key={i}
-            r={8}
+            r={!d.claimed ? 8 : 5}
             cx={xScale(d.x)}
             cy={yScale(d.y)}
             stroke={colorScale(d.price_cat)}
@@ -76,8 +106,6 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
 
       return (
         <div className="text-center">
-            {/* axis top with the color legend */}
-            {/* <span>span</span> */}
             <svg width={width} height={height} display={"block"}>
                 <g
                     width={boundsWidth}
@@ -87,9 +115,9 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
                     {/* Top legend */}
                     <g transform={`translate(0, -${boundsHeight})`}>
                         <AxisTop
-                        xScale={xScale}
-                        pixelsPerTick={40}
-                        height={boundsHeight}
+                          xScale={xScale}
+                          pixelsPerTick={40}
+                          height={boundsHeight}
                         />
                     </g>
 
@@ -100,9 +128,9 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
                     {/* X axis, use an additional translation to appear at the bottom */}
                     <g transform={`translate(0, ${boundsHeight})`}>
                         <AxisBottom
-                        xScale={xScale}
-                        pixelsPerTick={40}
-                        height={boundsHeight}
+                          xScale={xScale}
+                          pixelsPerTick={40}
+                          height={boundsHeight}
                         />
                     </g>
         
@@ -114,17 +142,17 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
             {/* Tooltip */}
             <div
                 style={{
-                width: boundsWidth,
-                height: boundsHeight,
-                position: "absolute",
-                top: 0,
-                left: 0,
-                pointerEvents: "none",
-                marginLeft: margins[1],
-                marginTop: margins[0],
+                  width: boundsWidth,
+                  height: boundsHeight,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  pointerEvents: "none",
+                  marginLeft: margins[1],
+                  marginTop: margins[0],
                 }}
             >
-                <Tooltip interactionData={hovered} />
+                {/* <Tooltip interactionData={hovered} /> */}
             </div>
         </div>
       );

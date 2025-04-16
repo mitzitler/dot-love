@@ -1,22 +1,12 @@
 /* registry styles */
 
-// https://stackoverflow.com/questions/13847755/css-media-queries-for-screen-sizes
-/* Super laarge screens ----------- */
-@media only screen 
-and (min-width : 3000px) {
-  /* Styles */
-}
-
-/* Large screens ----------- */
-@media only screen 
-and (max-width : 1300px) {
-  /* Styles */
-}
-
-/* Small screens ----------- */
-@media only screen 
-and (max-width : 550px) {
-  /* Styles */
+@media (max-width: 450px) {
+  .responsive-chart {
+    width: 100% !important;
+    height: auto !important;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 }
 
 .registry h1 {
@@ -93,4 +83,65 @@ and (max-width : 550px) {
     top:50%;
     transform:translateY(-50%);
     border-color: transparent black transparent transparent;
+}
+
+/* Customize the text */
+.checkbox-item label {
+}
+
+
+/* Customize the label (the container) */
+.checkbox-item {
+  display: block;
+  position: relative;
+  margin: 0 0.5em 0.2em 0.5em;
+  cursor: pointer;
+  color: rgb(69, 50, 50);
+  font-size: large;
+  padding-left: 2em
+}
+
+.checkbox-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0% 2% 0% 0%;
+  height: 25px;
+  width: 25px;
+  border-radius: 8px;
+  background-color: #db568f
+}
+
+.checkbox-item input:checked ~ .checkmark {
+  background-color: #f32121;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-item input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-item .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
 }

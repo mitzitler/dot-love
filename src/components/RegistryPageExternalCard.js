@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { giftClaimedToggle } from '../features/guest/extrasSlice';
 import '../App.css';
 
 export function RegistryPageExternalCard({Data, displayedId}) {
-
+    const dispatch = useDispatch();
+    // const giftClaimed = useSelector((state) => state.extras.giftClaimed) 
     const [giftData, setGiftData] = useState({})
+    // const [giftClaimed, setGiftClaimed] = useState({})
+    // const [giftClaimed, setGiftClaimed] = useState(false)
 
     useEffect(() => {
         const gift_name = Data.find(gift => gift.id === displayedId)
         setGiftData(gift_name)
     }, [displayedId])
+
+    // const handleClaim = () => {
+    //     const gift_claimed = giftData.claimed
+    //     setGiftClaimed(!gift_claimed)
+    // }, [displayedId, giftClaimed])
 
     return ( 
         <div>
@@ -21,25 +31,40 @@ export function RegistryPageExternalCard({Data, displayedId}) {
                 </p>
             </div>
             :
-            <div class="relative m-auto grid grid-cols-4" >
-                <div class="col-span-1"> 
-                    <img className="gift image w-24 h-24 my-4 mx-24 rounded-2xl flex justify-center items-center" src={giftData.image_link} alt="Image of gift" /> 
-                </div>
-                <div class="col-span-3">
-                    <span>
-                        <button className="rounded-lg text-lg pt-1 my-2">
-                            <a href={giftData.link} >
-                                🪩  🌸  🪐   Buy me for $ {giftData.price} !   🪐  🌸  🪩
-                                {/* the giftData clicks are recorded to the users data */}
-                            </a>
-                        </button>
-                        <br/>
-                        <p className="gift info">
-                            {giftData.description}
-                        </p>
-                        {/* checkbox for if you buy it. if you click it it opens a modal */}
+            <div>
 
-                    </span>
+                <span className={!giftData.claimed ? '' : 'grayscale' }>
+                    <button className="rounded-lg text-lg pt-1 my-2">
+                        <a href={giftData.link} >
+                            🪩  🌸  🪐   Buy me for $ {giftData.price} !   🪐  🌸  🪩
+                            {/* the giftData clicks are recorded to the users data */}
+                        </a>
+                    </button>
+                    <span className="rounded-lg text-sm pt-1 my-2"> → </span>
+                    <button className="rounded-lg text-lg pt-1 px-2 my-2"
+                        // onClick={()=>dispatch(
+                        //     giftClaimedToggle([
+                        //         giftData.id, giftData.claimed
+                        //     ]))
+                        // }>
+                        onClick={()=>giftData.claimed=!!giftData.claimed}>
+                        I'm claiming this!
+                    </button>
+                </span>
+                <div className="relative m-auto grid grid-cols-4" >
+                    <div className={!giftData.claimed ? "col-span-1" : "col-span-1 grayscale"}> 
+                        <img className="gift image w-24 h-24 my-4 mx-24 rounded-2xl flex justify-center items-center" 
+                            src={giftData.image_link} alt="Image of gift" /> 
+                    </div>
+                    <div class="col-span-3">
+                        <span>
+                            <br/>
+                            <p className="gift info">
+                                {giftData.description}
+                            </p>
+
+                        </span>
+                    </div>
                 </div>
             </div>
             }

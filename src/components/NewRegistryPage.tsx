@@ -14,7 +14,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/teapot.png"),
         price: 154,
         price_cat: '150+',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: true
     },
     { x: 2,   y: 3,   id: 2, name: "Toaster",
         description: "Its crazy we made it this far without a toaster, but this is such a solid registry item I wanted to hold out. This specific toaster mixed form with function, which is so important given such limited counter space.",
@@ -22,7 +23,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/toaster.png"),
         price: 125,
         price_cat: '100-150',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: 3,   y: 5,   id: 3, name: "Towels",
         description: "Dusen dusen is an awesome local brand, their workshop located around the corner in East Williamsburg. Pops of color make my seratonin explode (in a good way).",
@@ -30,7 +32,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/towels.png"),
         price: 70,
         price_cat: '50-100',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: 5,   y: 7,   id: 5, name: "Cups",
         description: "Its no secret I love pottery, and will try to make anything and everything with ceramics. One thing I cant make with ceramics? Glass cups.",
@@ -38,7 +41,8 @@ const Data = [
         image_link:require("../assets/temp-registry-photos/cups.png"),
         price: 30,
         price_cat: '0-50',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: -10, y: 10,  id: 6, name: "Flatware",
         description: "Every house needs flatware. Even ours!",
@@ -46,7 +50,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/flatware.png"),
         price: 38,
         price_cat: '0-50',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: 10,  y: 10,  id: 7, name: "Aperitif",
         description: "Everyone needs more non-alcoholic drinks in their life, and we love Ghia's products",
@@ -54,7 +59,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/aperitif.png"),
         price: 68,
         price_cat: '50-100',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: -9.5, y: -7, id: 8, name: "Table Light",
         description: "I believe this gooey wabi-sabi style will never go out of style - or at least that it will always make me happy to look at. This Gantri table lamp really exemplifies that.",
@@ -62,7 +68,8 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/table-lamp.png"),
         price: 248,
         price_cat: '150+',
-        last_checked: "2024-09-22"
+        last_checked: "2024-09-22",
+        claimed: false
      },
     { x: 10,  y: -9, id: 9, name: "Honeymoon Drink",
         description: "Buy us a drink on our honeymoon and we will toast to you!",
@@ -70,12 +77,14 @@ const Data = [
         image_link: require("../assets/temp-registry-photos/drink.png"),
         price: 15,
         price_cat: '??',
-        last_checked: ""
+        last_checked: "",
+        claimed: false
      },
 ]
 
 export function NewRegistryPage() {
     const [displayedId, setDisplayedId] = useState<number | null>()
+    const [claimedGift, setClaimedGift] = useState<number | boolean>()
     return ( 
         <div>
             <RegistryPageExternalTitle
@@ -93,7 +102,8 @@ export function NewRegistryPage() {
             </div>
             <RegistryPageExternalCard class="card col-span-1 static"
                 displayedId = {displayedId}
-                Data={Data}  
+                Data = {Data}  
+                setClaimedGift = {setClaimedGift}
                 />
         </div>
     )
