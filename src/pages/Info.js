@@ -128,7 +128,7 @@ export function Info() {
                     // disabled for x seconds after loading
                     // disabled={rsvpStatus === 'undecided' ? true : false} 
                     to='/about'
-                    end><marquee>ABOUT US -> </marquee></NavLink>
+                    end><marquee>ABOUT US → </marquee></NavLink>
             </CardStackFooter>
         </>
     )
