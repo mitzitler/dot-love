@@ -89,7 +89,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
         dispatch(dateLinkRequestedInput())
     }
 
-    if (phoneNumberCountryCode == null || phoneNumberCountryCode == "") {
+    if (phoneNumberCountryCode === null || phoneNumberCountryCode === "") {
         dispatch(phoneNumberCountryCodeInput('1'))
     }
 

@@ -87,7 +87,7 @@ export function Info() {
 
                     <InfoBox id="wear" class="dress-code" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <h3>What should I wear?</h3>
+                        <h3>And wear? <strong>(cocktail!)</strong></h3>
                     </InfoBox>
                         {expandedBox === "wear" && (
                             <InfoBoxExpanded>
@@ -101,7 +101,7 @@ export function Info() {
                     
                     <InfoBox id="faq" class="faq" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <h3>What else should I know?</h3>
+                        <h3>And know? <strong>(check often!)</strong></h3>
                     </InfoBox>
                         {expandedBox === "faq" && (
                             <InfoBoxExpanded>

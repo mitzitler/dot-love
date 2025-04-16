@@ -3,8 +3,18 @@ import os
 import random
 import string
 import traceback
+from functools import wraps
+from boto3.dynamodb.types import TypeDeserializer
 import uuid
 from enum import Enum
+
+# TODO: from aws_lambda_powertools.event_handler import Response
+# ex:
+# return Response(
+#     status_code=200,
+#     content_type="application/json",
+#     body={"code": 200, "message": "success"},
+# )
 
 import boto3
 from aws_lambda_powertools import Logger
@@ -18,6 +28,7 @@ from twilio.rest import Client
 
 # Environment Variables
 USER_TABLE_NAME = os.environ["user_table_name"]
+INTERNAL_API_KEY = os.environ["internal_api_key"]
 SES_SENDER_EMAIL = os.environ["ses_sender_email"]
 SES_CONFIG_ID = os.environ["ses_config_id"]
 SES_ADMIN_LIST = os.environ["ses_admin_list"]
@@ -194,6 +205,9 @@ class DotLoveMessageType(Enum):
     REGISTRATION_SUCCESS_EMAIL_WITH_GUEST = 1
     REGISTRATION_SUCCESS_EMAIL_NO_GUEST = 2
     RSVP_REMINDER_EMAIL = 3
+    REGISTRATION_SUCCESS_TEXT = 4
+    REGISTRATION_SUCCESS_NOT_COMING_TEXT = 5
+    RAW_TEXT = 6
 
     def __str__(self):
         return self.name
@@ -270,6 +284,53 @@ class DotLoveMessageClient:
         )
 
         return f"SES response ID: {ses_response['MessageId']} | SES success code: {ses_response['ResponseMetadata']['HTTPStatusCode']}."
+
+    def _get_text_template(self, message_type):
+        """
+        Retrieve the text template corresponding to the message type.
+
+        :param message_type: The type of message.
+        :return: The text template as a string.
+        """
+        message_type_enum = DotLoveMessageType[message_type]
+        templates = {
+            DotLoveMessageType.REGISTRATION_SUCCESS_TEXT: """
+                🎉 RSVP Confirmed! 🎉
+
+                Thank you so much for RSVP'ing to our wedding, {first_name}!
+                We are so excited for you to be there with us on our special day 💒💕
+
+                Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
+
+                We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
+
+                Please note, responses to this phone number are not being recorded and we will not see them! 🙈
+
+                If you wish to contact us, please reach out directly via one of the following methods:
+
+                Matthew:
+                📨 themattsaucedo@gmail.com
+                📱 +1 (352) 789-4244
+
+                Mitzi:
+                📨 mitzitler@gmail.com
+                📱 +1 (504) 638-7943
+
+                """,
+            DotLoveMessageType.REGISTRATION_SUCCESS_NOT_COMING_TEXT: """
+                ⛔ RSVP Confirmed ⛔
+
+                Thank you so much for filling out your RSVP form for our wedding!
+                We are sorry you won't be able to attend, but we hope to see you soon anyway!
+
+                We will be updating our website, www.mitzimatthew.love, soon with our registry! 🎁
+                We'll send an update to all those invited once that's done 😁
+            """,
+            DotLoveMessageType.RAW_TEXT: """
+                {raw}
+            """,
+        }
+        return templates[message_type_enum]
 
     def _get_email_template(self, message_type):
         """
@@ -351,6 +412,46 @@ class DotLoveMessageClient:
             },
         }
         return templates[message_type]
+
+    def text(self, message_type, template_input, recipient_phone):
+        """
+        Send a text based on the message type and template input.
+
+        :param message_type: The type of message to send.
+        :param template_input: A dictionary with template variables for interpolation.
+        # TODO: Validate this is oneof registered user
+        :param recipient_phone: Phone number to text.
+        :return: None
+        """
+        template = self._get_text_template(message_type)
+        text_body = template.format(**template_input).strip()
+
+        TWILIO_CLIENT.messages.create(
+            body=text_body,
+            from_=TWILIO_SENDER_NUMBER,
+            to=recipient_phone,
+        )
+
+    def text_blast(self, message_type, template_input, numbers):
+        """
+        Send a text blast based on the message type and template input.
+
+        :param message_type: The type of message to send.
+        :param template_input: A dictionary with template variables for interpolation.
+        :param recipient_phone: Number list.
+        :return: None
+        """
+        template = self._get_text_template(message_type)
+        text_body = template.format(**template_input).strip()
+
+        for number in numbers:
+            try:
+                TWILIO_CLIENT.messages.create(
+                    body=text_body, from_=TWILIO_SENDER_NUMBER, to=number
+                )
+            except Exception as e:
+                log.exception("failed to send text to number=" + number)
+                continue
 
 
 class UserAddress:
@@ -710,17 +811,24 @@ class User:
 
     @staticmethod
     def from_client_rsvp(guest_info):
-        first = guest_info["firstName"].lower()
-        last = guest_info["lastName"].lower()
+        first = guest_info["firstName"].lower().rstrip().lstrip()
+        last = guest_info["lastName"].lower().rstrip().lstrip()
         guest_link_string = "".join(
             random.choice(string.ascii_lowercase + string.digits) for _ in range(4)
         )
 
         # paranoid country code checks
-        country_code = guest_info["phoneNumberCountryCode"]
-        if country_code.lower() in ["united states", "canada"]:
+        country_code = (
+            guest_info["phoneNumberCountryCode"]
+            .replace(" ", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("-", "")
+            .replace("+", "")
+        )
+        if not country_code.isdigit():
+            logger.info("how, literally how")
             country_code = "1"
-        country_code = country_code.replace("+", "")
 
         phone = (
             "+"
@@ -776,9 +884,8 @@ class User:
         )
 
     def register_db(self, dynamo_client):
-        key_expression = {
-            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
-        }
+        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
+
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
@@ -816,9 +923,7 @@ class User:
         )
 
     def update_db(self, dynamo_client):
-        key_expression = {
-            "first_last": {"S": self.first.lower() + "_" + self.last.lower()}
-        }
+        key_expression = {"first_last": {"S": self.first + "_" + self.last}}
         field_value_map = {
             # basic details
             "rsvp_code": self.rsvp_code,
@@ -905,6 +1010,15 @@ class CWDynamoClient:
     # NOTE: This only works for 1mb of data atm (need to add logic for pagination)
     def get_all(self, table_name):
         return self.client.scan(TableName=table_name)["Items"]
+
+    # NOTE: This only works for 1mb of data atm (need to add logic for pagination)
+    def get_all_of_col(self, table_name, col_name):
+        deserializer = TypeDeserializer()
+        response = self.client.scan(TableName=table_name, ProjectionExpression=col_name)
+        return [
+            {k: deserializer.deserialize(v) for k, v in item.items()}
+            for item in response["Items"]
+        ]
 
     def create(
         self,
@@ -1211,25 +1325,57 @@ def update():
     return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
 
 
+def validate_internal_route(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        event = app.current_event
+        api_key = event.headers.get("Internal-Api-Key")
+
+        if not api_key or api_key != INTERNAL_API_KEY:
+            return {"code": 401, "message": "no valid api key"}
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@validate_internal_route
 @app.post("/gizmo/email")
 def send_email():
     payload = app.current_event.json_body
-    res = DOT_LOVE_EMAIL_CLIENT.email(
+    res = DOT_LOVE_MESSAGE_CLIENT.email(
         message_type=payload["template_type"],
         template_input=payload["template_details"],
-        # TODO: This should be a database lookup when we have time
         recipient_email=payload["recipient_email"],
     )
     return {"code": 200, "data": res}
 
 
+@validate_internal_route
 @app.post("/gizmo/text")
 def send_text():
     payload = app.current_event.json_body
-    res = DOT_LOVE_EMAIL_CLIENT.text(
+
+    # handle text blasts
+    is_blast = payload["is_blast"]
+    if is_blast:
+        numbers_dynamo_res = CW_DYNAMO_CLIENT.get_all_of_col(
+            table_name=USER_TABLE_NAME, col_name="phone"
+        )
+        numbers = []
+        for dynamo_res in numbers_dynamo_res:
+            numbers.append(dynamo_res["phone"])
+
+        res = DOT_LOVE_MESSAGE_CLIENT.text_blast(
+            message_type=payload["template_type"],
+            template_input=payload["template_details"],
+            numbers=numbers,
+        )
+        return {"code": 200, "data": res}
+
+    res = DOT_LOVE_MESSAGE_CLIENT.text(
         message_type=payload["template_type"],
         template_input=payload["template_details"],
-        # TODO: This should be a database lookup when we have time
         recipient_phone=payload["recipient_phone"],
     )
     return {"code": 200, "data": res}
@@ -1249,6 +1395,12 @@ def middleware_before(handler, event, context):
     # Exclude middleware for healthcheck
     if event["rawPath"].split("/")[-1] == "ping":
         return handler(event, context)
+
+    # internal auth handling
+    if event["rawPath"].split("/")[-1] in ["text", "email"]:
+        api_key = event["headers"].get("internal-api-key")
+        if not api_key or api_key != INTERNAL_API_KEY:
+            return {"code": 401, "message": "no valid api key"}
 
     # append trace information
     trace_id = str(uuid.uuid4())
@@ -1276,8 +1428,8 @@ def middleware_before(handler, event, context):
     return handler(event, context)
 
 
-@middleware_before
 @log.inject_lambda_context(log_event=True)
+@middleware_before
 def handler(event, context):
     try:
         return app.resolve(event, context)
