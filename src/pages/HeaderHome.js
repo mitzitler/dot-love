@@ -3,16 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
-import { loginSuccessInput } from '../features/guest/userSlice.js';
+// import { loginSuccessInput } from '../features/guest/userSlice.js';
 import { useLocation } from 'react-router-dom';
 import '../App.css';
 import { useSelector } from 'react-redux';
 
-export function HeaderHome() {
+export function HeaderHome({loginSuccess, setLoginSuccess}) {
     const [entryValue, setEntryValue] = useState("")
     const entryValuePlaceholder = "First Last"
     const [loginHeader, setLoginHeader] = useState(null);
-    // const [loginSuccess, setLoginSuccess] = useState(false);
 
     // Function to emit toast 🍞
     const notify = (input) => {
@@ -35,7 +34,7 @@ export function HeaderHome() {
 
     useEffect(() => {
         if (data && data.code === 200) {
-            loginSuccessInput(true);
+            setLoginSuccess(true);
             console.log("Gizmo login success, result:", data);
             notify(`Welcome, ${data.body.user.first}! Please scroll down`)
         }
@@ -44,11 +43,21 @@ export function HeaderHome() {
         }
     }, [data, error]);
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+        }
+      };
+
     const handleNameChange = (e) => {
         const value = e.target.value;
         setEntryValue(value);
 
         const [first, last] = value.trim().split(" ");
+        if(e.keyCode == 13){ 
+            e.preventDefault();
+         }
+
         if (first && last) {
             const firstLast = `${first}_${last}`;
             setLoginHeader({ 'X-First-Last': firstLast });
@@ -57,18 +66,12 @@ export function HeaderHome() {
         }
     };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault()
-        }
-      };
-
     const handleClearField = () => {
         setEntryValue("");
         setLoginHeader(null);
     };
 
-    const loginSuccess = useSelector((state) => state.user.loginSuccess) 
+    // const loginSuccess = useSelector((state) => state.user.loginSuccess) 
 
     // useEffect(() => {
     //     const preventScroll = (event) => {
@@ -99,7 +102,7 @@ export function HeaderHome() {
     return (
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader classname="h-screen transfom-scale-5"
+        <GenericHeader class="h-screen transfom-scale-5"
             placeholder={"Full name?"} entryValue={entryValue} 
             setEntryValue={setEntryValue}>
             <div class= "egg backdrop-blur-xl" />
@@ -107,7 +110,7 @@ export function HeaderHome() {
               <input placeholder={entryValuePlaceholder} type="text"
                   id="genericheader"
                   value={entryValue}
-                  onFocus={handleClearField}
+                //   onFocus={handleClearField}
                   onInput={handleNameChange}
                   onKeyDown={handleKeyDown}/>
             </form>
