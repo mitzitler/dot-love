@@ -7,37 +7,14 @@ import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 import '../App.css';
 
-// import { MapBox } from '../components/MapBox.js'; // this doesnt work rn
-// import {Loader, LoaderOptions} from 'google-maps';
-
-// const options: LoaderOptions = 'region';
-// const loader = new Loader('my-api-key', options);
-
-// const google = await loader.load();
-// const map = new google.maps.Map(document.getElementById('map'), {
-// center: {lat: 40.68724549962714, lng: -73.98622621879578}, 
-// zoom: 8,
-// })
-
-// look at this: https://blog.openreplay.com/creating-a-collapsible-component-for-react/
-
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
-    // const [isExpanded, setIsExpanded] = useState(false)
-
-    // const toggleIsExpanded = useCallback(() => {
-    //     setIsExpanded((isExpanded) => !isExpanded);
-    //   }, []);
 
     const pageMainColor = "babyblue" 
     const pageSecondaryColor = "lilac" 
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
-    
-    // useEffect(() => {
-    //     window.scrollTo(0, 0); 
-    // }, []);
 
     const diety = {
         name: 'Diety Events',
@@ -48,8 +25,6 @@ export function Info() {
         console.log(id)
         setExpandedBox((current) => (current === id ? null : id)); // Toggle expansion
     }
-
-    // console.log(pageMainClass)
 
     return (
 
@@ -104,6 +79,7 @@ export function Info() {
                         )}
                     
                 </div>
+            </div>
             </CardStackPage>
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} >
