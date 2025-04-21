@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
-// import { loginSuccessInput } from '../features/guest/userSlice.js';
 import { useLocation } from 'react-router-dom';
 import '../App.css';
 import { useSelector } from 'react-redux';
@@ -54,10 +53,11 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
         setEntryValue(value);
 
         const [first, last] = value.trim().split(" ");
+
         if(e.keyCode == 13){ 
             e.preventDefault();
          }
-
+      
         if (first && last) {
             const firstLast = `${first}_${last}`;
             setLoginHeader({ 'X-First-Last': firstLast });
@@ -65,39 +65,6 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
             setLoginHeader(null); // Prevent invalid API calls
         }
     };
-
-    const handleClearField = () => {
-        setEntryValue("");
-        setLoginHeader(null);
-    };
-
-    // const loginSuccess = useSelector((state) => state.user.loginSuccess) 
-
-    // useEffect(() => {
-    //     const preventScroll = (event) => {
-    //       event.preventDefault();
-    //     };
-    
-    //     if (!loginSuccess) {
-    //       window.addEventListener("wheel", preventScroll, { passive: false });
-    //       window.addEventListener("touchmove", preventScroll, { passive: false });
-    //       window.addEventListener("keydown", (event) => {
-    //         if (["ArrowUp", "ArrowDown", "Space", "PageUp", "PageDown"].includes(event.key)) {
-    //           preventScroll(event);
-    //         }
-    //       });
-    //     } else {
-    //       window.removeEventListener("wheel", preventScroll);
-    //       window.removeEventListener("touchmove", preventScroll);
-    //       window.removeEventListener("keydown", preventScroll);
-    //     }
-    
-    //     return () => {
-    //       window.removeEventListener("wheel", preventScroll);
-    //       window.removeEventListener("touchmove", preventScroll);
-    //       window.removeEventListener("keydown", preventScroll);
-    //     };
-    //   }, [loginSuccess]);
 
     return (
         <>

@@ -1,9 +1,6 @@
 import React from "react";
 
 export function InfoBox({children, collapsable, onClickExpand, id, expandedBox}) {
-
-    // console.log(expandedBox)
-
     if (!collapsable) {
         return(
             <div class='info-box'>
@@ -15,7 +12,7 @@ export function InfoBox({children, collapsable, onClickExpand, id, expandedBox})
             <div class='info-box' onClick={() => onClickExpand(id)}>
                 <span> 
                     <button class='info-box-button' >
-                        {/* i am getting slightly frustrated lol that the spacing jumps when the button is clicked lol */}
+                        {/* i am getting slightly frustrated that the spacing jumps when the button is clicked lol */}
                         {expandedBox === id ? '-' : '+'}
                     </button>
                     <p class='info-box-p'>{children}</p> 

@@ -6,7 +6,7 @@ import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearForm } from '../../features/guest/rsvpSlice';
+import { clearForm, phoneNumberInput, phoneNumberCountryCodeInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
 import { store } from '../../store'
@@ -23,6 +23,9 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const firstName = useSelector((state) => state.rsvp.firstName);
     const lastName = useSelector((state) => state.rsvp.lastName);
     const pronouns = useSelector((state) => state.rsvp.pronouns);
+    const email = useSelector((state) => state.rsvp.email);
+    const phoneNumberCountryCode = useSelector((state) => state.rsvp.phoneNumberCountryCode);
+    const phoneNumber = useSelector((state) => state.rsvp.phoneNumber);
     const fullGuestInfo = useSelector((state) => state.rsvp);
     const completedRsvps = useSelector((state) => state.rsvpCompleted.completedRsvps);
     const submitted = useSelector((state) => state.rsvpCompleted.submitted);
@@ -44,14 +47,11 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
         // NOTE: Since redux is async, we don't know if completedRsvps
         //       is updated or not. To account for this, combine it with
         //       the lastest rsvp and then just remove duplicates if present.
-        console.log("completed rsvps", completedRsvps) // info from first time filling out form TODO: Remove
-        console.log("full guest info", fullGuestInfo) // info from second time filling out form TODO: Remove
         const uniqueRsvpsToSubmit = Array.from(
             new Map(
                 [...completedRsvps, fullGuestInfo].map(rsvp => [rsvp.firstName, rsvp])
             ).values()
         );
-        console.log("api rsvps", uniqueRsvpsToSubmit) // info from first time filling out form TODO: Remove
 
         // Make the API call
         try {
@@ -84,19 +84,22 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const name = firstName + " " + lastName
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-    const [dateLinkRequested, setDateLinkRequested] = useState(false)
 
     function handleDateLinkRequested() {
-        setDateLinkRequested(!dateLinkRequested);
-        console.log('text me a link: ' + !dateLinkRequested)
+        dispatch(dateLinkRequestedInput())
+    }
+
+    if (phoneNumberCountryCode === null || phoneNumberCountryCode === "") {
+        dispatch(phoneNumberCountryCodeInput('1'))
     }
 
   return(
     <>
         <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-            <h1 id="submit-header1">Does this all look right, {name}?</h1>
+            <h1 id="submit-header1">How's this, {name}?</h1>
             <p id="submit-header2">({pronouns})</p>
+            <p id="submit-header3">{phoneNumber} - {email}</p>
             <p>{rsvpString}</p>
             <div className="submit-div grid grid-cols-2">
                 <FormSubmitLeft />
@@ -113,7 +116,7 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                     <label className='checkbox-guest' for="guest-yes">
                         Check this box to be sent a unique link for your guest to RSVP. This link will be active until August 7th, 2024 - three months before the wedding.
                         <input id="guest-yes" name="guest-yes" type="checkbox"
-                            onClick={()=>handleDateLinkRequested()}/>
+                            onClick={(e)=>dispatch(dateLinkRequestedInput())}/>
                         <span class="checkmark"></span>
                     </label>
                 </div>

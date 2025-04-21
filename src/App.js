@@ -1,5 +1,6 @@
 import React, {useRef} from 'react';
 import { RSVP } from './pages/RSVP'
+import { HeaderHome } from './pages/HeaderHome';
 import { Home } from './pages/Home';
 import { LightShow } from './components/LightShowVideo'
 import { Routes, Route } from 'react-router-dom';

@@ -62,19 +62,19 @@ export function FormSubmitRight() {
 
     return(
         <div className="submit-card-right">
-            <h3 className="submit-text-overlay">
+            <h4 className="submit-text-overlay">
                 {createRestrictionsString(dietaryRestrictions)}
-            </h3>
+            </h4>
             <p></p>
-            <h3 className="submit-text-overlay">
+            {/* <h4 className="submit-text-overlay">
                 {createInclusionsString(dietaryInclusions)}
-            </h3>
+            </h4> */}
             {moreRestrictions.length > 0 && 
             <>
                 <p></p>
-                <h3 className="submit-text-overlay">
+                <h4 className="submit-text-overlay">
                     You also noted restrictions: {moreRestrictions}
-                </h3>
+                </h4>
             </>
             }
         </div>

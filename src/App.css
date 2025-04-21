@@ -57,6 +57,14 @@
   box-sizing: border-box;
 }
 
+.Toastify__toast-container {
+  z-index: 9999 !important;
+}
+
+.Toastify__toast {
+  z-index: 9999 !important;
+}
+
 html, body {
   max-width: 100%;
   max-height: 100dvh
