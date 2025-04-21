@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
+import { CardStackFooter } from '../components/CardStackFooter.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 import '../App.css';
@@ -51,6 +53,8 @@ export function Info() {
 
     return (
 
+        <>
+
         <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor}
@@ -99,28 +103,16 @@ export function Info() {
                             </InfoBoxExpanded>
                         )}
                     
-                    <InfoBox id="faq" class="faq" collapsable={true} onClickExpand={onClickExpand}
-                        expandedBox={expandedBox}>
-                        <h3>And know? <strong>(check often!)</strong></h3>
-                    </InfoBox>
-                        {expandedBox === "faq" && (
-                            <InfoBoxExpanded>
-                                <ul>
-                                    <li>🟡 This venue has stairs, so please let us know as soon as you can if you have mobility issues</li>
-                                    <li>🟡 We'll text whenever we have updates with more information!</li>
-                                    <li></li>
-                                </ul>
-                            </InfoBoxExpanded>
-                        )}
-                    
-                    {/* <InfoBox id="map" class="map" collapsable={false}> */}
-                        {/* <MapBox business={diety}/> */}
-                    {/* </InfoBox> */}
-
                 </div>
-            </div>
-        </CardStackPage>
-        // this card stack page is missing the top child, and puts the third child as a nav bar card
-        // </>
+            </CardStackPage>
+            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} >
+                <NavLink className='btn-23' 
+                    // disabled for x seconds after loading
+                    // disabled={rsvpStatus === 'undecided' ? true : false} 
+                    to='/about'
+                    end><marquee>ABOUT US → </marquee></NavLink>
+            </CardStackFooter>
+        </>
     )
 }
