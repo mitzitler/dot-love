@@ -66,15 +66,25 @@ export function Info() {
 
                     <InfoBox id="wear" class="dress-code" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <h3>And wear? <strong>(cocktail!)</strong></h3>
+                        <h3>What should I wear?</h3>
                     </InfoBox>
                         {expandedBox === "wear" && (
                             <InfoBoxExpanded>
                                 <ul>
-                                    <li>🟡 Dress code is semi-formal</li>
-                                    <li>🟡 Wedding colors to come soon!!!</li>
+                                    <li>🟡 Dress code is cocktail</li>
+                                    {/* <li>🟡 Wedding colors to come soon!!!</li> */}
                                     <li>🟡 Pinterest board to come soon!!!</li>
                                 </ul>    
+
+                                <div class="mt-4">
+                                    <NavLink 
+                                    to='/info/dresscode' end>
+                                        <div class="px-4 py-2 m-auto w-40 text-center border-dashed border-4 bg-slate-200 border-red-300 font-mono">
+                                            More on dress code!
+                                        </div>
+                                    </NavLink>
+                                </div>
+
                             </InfoBoxExpanded>
                         )}
                     

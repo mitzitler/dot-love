@@ -37,6 +37,15 @@ module.exports = {
         raspberry: {
           400: '#db5186',
           500: '#ed2872'
+        },
+        terracotta: {
+          500: "#DE6B54"
+        },
+        plum: {
+          500: "#902E6B"
+        },
+        cream: {
+          500: "#FBFBF2"
         }
       }
     },
