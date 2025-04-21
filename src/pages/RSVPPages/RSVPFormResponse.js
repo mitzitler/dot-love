@@ -5,14 +5,14 @@ import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
 import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
-import { ToastContainer, toast } from 'react-toastify'; // Toast (yum!)
+import { toast } from 'react-toastify'; // Toast (yum!)
 
 export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection, rsvpCode}) {
 
     const dispatch = useDispatch();
 
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-    const submitted = useSelector((state) => state.rsvp.submitted)
+    const submitted = useSelector((state) => state.rsvpCompleted.submitted)
 
     // Function to emit toast 🍞
     const notify = (input) => {

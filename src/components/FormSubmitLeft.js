@@ -33,13 +33,13 @@ export function FormSubmitLeft() {
     return(
         <div className="submit-card-left">
             {/* i hate this styling so much */}
-            <h3 className="submit-text-overlay ">
+            <h4 className="submit-text-overlay ">
                 Your mailing address is: {streetAddress} {city}, {stateProvince} {zipcode} - in  {countryNew}
-            </h3>
+            </h4>
             <p></p>
-            <h3 className="submit-text-overlay">
+            {/* <h4 className="submit-text-overlay">
                 We will reach out to you at {phoneNumber} and {email}
-            </h3>
+            </h4> */}
         </div>
     )
 

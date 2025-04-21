@@ -45,7 +45,7 @@ export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiary
         <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>  
                     <h1 >... and any dietary restrictions, please!</h1> 
-                    <h2 class="px-5 py-0 my-0">Touch the food icons to turn on and off your 
+                    <h2>Touch the food icons to turn on and off your 
                         dietary restrictions</h2>
                     <div className="dietary-grid grid grid-cols-2">
 

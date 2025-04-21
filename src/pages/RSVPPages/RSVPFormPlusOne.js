@@ -5,7 +5,8 @@ import '../../App.css';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { useDispatch, useSelector } from 'react-redux';
-import { rsvpStatusInput } from '../../features/guest/rsvpSlice';
+import { rsvpStatusInput, rsvpCodeInput } from '../../features/guest/rsvpSlice';
+import { clearCompleteRSVPs } from '../../features/guest/rsvpCompletedSlice';
 import { useGetUserByGuestLinkQuery } from '../../services/gizmo.js'
 import { toast } from 'react-toastify'; // Toast (yum!)
 
@@ -19,6 +20,9 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     // handle guest code query param
     const [searchParams] = useSearchParams();
     const code = searchParams.get('code');
+
+    // clear any lingering form
+    dispatch(clearCompleteRSVPs())
 
     // Function to emit toast 🍞
     const notify = (input) => {
@@ -42,18 +46,19 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     // handle return
     if (isLoading) {
         console.log(isLoading)
-        return <p>Loading guest details...</p>;
+        return (<p>Loading guest details...</p>);
     }
     else {
         console.log(isLoading)
 
-        return <><CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+        return (<><CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
         <h1>Hello, guest of {data.body.user.first} {data.body.user.last}!</h1>
 
 
         { notify("Guest link accepted! Please Scroll down")}
-                {console.log('toasty') }
+        {/* HACK: Technically there is no rsvpCode for a plus one, but we use fzn to note they do not get a plus 1 */}
+        {/* { dispatch(rsvpCodeInput('fzn')) } */}
         <div>
             <h2>May we expect your presence at our wedding on <br></br>
                 November 7th, 2025 in Brooklyn, NY?</h2>
@@ -62,14 +67,20 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
         <div id="rsvp-radio">
             <div id="radio-item">
                 <input id="rsvp-yes" name="rsvp" type="radio" value={rsvpStatus}
-                    onClick={()=>dispatch(rsvpStatusInput("attending"))}></input>
+                    onClick={()=>{
+                        dispatch(rsvpStatusInput("attending"));
+                        dispatch(rsvpCodeInput('fzn'))
+                        }}></input>
                 <label className='radio-label' htmlFor="rsvp-yes">
                     Yes, I will be in attendance!
                 </label>
             </div>
             <div id="radio-item">
                 <input id="rsvp-no" name="rsvp" type="radio" value={rsvpStatus}
-                    onClick={()=>dispatch(rsvpStatusInput("notattending"))}></input>
+                    onClick={()=>{
+                        dispatch(rsvpStatusInput("notattending"));
+                        dispatch(rsvpCodeInput('fzn'))
+                        }}></input>
                 <label className='radio-label' htmlFor="rsvp-no">
                     No, unfortunately I cannot attend
                 </label>
@@ -87,10 +98,6 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
                     {/* and there needs to be an error message too */}
             </CardStackFooter> 
             </>
-    }
-    if (error) {
-      return <p>Error validating code. Please try again.</p>;
-    }
-        
-              
+               )}
+
 }

@@ -64,6 +64,9 @@ class DotLoveCoreStack(Stack):
         self.twilio_sender_number = self.obtain_ssm_client_secret(
             secret_name="/dot-love/twilio/sender-number"
         )
+        self.internal_api_key = self.obtain_ssm_client_secret(
+            secret_name="/dot-love/auth/internal-api-key"
+        )
         self.contact_info = {
             "matthew": {
                 "phone": self.obtain_ssm_client_secret(
@@ -126,6 +129,7 @@ class DotLoveCoreStack(Stack):
             twilio_account_sid=self.twilio_account_sid,
             twilio_sender_number=self.twilio_sender_number,
             contact_info=self.contact_info,
+            internal_api_key=self.internal_api_key,
         )
         # Tie Gizmo Lambda to API Gateway
         self.add_gizmo_routes_to_api_gw(
@@ -257,6 +261,7 @@ class DotLoveCoreStack(Stack):
         twilio_account_sid,
         twilio_sender_number,
         contact_info,
+        internal_api_key,
     ):
         gizmo_lambda_role = iam.Role(
             scope=self,
@@ -302,6 +307,8 @@ class DotLoveCoreStack(Stack):
                 "matthew_phone": contact_info["matthew"]["phone"],
                 # for plus-one guest checking
                 "open_plus_one_code": "unf",
+                # for internal routes
+                "internal_api_key": internal_api_key,
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
