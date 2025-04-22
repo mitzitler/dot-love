@@ -16,7 +16,7 @@ export function Info() {
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
 
-    const diety = {
+    const deity = {
         name: 'Diety Events',
         coordinates: [40.68725385467351, -73.98617663587743], 
       };
@@ -43,7 +43,7 @@ export function Info() {
                         <h4>Schedule</h4>
                         <ul>
                             <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
-                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Diety Events</li>
+                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Deity Events</li>
                             <li class="text-sm text-left pl-1.5"> 7.00pm - Drinks</li>
                             <li class="text-sm text-left pl-1.5"> 8.00pm - Dinner</li>
                             <li class="text-sm text-left pl-1.5"> 9.00pm - Dancing</li>
