@@ -53,15 +53,21 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
         setEntryValue(value);
 
         const [first, last] = value.trim().split(" ");
+        const [first1, first2, last1] = value.trim().split(" ");
 
         if(e.keyCode == 13){ 
             e.preventDefault();
          }
       
-        if (first && last) {
-            const firstLast = `${first}_${last}`;
+         if (first1 && first2 && last1) {
+            const firstLast = `${first1} ${first2}_${last1}`;
+            console.log('first1 first2 and last: ', firstLast)
             setLoginHeader({ 'X-First-Last': firstLast });
-        } else {
+        } else if (first && last) {
+            const firstLast = `${first}_${last}`;
+            console.log('first and last: ', firstLast)
+            setLoginHeader({ 'X-First-Last': firstLast });
+        } else  {
             setLoginHeader(null); // Prevent invalid API calls
         }
     };

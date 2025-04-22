@@ -73,7 +73,7 @@ export function Info() {
                                 <ul>
                                     <li>🟡 Dress code is cocktail</li>
                                     {/* <li>🟡 Wedding colors to come soon!!!</li> */}
-                                    <li>🟡 Pinterest board to come soon!!!</li>
+                                    {/* <li>🟡 Pinterest board to come soon!!!</li> */}
                                 </ul>    
 
                                 <div class="mt-4">

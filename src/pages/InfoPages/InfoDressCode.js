@@ -12,9 +12,9 @@ export function InfoDressCode(guestDressCode) {
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
 
-    const guestType = "bridesperson"
+    // const guestType = "bridesperson"
 
-    // const guestType = ""
+    const guestType = ""
 
     return (
 
