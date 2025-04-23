@@ -36,14 +36,14 @@ export function Router () {
                     </Transitionizer>
                 }
             />
-            <Route
+            {/* <Route
                 path="/info/dresscode"
                 element={
                     <Transitionizer>
                         <InfoDressCode />
                     </Transitionizer>
                 }
-            />
+            /> */}
             {/* <Route
                 path="/registry"
                 element={

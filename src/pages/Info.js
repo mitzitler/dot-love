@@ -29,7 +29,14 @@ export function Info() {
     return (
 
         <>
-
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+            pageTertiaryColor={pageTertiaryColor} >
+            <NavLink className='btn-23' 
+                // disabled for x seconds after loading
+                // disabled={rsvpStatus === 'undecided' ? true : false} 
+                to='/about'
+                end><marquee>ABOUT US → </marquee></NavLink>
+        </CardStackFooter>
         <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor}
@@ -72,17 +79,10 @@ export function Info() {
                             <InfoBoxExpanded>
                                 <ul>
                                     <li>🟡 Dress code is cocktail</li>
-                                    {/* <li>🟡 Wedding colors to come soon!!!</li> */}
-                                    {/* <li>🟡 Pinterest board to come soon!!!</li> */}
+                                    <li>🟡 Scroll below for more details!</li>
                                 </ul>    
 
                                 <div class="mt-4">
-                                    <NavLink 
-                                    to='/info/dresscode' end>
-                                        <div class="px-4 py-2 m-auto w-40 text-center border-dashed border-4 bg-slate-200 border-red-300 font-mono">
-                                            More on dress code!
-                                        </div>
-                                    </NavLink>
                                 </div>
 
                             </InfoBoxExpanded>
@@ -91,14 +91,42 @@ export function Info() {
                 </div>
             </div>
             </CardStackPage>
-            <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} >
-                <NavLink className='btn-23' 
-                    // disabled for x seconds after loading
-                    // disabled={rsvpStatus === 'undecided' ? true : false} 
-                    to='/about'
-                    end><marquee>ABOUT US → </marquee></NavLink>
-            </CardStackFooter>
+            <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection} >
+                <h1>Info: Dress Code</h1>
+                <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
+                <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
+                    <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
+
+                        <InfoBox collapsable={false}>
+                            <h4>Notes on Attire..</h4>
+                            <ul>
+                                <li class="text-sm text-left">The dress code for our wedding will be <b>cocktail attire.</b></li>
+                                <br/>
+                                <li class="text-sm text-left mb-3">What does this mean? Cocktail sits in between formal and semi formal.</li>
+                                <li class="text-sm text-left mb-3">
+                                If you like to wear suits, please feel free to wear a suit or dress shirt. 
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                If you rather wear dresses, a cocktail dress or dressy seperates are great. 
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                And of course, pantsuits, jumpsuits and dressy separates of the same lengths are great too!
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                For this time of year, we’d also recommend a coat, and there will be coat check at the venue!
+                                </li>
+
+                                {/* here : scroll for more info about BRIDES SIDE */}
+                                
+
+                            </ul>
+                        </InfoBox>
+                    </div>
+                </div>
+            </CardStackPage>
+
+            {/* here: conditionally render another page with ATTIRE EXAMPLES */}
         </>
     )
 }

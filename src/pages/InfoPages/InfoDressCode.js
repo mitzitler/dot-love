@@ -44,12 +44,18 @@ export function InfoDressCode(guestDressCode) {
                             <br/>
                             <li class="text-sm text-left">The dress code for our wedding will be <b>cocktail attire.</b></li>
                             <br/>
-                            <li class="text-sm text-left">What does this mean? Cocktail sits in between formal and semi formal.</li>
-                            <li class="text-sm text-left">
-                                    If you like to wear suits, please feel free to wear a suit or dress shirt. 
-                                    If you rather wear dresses, a cocktail dress or dressy seperates are great. 
-                                    And of course, pantsuits, jumpsuits and dressy separates of the same lengths are great too!
-                                    For this time of year, we’d also recommend a coat, and there will be coat check at the venue!
+                            <li class="text-sm text-left mb-3">What does this mean? Cocktail sits in between formal and semi formal.</li>
+                            <li class="text-sm text-left mb-3">
+                                If you like to wear suits, please feel free to wear a suit or dress shirt. 
+                            </li>
+                            <li class="text-sm text-left mb-3">
+                                If you rather wear dresses, a cocktail dress or dressy seperates are great. 
+                            </li>
+                            <li class="text-sm text-left mb-3">
+                                And of course, pantsuits, jumpsuits and dressy separates of the same lengths are great too!
+                            </li>
+                            <li class="text-sm text-left mb-3">
+                                For this time of year, we’d also recommend a coat, and there will be coat check at the venue!
                             </li>
                             {guestType === "bridesperson" ?
                             <>
