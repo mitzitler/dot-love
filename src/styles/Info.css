@@ -17,7 +17,7 @@
 
 .right-justify {
     justify-content: right;
-    min-width: 400px;
+    min-width: 360px;
     display: flex;
 } 
 
@@ -28,7 +28,7 @@
     flex-direction: column;
     gap: 16px;
     align-items: right;
-    width: 80%;
+    width: 88%;
     font-size: large;
     color: rgb(21, 21, 102);
 
