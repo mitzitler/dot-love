@@ -31,7 +31,6 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
                 { rsvpCode.toUpperCase() === "NZU" & submitted != null ? 
                     <h1>Please RSVP For the Second Guest...</h1> : 
                     <h1>Repondez S'il Vous Plait!</h1> }
-<section class="section-content swipe-card flex-grow bg-lime-400/75 border-lime-500/50 border-2 backdrop-blur-md"></section>
                 { notify("Code accepted! Please Scroll down")}
                 {console.log('toasty') }
                 <div>
