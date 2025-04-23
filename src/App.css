@@ -386,13 +386,13 @@ header {
   z-index: 4
 }
 
-.swipe-card:nth-child(1) {
+.swipe-card:nth-child(4) {
   z-index: 4;
   position: absolute;
   top: 0
 }
 
-.swipe-card:nth-child(2) {
+.swipe-card:nth-child(5) {
   z-index: 3;
   position: absolute;
   top: 0;
@@ -400,14 +400,14 @@ header {
   transform: translate(10px, 20px);
 }
 
-.swipe-card:nth-child(3) {
+.swipe-card:nth-child(6) {
   z-index: 2;
   position: absolute;
   filter: brightness(0.9);
   transform: translate(20px, 40px);
 }
 
-.swipe-card:nth-child(4) {
+.swipe-card:nth-child(1) {
   z-index: 4;
   height: 80px;
   position: absolute;
@@ -421,7 +421,7 @@ header {
   
 }
 
-.swipe-card:nth-child(5) {
+.swipe-card:nth-child(2) {
   z-index: 3;
   height: 80px;
   position: absolute;
@@ -434,7 +434,7 @@ header {
     -16px 32px 32px hsla(0, 0%, 70%, 0.2);
 }
 
-.swipe-card:nth-child(6) {
+.swipe-card:nth-child(3) {
   z-index: 2;
   height: 80px;
   position: absolute;

@@ -92,7 +92,7 @@ export function RSVP() {
 
         { isAllowed ?
         <div classname="container">
-            <main className="card-stack">
+            <main className="rsvp-card-stack">
                 <Routes>
                     {/* Entrypoint for normal guests */}
                     <Route path="/" element={

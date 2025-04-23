@@ -390,3 +390,81 @@
   color: #ffc107;
   background-color: #ffc107;
 }
+
+.rsvp-card-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.rsvp-swipe-card {
+  margin: auto;
+  height: 650px;
+  width: 90%
+}
+
+.rsvp-swipe-card top {
+  z-index: 4
+}
+
+.rsvp-swipe-card:nth-child(1) {
+  z-index: 4;
+  position: absolute;
+  top: 0
+}
+
+.rsvp-swipe-card:nth-child(2) {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  filter: brightness(0.95);
+  transform: translate(10px, 20px);
+}
+
+.rsvp-swipe-card:nth-child(3) {
+  z-index: 2;
+  position: absolute;
+  filter: brightness(0.9);
+  transform: translate(20px, 40px);
+}
+
+.rsvp-swipe-card:nth-child(4) {
+  z-index: 4;
+  height: 80px;
+  position: absolute;
+  transform: translateY(720px);
+  box-shadow:
+    -1px 2px 2px hsla(0, 0%, 70%, 0.2),
+    -2px 4px 4px hsla(0, 0%, 70%, 0.2),
+    -4px 8px 8px hsla(0, 0%, 70%, 0.2),
+    -8px 16px 16px hsla(0, 0%, 70%, 0.2),
+    -16px 32px 32px hsla(0, 0%, 70%, 0.2);
+  
+}
+
+.rsvp-swipe-card:nth-child(5) {
+  z-index: 3;
+  height: 80px;
+  position: absolute;
+  transform: translate(-8px, 740px);
+  box-shadow:
+    -1px 2px 2px hsla(0, 0%, 70%, 0.2),
+    -2px 4px 4px hsla(0, 0%, 70%, 0.2),
+    -4px 8px 8px hsla(0, 0%, 70%, 0.2),
+    -8px 16px 16px hsla(0, 0%, 70%, 0.2),
+    -16px 32px 32px hsla(0, 0%, 70%, 0.2);
+}
+
+.rsvp-swipe-card:nth-child(6) {
+  z-index: 2;
+  height: 80px;
+  position: absolute;
+  transform: translate(-16px, 760px);
+  box-shadow:
+    -1px 2px 2px hsla(0, 0%, 70%, 0.2),
+    -2px 4px 4px hsla(0, 0%, 70%, 0.2),
+    -4px 8px 8px hsla(0, 0%, 70%, 0.2),
+    -8px 16px 16px hsla(0, 0%, 70%, 0.2),
+    -16px 32px 32px hsla(0, 0%, 70%, 0.2);
+}
