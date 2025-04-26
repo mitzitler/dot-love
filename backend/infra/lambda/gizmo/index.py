@@ -1373,6 +1373,28 @@ def send_text():
         )
         return {"code": 200, "data": res}
 
+    # NOTE: this is important for calls from Spectaculo, where the number is not known
+    # fetch the phone number if not provided
+    if payload["recipient_phone"] == "":
+        try:
+            user = User.from_first_last_db(app.context["first_last"], CW_DYNAMO_CLIENT)
+        except Exception as e:
+            err_msg = "failed to fetch user from db"
+            log.exception(err_msg)
+            return {
+                "code": 500,
+                "message": err_msg,
+            }
+        if not user:
+            err_msg = "no such user exists in db"
+            log.info(err_msg)
+            return {
+                "code": 404,
+                "message": err_msg,
+            }
+
+        payload["recipient_phone"] = user.address.phone
+
     res = DOT_LOVE_MESSAGE_CLIENT.text(
         message_type=payload["template_type"],
         template_input=payload["template_details"],

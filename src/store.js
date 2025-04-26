@@ -5,6 +5,7 @@ import rsvpReducer from "./features/guest/rsvpSlice";
 import rsvpCompletedReducer from "./features/guest/rsvpCompletedSlice";
 import userReducer from "./features/guest/userSlice";
 import { gizmoApi } from './services/gizmo';
+import { spectaculoApi } from './services/spectaculo';
 
 const persistConfig = {
     key: 'root',
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     rsvpCompleted: rsvpCompletedReducer,
     user: userReducer,
     [gizmoApi.reducerPath]: gizmoApi.reducer,
+    [spectaculoApi.reducerPath]: spectaculoApi.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -28,7 +30,7 @@ const store = configureStore({
             serializableCheck: {
                 ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
             },
-        }).concat(gizmoApi.middleware)
+        }).concat(gizmoApi.middleware, spectaculoApi.middleware)
 })
 
 const persistor = persistStore(store)
