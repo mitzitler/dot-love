@@ -372,6 +372,11 @@ class DotLoveCoreStack(Stack):
                 "TZ": "US/Eastern",
                 # for calling gizmo
                 "internal_api_key": self.internal_api_key,
+                # contact info
+                "mitzi_email": self.contact_info["mitzi"]["email"],
+                "mitzi_phone": self.contact_info["mitzi"]["phone"],
+                "matthew_email": self.contact_info["matthew"]["email"],
+                "matthew_phone": self.contact_info["matthew"]["phone"],
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
@@ -543,31 +548,39 @@ class DotLoveCoreStack(Stack):
 
         # Create Spectaculo API routes
         #
-        # /claim/create
+        # POST /claim
         # Create a registry claim
         dot_love_api_gw.add_routes(
-            path="/spectaculo/claim/create",
+            path="/spectaculo/claim",
             methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
         )
         #
-        # /claim/update
+        # PATCH /claim
         # Update a registry claim
         dot_love_api_gw.add_routes(
-            path="/spectaculo/claim/update",
+            path="/spectaculo/claim",
             methods=[apigw.HttpMethod.PATCH],
             integration=spectaculo_service_integration,
         )
         #
-        # /items
-        # Get all registry items
+        # GET /claim
+        # Get claims for a user
         dot_love_api_gw.add_routes(
-            path="/spectaculo/items",
+            path="/spectaculo/claim",
             methods=[apigw.HttpMethod.GET],
             integration=spectaculo_service_integration,
         )
         #
-        # /item/{id}
+        # GET /item
+        # Get all registry items
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/item",
+            methods=[apigw.HttpMethod.GET],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # GET /item/{id}
         # Get specific registry item
         dot_love_api_gw.add_routes(
             path="/spectaculo/item/{id}",
@@ -575,18 +588,10 @@ class DotLoveCoreStack(Stack):
             integration=spectaculo_service_integration,
         )
         #
-        # /claims/{first_last}
-        # Get claims for a user
-        dot_love_api_gw.add_routes(
-            path="/spectaculo/claims/{first_last}",
-            methods=[apigw.HttpMethod.GET],
-            integration=spectaculo_service_integration,
-        )
-        #
         # /payment/create
         # Create payment intent
         dot_love_api_gw.add_routes(
-            path="/spectaculo/payment/create",
+            path="/spectaculo/payment",
             methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
         )
@@ -795,7 +800,7 @@ class DotLoveCoreStack(Stack):
         return secret["Parameter"]["Value"]
 
     def create_global_dependency_layer(self):
-        # External Package(s) (AWS Powertools, Twilio)
+        # External Package(s) (AWS Powertools, Twilio, Stripe)
         # NOTE: Generation guide:
         #   https://medium.com/geekculture/deploying-aws-lambda-layers-with-python-8b15e24bdad2
         #   So essentially, creating a `layer` folder, and running the following:
