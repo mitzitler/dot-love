@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NewRegistryPageChart } from "./NewRegistryPageChart.tsx";
 import { RegistryPageExternalTitle } from "./RegistryPageExternalTitle.js";
 import { RegistryPageExternalCard } from "./RegistryPageExternalCard.js";
-import useRegistryItems from './useRegistryItems.js';
+import useRegistryItems from '../../../components/useRegistryItems.js';
 import '../App.css';
 
 // NOTE: LINK TO BUY OBJECTS NEEDS TO CREATE A NEW TAB

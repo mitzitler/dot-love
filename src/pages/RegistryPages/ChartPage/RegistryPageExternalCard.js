@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { giftClaimedToggle } from '../features/guest/extrasSlice';
+import { giftClaimedToggle } from '../../../features/guest/extrasSlice';
 import '../App.css';
 
 export function RegistryPageExternalCard({Data, displayedId}) {

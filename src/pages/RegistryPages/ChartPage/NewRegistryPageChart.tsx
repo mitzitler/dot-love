@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { scaleLinear } from "d3-scale";
 import 'react-tippy/dist/tippy.css'
-import { AxisBottom } from "./chart/AxisBottom";
-import { AxisLeft } from "./chart/AxisLeft";
-import { Tooltip, InteractionData } from "./chart/Tooltip";
+import { AxisBottom } from "./ChartComponents/AxisBottom";
+import { AxisLeft } from "./ChartComponents/AxisLeft";
+import { Tooltip, InteractionData } from "./ChartComponents/Tooltip";
 import '../styles/Registry.css'
-import { AxisTop } from "./chart/AxisTop";
+import { AxisTop } from "./ChartComponents/AxisTop";
 
 // doing this: https://www.react-graph-gallery.com/scatter-plot
 

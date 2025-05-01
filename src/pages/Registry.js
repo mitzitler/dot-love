@@ -2,8 +2,9 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
-import { NewRegistryPage } from '../components/NewRegistryPage.js';
-
+import { NewRegistryPage } from './RegistryPages/NewRegistryPage.js';
+import { RegistryTablePage } from './RegistryPages/RegistryTablePage.js';
+import { RegistryClaim } from './RegistryPages/RegistryClaim.js';
 
 export function Registry({registryItems}) {
 
@@ -31,6 +32,16 @@ export function Registry({registryItems}) {
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
             <NewRegistryPage registryItems={registryItems} />
+        </CardStackPage>
+        <CardStackPage pageMainColor={pageMainColor} 
+            pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
+            pageSection={pageSection}>
+            <RegistryTablePage registryItems={registryItems} />
+        </CardStackPage>
+        <CardStackPage pageMainColor={pageMainColor} 
+            pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
+            pageSection={pageSection}>
+            <RegistryClaim registryItems={registryItems} />
         </CardStackPage>
         </>
     )
