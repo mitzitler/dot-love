@@ -390,30 +390,10 @@ header {
 
 .swipe-card:nth-child(1) {
   z-index: 4;
-  position: absolute;
-  top: 0
-}
-
-.swipe-card:nth-child(2) {
-  z-index: 3;
-  position: absolute;
-  top: 0;
-  filter: brightness(0.95);
-  transform: translate(10px, 20px);
-}
-
-.swipe-card:nth-child(3) {
-  z-index: 2;
-  position: absolute;
-  filter: brightness(0.9);
-  transform: translate(20px, 40px);
-}
-
-.swipe-card:nth-child(4) {
-  z-index: 4;
   height: 80px;
   position: absolute;
-  transform: translateY(720px);
+  top: 0;
+  //transform: translateY(720px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
     -2px 4px 4px hsla(0, 0%, 70%, 0.2),
@@ -423,11 +403,12 @@ header {
   
 }
 
-.swipe-card:nth-child(5) {
+.swipe-card:nth-child(2) {
   z-index: 3;
   height: 80px;
   position: absolute;
-  transform: translate(-8px, 740px);
+  //transform: translate(-8px, 740px);
+  transform: translate(-8px, 20px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
     -2px 4px 4px hsla(0, 0%, 70%, 0.2),
@@ -436,17 +417,105 @@ header {
     -16px 32px 32px hsla(0, 0%, 70%, 0.2);
 }
 
-.swipe-card:nth-child(6) {
+.swipe-card:nth-child(3) {
   z-index: 2;
   height: 80px;
   position: absolute;
-  transform: translate(-16px, 760px);
+  //transform: translate(-16px, 760px);
+  transform: translate(-16px, 40px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
     -2px 4px 4px hsla(0, 0%, 70%, 0.2),
     -4px 8px 8px hsla(0, 0%, 70%, 0.2),
     -8px 16px 16px hsla(0, 0%, 70%, 0.2),
     -16px 32px 32px hsla(0, 0%, 70%, 0.2);
+}
+
+.swipe-card:nth-child(4) {
+  z-index: 4;
+  position: absolute;
+  transform: translateY(140px)
+}
+
+.swipe-card:nth-child(5) {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  filter: brightness(0.95);
+  transform: translate(10px, 160px);
+}
+
+.swipe-card:nth-child(6) {
+  z-index: 2;
+  position: absolute;
+  filter: brightness(0.9);
+  transform: translate(20px, 180px);
+}
+
+.swipe-card:nth-child(7) {
+  z-index: 4;
+  position: absolute;
+  top: 0;
+  transform: translateY(860px)
+}
+
+.swipe-card:nth-child(8) {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  filter: brightness(0.95);
+  transform: translate(10px, 880px);
+}
+
+.swipe-card:nth-child(9) {
+  z-index: 2;
+  position: absolute;
+  filter: brightness(0.9);
+  transform: translate(20px, 900px);
+}
+
+.swipe-card:nth-child(10) {
+  z-index: 4;
+  position: absolute;
+  top: 0;
+  transform: translateY(1580px)
+}
+
+.swipe-card:nth-child(11) {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  filter: brightness(0.95);
+  transform: translate(10px, 1600px);
+}
+
+.swipe-card:nth-child(12) {
+  z-index: 2;
+  position: absolute;
+  filter: brightness(0.9);
+  transform: translate(20px, 1620px);
+}
+
+.swipe-card:nth-child(13) {
+  z-index: 4;
+  position: absolute;
+  top: 0;
+  transform: translateY(2300px)
+}
+
+.swipe-card:nth-child(14) {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  filter: brightness(0.95);
+  transform: translate(10px, 2320px);
+}
+
+.swipe-card:nth-child(15) {
+  z-index: 2;
+  position: absolute;
+  filter: brightness(0.9);
+  transform: translate(20px, 2340px);
 }
 
 .button-container {

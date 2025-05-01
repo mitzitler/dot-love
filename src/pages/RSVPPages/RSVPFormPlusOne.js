@@ -90,7 +90,7 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     </CardStackPage>
 
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} >
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                 <NavLink className='btn-23'
                     disabled={rsvpStatus === 'undecided' ? true : false}
                     to={rsvpStatus !== 'undecided' ? '/rsvp/contact' : '/'}

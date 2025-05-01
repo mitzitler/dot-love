@@ -150,6 +150,22 @@ class DotLoveCoreStack(Stack):
             dot_love_api_gw=self.dot_love_api_gw,
             spectaculo_lambda=self.dot_love_spectaculo_lambda["function"],
         )
+
+        # Set Stripe environment variables for the Spectaculo Lambda
+        # TODO: Replace empty strings with actual values:
+        # 1. Create Stripe account and get API key
+        # 2. Store API key in SSM Parameter Store at /dot-love/stripe/secret-key
+        # 3. Create webhook endpoint in Stripe dashboard pointing to /spectaculo/payment/webhook
+        # 4. Store webhook secret in SSM Parameter Store at /dot-love/stripe/webhook-secret
+        # 5. Update these environment variables to use those SSM parameters
+        self.dot_love_spectaculo_lambda["function"].add_environment(
+            key="STRIPE_SECRET",
+            value=self.internal_api_key,
+        )
+        self.dot_love_spectaculo_lambda["function"].add_environment(
+            key="STRIPE_WEBHOOK_SECRET",
+            value=self.internal_api_key,
+        )
         # Create s3 bucket to store registry item images
         self.create_dot_love_registry_item_img_s3()
 
@@ -348,12 +364,14 @@ class DotLoveCoreStack(Stack):
             description="DotLove Spectaculo Service, to handle the registry",
             environment={
                 # For getting registry data
-                "registryItemTableName": registry_item_table.table_name,
-                "registryClaimTableName": registry_claim_table.table_name,
+                "registry_item_table_name": registry_item_table.table_name,
+                "registry_claim_table_name": registry_claim_table.table_name,
                 # Lambda Powertools
                 "POWERTOOLS_SERVICE_NAME": "spectaculo",
                 "POWERTOOLS_LOG_LEVEL": "INFO",
                 "TZ": "US/Eastern",
+                # for calling gizmo
+                "internal_api_key": self.internal_api_key,
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
@@ -531,8 +549,6 @@ class DotLoveCoreStack(Stack):
             path="/spectaculo/claim/create",
             methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
-            # TODO: Add this? for common mesage format
-            # authorizer=self.lambda_authorizer,
         )
         #
         # /claim/update
@@ -541,8 +557,46 @@ class DotLoveCoreStack(Stack):
             path="/spectaculo/claim/update",
             methods=[apigw.HttpMethod.PATCH],
             integration=spectaculo_service_integration,
-            # TODO: Add this? for common mesage format
-            # authorizer=self.lambda_authorizer,
+        )
+        #
+        # /items
+        # Get all registry items
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/items",
+            methods=[apigw.HttpMethod.GET],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # /item/{id}
+        # Get specific registry item
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/item/{id}",
+            methods=[apigw.HttpMethod.GET],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # /claims/{first_last}
+        # Get claims for a user
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/claims/{first_last}",
+            methods=[apigw.HttpMethod.GET],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # /payment/create
+        # Create payment intent
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/payment/create",
+            methods=[apigw.HttpMethod.POST],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # /payment/webhook
+        # Handle Stripe webhooks
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/payment/webhook",
+            methods=[apigw.HttpMethod.POST],
+            integration=spectaculo_service_integration,
         )
 
         return

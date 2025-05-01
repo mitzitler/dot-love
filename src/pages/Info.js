@@ -1,43 +1,22 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
+import { CardStackFooter } from '../components/CardStackFooter.js';
 import { InfoBox } from '../components/InfoBox.js';
 import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
 import '../App.css';
 
-// import { MapBox } from '../components/MapBox.js'; // this doesnt work rn
-// import {Loader, LoaderOptions} from 'google-maps';
-
-// const options: LoaderOptions = 'region';
-// const loader = new Loader('my-api-key', options);
-
-// const google = await loader.load();
-// const map = new google.maps.Map(document.getElementById('map'), {
-// center: {lat: 40.68724549962714, lng: -73.98622621879578}, 
-// zoom: 8,
-// })
-
-// look at this: https://blog.openreplay.com/creating-a-collapsible-component-for-react/
-
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
-    // const [isExpanded, setIsExpanded] = useState(false)
-
-    // const toggleIsExpanded = useCallback(() => {
-    //     setIsExpanded((isExpanded) => !isExpanded);
-    //   }, []);
 
     const pageMainColor = "babyblue" 
     const pageSecondaryColor = "lilac" 
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
-    
-    // useEffect(() => {
-    //     window.scrollTo(0, 0); 
-    // }, []);
 
-    const diety = {
+    const deity = {
         name: 'Diety Events',
         coordinates: [40.68725385467351, -73.98617663587743], 
       };
@@ -47,10 +26,17 @@ export function Info() {
         setExpandedBox((current) => (current === id ? null : id)); // Toggle expansion
     }
 
-    // console.log(pageMainClass)
-
     return (
 
+        <>
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+            pageTertiaryColor={pageTertiaryColor} >
+            <NavLink className='btn-23' 
+                // disabled for x seconds after loading
+                // disabled={rsvpStatus === 'undecided' ? true : false} 
+                to='/about'
+                end><marquee>ABOUT US → </marquee></NavLink>
+        </CardStackFooter>
         <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor}
@@ -64,7 +50,7 @@ export function Info() {
                         <h4>Schedule</h4>
                         <ul>
                             <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
-                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Diety Events</li>
+                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Deity Events</li>
                             <li class="text-sm text-left pl-1.5"> 7.00pm - Drinks</li>
                             <li class="text-sm text-left pl-1.5"> 8.00pm - Dinner</li>
                             <li class="text-sm text-left pl-1.5"> 9.00pm - Dancing</li>
@@ -87,40 +73,60 @@ export function Info() {
 
                     <InfoBox id="wear" class="dress-code" collapsable={true} onClickExpand={onClickExpand}
                         expandedBox={expandedBox}>
-                        <h3>And wear? <strong>(cocktail!)</strong></h3>
+                        <h3>What should I wear?</h3>
                     </InfoBox>
                         {expandedBox === "wear" && (
                             <InfoBoxExpanded>
                                 <ul>
-                                    <li>🟡 Dress code is semi-formal</li>
-                                    <li>🟡 Wedding colors to come soon!!!</li>
-                                    <li>🟡 Pinterest board to come soon!!!</li>
+                                    <li>🟡 Dress code is cocktail</li>
+                                    <li>🟡 Scroll below for more details!</li>
                                 </ul>    
-                            </InfoBoxExpanded>
-                        )}
-                    
-                    <InfoBox id="faq" class="faq" collapsable={true} onClickExpand={onClickExpand}
-                        expandedBox={expandedBox}>
-                        <h3>And know? <strong>(check often!)</strong></h3>
-                    </InfoBox>
-                        {expandedBox === "faq" && (
-                            <InfoBoxExpanded>
-                                <ul>
-                                    <li>🟡 This venue has stairs, so please let us know as soon as you can if you have mobility issues</li>
-                                    <li>🟡 We'll text whenever we have updates with more information!</li>
-                                    <li></li>
-                                </ul>
-                            </InfoBoxExpanded>
-                        )}
-                    
-                    {/* <InfoBox id="map" class="map" collapsable={false}> */}
-                        {/* <MapBox business={diety}/> */}
-                    {/* </InfoBox> */}
 
+                                <div class="mt-4">
+                                </div>
+
+                            </InfoBoxExpanded>
+                        )}
+                    
                 </div>
             </div>
-        </CardStackPage>
-        // this card stack page is missing the top child, and puts the third child as a nav bar card
-        // </>
+            </CardStackPage>
+            <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection} >
+                <h1>Info: Dress Code</h1>
+                <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
+                <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
+                    <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
+
+                        <InfoBox collapsable={false}>
+                            <h4>Notes on Attire..</h4>
+                            <ul>
+                                <li class="text-sm text-left">The dress code for our wedding will be <b>cocktail attire.</b></li>
+                                <br/>
+                                <li class="text-sm text-left mb-3">What does this mean? Cocktail sits in between formal and semi formal.</li>
+                                <li class="text-sm text-left mb-3">
+                                If you like to wear suits, please feel free to wear a suit or dress shirt. 
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                If you rather wear dresses, a cocktail dress or dressy seperates are great. 
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                And of course, pantsuits, jumpsuits and dressy separates of the same lengths are great too!
+                                </li>
+                                <li class="text-sm text-left mb-3">
+                                For this time of year, we’d also recommend a coat, and there will be coat check at the venue!
+                                </li>
+
+                                {/* here : scroll for more info about BRIDES SIDE */}
+                                
+
+                            </ul>
+                        </InfoBox>
+                    </div>
+                </div>
+            </CardStackPage>
+
+            {/* here: conditionally render another page with ATTIRE EXAMPLES */}
+        </>
     )
 }

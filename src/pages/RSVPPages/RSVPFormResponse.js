@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import '../../styles/RSVP.css';
 import '../../App.css';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
@@ -30,7 +31,6 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
                 { rsvpCode.toUpperCase() === "NZU" & submitted != null ? 
                     <h1>Please RSVP For the Second Guest...</h1> : 
                     <h1>Repondez S'il Vous Plait!</h1> }
-
                 { notify("Code accepted! Please Scroll down")}
                 {console.log('toasty') }
                 <div>
@@ -68,7 +68,7 @@ export function RSVPFormResponse({pageMainColor, pageSecondaryColor, pageTertiar
 
             </CardStackPage>
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} >
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection} >
                 <NavLink className='btn-23' 
                     disabled={rsvpStatus === 'undecided' ? true : false} 
                     to={rsvpStatus === 'undecided' ? '/rsvp' : '/rsvp/contact'} 

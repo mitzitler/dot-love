@@ -48,6 +48,15 @@ module.exports = {
           400: '#d9d0b2',
           500: '#b5a982'
         },
+        terracotta: {
+          500: "#DE6B54"
+        },
+        plum: {
+          500: "#902E6B"
+        },
+        cream: {
+          500: "#FBFBF2"
+        }
       }
     },
   },

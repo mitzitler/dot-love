@@ -130,7 +130,7 @@ export function RSVPFormDietary({pageMainColor, pageSecondaryColor, pageTertiary
                     </div>
         </CardStackPage>
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} >
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                 <NavLink className='btn-23' to='/rsvp/contact' end>
                     <marquee>Return</marquee>
                 </NavLink> 

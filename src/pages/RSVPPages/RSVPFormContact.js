@@ -219,7 +219,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                 </div>
             </CardStackPage>
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} >
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                 <NavLink className='btn-23' to='/rsvp' end><marquee>Return</marquee></NavLink> 
                 <NavLink className='btn-23' 
                     // maybe theres something to having an onhover here dispatch the continueDietary?
