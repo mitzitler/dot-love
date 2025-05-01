@@ -1,11 +1,12 @@
 import React from 'react';
 import {Routes, Route} from 'react-router-dom';
 
-import {Transitionizer} from '../components/Transitionizer';
-import {Info} from '../pages/Info';
+import { Transitionizer } from '../components/Transitionizer';
+import { Info } from '../pages/Info';
+import { RegistryTemp } from '../pages/RegistryTemp';
 import { InfoDressCode } from '../pages/InfoPages/InfoDressCode.js'
-import {Registry} from '../pages/Registry';
-import {AboutUs} from '../pages/AboutUs';
+import { Registry } from '../pages/Registry';
+import { AboutUs } from '../pages/AboutUs';
 // import Thanks from '../pages/Thanks';
 import {Data} from '../pages/Data';
 
@@ -76,6 +77,15 @@ export function Router () {
                     </Transitionizer>
                 }
             /> */}
+
+            <Route
+                path="/tempregistry"
+                element={
+                    <Transitionizer>
+                        <RegistryTemp />
+                    </Transitionizer>
+                }
+            />
         </Routes>
     )
 }
