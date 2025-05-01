@@ -8,19 +8,20 @@ import '../App.css';
 
 export function RegistryTemp() {
 
-    const pageMainColor = "cream" 
-    const pageSecondaryColor = "plum" 
-    const pageTertiaryColor = "terracotta" 
+    const pageMainColor = "lilac" 
+    const pageSecondaryColor = "babyblue" 
+    const pageTertiaryColor = "raspberry" 
     const pageSection = "registry"
 
     let loginHeader = 'mitzi_zitler'
+    let data_array = {}
 
     // API Call - triggers only when loginHeader changes
-    const { data } = useGetRegistryItemsQuery(loginHeader);
+    const { data } = useGetRegistryItemsQuery( loginHeader );
 
-    console.log(data)
-    // console.log(data.body)
-    // console.log(data.body.items)
+    data_array = data.items
+
+    console.log(data_array)
 
     return (
 
@@ -31,13 +32,20 @@ export function RegistryTemp() {
                 to='/about'
                 end><marquee>NAVIGATION → </marquee></NavLink>
         </CardStackFooter>
-        <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
+        <CardStackPage className="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor}
         pageSection={pageSection}>
 
-            <h1>Temp Registry Page</h1>
+            <h1 className='py-4'>Temp Registry Page</h1>
 
+                <ul>
+                    {data_array.map((item) => (
+                        <li key={item.item_id}>
+                            {item.name}
+                        </li>
+                    ))}
+                </ul>
 
             </CardStackPage>
         </>

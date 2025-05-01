@@ -7,16 +7,7 @@ export const spectaculoApi = createApi({
     // Get all registry items
     getRegistryItems: builder.query({
       query: (firstLast) => ({
-        url: '/items',
-        method: 'GET',
-        headers: { 'X-First-Last': firstLast },
-      }),
-    }),
-
-    // Get a specific registry item by ID
-    getRegistryItem: builder.query({
-      query: ({ itemId, firstLast }) => ({
-        url: `/item/${itemId}`,
+        url: '/item',
         method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
