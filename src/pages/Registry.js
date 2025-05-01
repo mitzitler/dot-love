@@ -1,9 +1,11 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
-import { NewRegistryPage } from '../components/NewRegistryPage.tsx';
+import { CardStackFooter } from '../components/CardStackFooter.js';
+import { NewRegistryPage } from '../components/NewRegistryPage.js';
 
 
-export function Registry() {
+export function Registry({registryItems}) {
 
     const pageMainColor = "khaki"  // temp colors
     const pageSecondaryColor = "lime"
@@ -11,13 +13,26 @@ export function Registry() {
 
     const pageSection = "registry"
 
+    
+
     return (
     
+        <>
+
+        <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+            pageTertiaryColor={pageTertiaryColor} >
+            <NavLink className='btn-23' 
+                // disabled for x seconds after loading
+                // disabled={rsvpStatus === 'undecided' ? true : false} 
+                to='/about'
+                end><marquee>ABOUT US → </marquee></NavLink>
+        </CardStackFooter>
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <NewRegistryPage />
+            <NewRegistryPage registryItems={registryItems} />
         </CardStackPage>
+        </>
     )
 
 }

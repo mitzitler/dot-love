@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Router } from '../routes/Router'
 import { HeaderHome } from './HeaderHome';
+import useRegistryItems from '../components/useRegistryItems.js';
 import '../App.css';
 
 export function Home() {
 
     const [loginSuccess, setLoginSuccess] = useState(false);
 
+    let loginHeaderHard = 'mitzi_zitler'
+    const registryItems = useRegistryItems(loginSuccess, loginHeaderHard)
+    console.log(registryItems)
 
     return (
         <>
@@ -19,7 +23,7 @@ export function Home() {
         <div className="container">
             <main className="card-stack">
 
-                    <Router />
+                    <Router registryItems={registryItems} />
             </main>
         </div>
         

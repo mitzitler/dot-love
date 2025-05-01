@@ -1,13 +1,16 @@
-// import { HomePageRoutes } from '../routes/HomePageRoutes';
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
+import { setloginHeaderState } from '../features/guest/extrasSlice.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
 import { useLocation } from 'react-router-dom';
 import '../App.css';
-import { useSelector } from 'react-redux';
 
 export function HeaderHome({loginSuccess, setLoginSuccess}) {
+
+    const dispatch = useDispatch();
+
     const [entryValue, setEntryValue] = useState("")
     const entryValuePlaceholder = "First Last"
     const [loginHeader, setLoginHeader] = useState(null);
@@ -34,6 +37,7 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
     useEffect(() => {
         if (data && data.code === 200) {
             setLoginSuccess(true);
+            // dispatch(setLoginSuccessState())
             console.log("Gizmo login success, result:", data);
             notify(`Welcome, ${data.body.user.first}! Please scroll down`)
         }
@@ -63,10 +67,12 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
             const firstLast = `${first1} ${first2}_${last1}`;
             console.log('first1 first2 and last: ', firstLast)
             setLoginHeader({ 'X-First-Last': firstLast });
+            dispatch(setloginHeaderState(firstLast))
         } else if (first && last) {
             const firstLast = `${first}_${last}`;
             console.log('first and last: ', firstLast)
             setLoginHeader({ 'X-First-Last': firstLast });
+            dispatch(setloginHeaderState(firstLast))
         } else  {
             setLoginHeader(null); // Prevent invalid API calls
         }
