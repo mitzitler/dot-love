@@ -4,7 +4,7 @@ import '../App.css';
 export function GenericHeader({children}) {
     
     return (
-      <div class = "header-main">
+      <div className = "header-main">
           <NavIcon>
             {children}
           </NavIcon>

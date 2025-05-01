@@ -75,10 +75,10 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
     return (
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader class="h-screen transfom-scale-5"
+        <GenericHeader className="h-screen transfom-scale-5"
             placeholder={"Full name?"} entryValue={entryValue} 
             setEntryValue={setEntryValue}>
-            <div class= "egg backdrop-blur-xl" />
+            <div className= "egg backdrop-blur-xl" />
             <form>
               <input placeholder={entryValuePlaceholder} type="text"
                   id="genericheader"

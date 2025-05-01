@@ -4,9 +4,9 @@ export function NavIcon({children}) {
 
 
     return (
-        <div class="header-nav">
-          <img class="outer-circle" src="https://cdn.mitzimatthew.love/nav_icon_circle.png" ></img>
-            <div class="egg-container" >
+        <div className="header-nav">
+          <img className="outer-circle" src="https://cdn.mitzimatthew.love/nav_icon_circle.png" ></img>
+            <div className="egg-container" >
                 {children}
             </div>
         </div>

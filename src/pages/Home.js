@@ -10,13 +10,13 @@ export function Home() {
 
     return (
         <>
-        <HeaderHome classname="h-screen transfom-scale-5" 
+        <HeaderHome className="h-screen transfom-scale-5" 
             loginSuccess={loginSuccess}
             setLoginSuccess={setLoginSuccess}
             />
             
         { loginSuccess ?
-        <div classname="container">
+        <div className="container">
             <main className="card-stack">
 
                     <Router />

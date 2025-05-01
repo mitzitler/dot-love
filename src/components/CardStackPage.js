@@ -26,7 +26,7 @@ export function CardStackPage({pageMainColor, pageSection, children, pageSeconda
     return(
         <>
             <section className={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${mainColor} ${mainBorder} border-1 backdrop-blur-md`}>
-            <div class={pageSection}>     
+            <div className={pageSection}>     
                 <div id="main">    
                     {children}
                 </div>
