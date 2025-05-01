@@ -39,12 +39,15 @@ module.exports = {
           500: '#ed2872'
         },
         terracotta: {
+          400: "#DE6B54",
           500: "#DE6B54"
         },
         plum: {
+          400: "#902E6B",
           500: "#902E6B"
         },
         cream: {
+          400: "#FBFBF2",
           500: "#FBFBF2"
         }
       }
