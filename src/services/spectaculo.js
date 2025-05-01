@@ -8,6 +8,7 @@ export const spectaculoApi = createApi({
     getRegistryItems: builder.query({
       query: (firstLast) => ({
         url: '/items',
+        method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
     }),
@@ -16,6 +17,7 @@ export const spectaculoApi = createApi({
     getRegistryItem: builder.query({
       query: ({ itemId, firstLast }) => ({
         url: `/item/${itemId}`,
+        method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
     }),
@@ -24,6 +26,7 @@ export const spectaculoApi = createApi({
     getUserClaims: builder.query({
       query: (firstLast) => ({
         url: `/claims/${firstLast}`,
+        method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
     }),
