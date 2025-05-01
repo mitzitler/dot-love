@@ -1,6 +1,7 @@
 @import './styles/AboutUs.css';
 @import './styles/Info.css';
 @import './styles/RSVP.css';
+@import './styles/Registry.css';
 
 @keyframes fullrotation {
   0% {
@@ -302,9 +303,10 @@ header {
   border-radius: 15px;
 }
 
+// height here gets overwritten by swipe-card below
 .section-content {
   border-radius: 15px; 
-  height: 600px
+  height: 600px 
 }
 
 .header-content {
@@ -378,7 +380,7 @@ header {
 
 .swipe-card {
   margin: auto;
-  height: 650px;
+  height: 750px;
   width: 90%
 }
 

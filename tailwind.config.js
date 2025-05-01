@@ -18,6 +18,12 @@ module.exports = {
     'border-lime-500/50',
     'bg-emerald-400/75',
     'border-emerald-500/50',
+    'bg-lime-400/75',
+    'border-lime-500/50',
+    'bg-fuchsia-400/75',
+    'border-fuchsia-500/50',
+    'bg-khaki-400/75',
+    'border-khaki-500/50',
 
   ],
   theme: {
@@ -37,6 +43,10 @@ module.exports = {
         raspberry: {
           400: '#db5186',
           500: '#ed2872'
+        },
+        khaki: {
+          400: '#d9d0b2',
+          500: '#b5a982'
         },
         terracotta: {
           500: "#DE6B54"
