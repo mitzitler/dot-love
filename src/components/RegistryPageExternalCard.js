@@ -11,7 +11,7 @@ export function RegistryPageExternalCard({Data, displayedId}) {
     // const [giftClaimed, setGiftClaimed] = useState(false)
 
     useEffect(() => {
-        const gift_name = Data.find(gift => gift.id === displayedId)
+        const gift_name = Data.find(gift => gift.item_id === displayedId)
         setGiftData(gift_name)
     }, [displayedId])
 
@@ -33,10 +33,10 @@ export function RegistryPageExternalCard({Data, displayedId}) {
             :
             <div>
 
-                <span className={!giftData.claimed ? '' : 'grayscale' }>
+                <span className={!giftData.claim_state ? '' : 'grayscale' }>
                     <button className="rounded-lg text-lg pt-1 my-2">
                         <a href={giftData.link} >
-                            🪩  🌸  🪐   Buy me for $ {giftData.price} !   🪐  🌸  🪩
+                            🪩  🌸  🪐   Buy me for $ {giftData.price_cents/100.0} !   🪐  🌸  🪩
                             {/* the giftData clicks are recorded to the users data */}
                         </a>
                     </button>
@@ -47,20 +47,20 @@ export function RegistryPageExternalCard({Data, displayedId}) {
                         //         giftData.id, giftData.claimed
                         //     ]))
                         // }>
-                        onClick={()=>giftData.claimed=!!giftData.claimed}>
+                        onClick={()=>giftData.claim_state=!!giftData.claim_state}>
                         I'm claiming this!
                     </button>
                 </span>
                 <div className="relative m-auto grid grid-cols-4" >
-                    <div className={!giftData.claimed ? "col-span-1" : "col-span-1 grayscale"}> 
+                    <div className={!giftData.claim_state ? "col-span-1" : "col-span-1 grayscale"}> 
                         <img className="gift image w-24 h-24 my-4 mx-24 rounded-2xl flex justify-center items-center" 
-                            src={giftData.image_link} alt="Image of gift" /> 
+                            src={giftData.image_url} alt="Image of gift" /> 
                     </div>
-                    <div class="col-span-3">
+                    <div className="col-span-3">
                         <span>
                             <br/>
                             <p className="gift info">
-                                {giftData.description}
+                                {giftData.descr}
                             </p>
 
                         </span>

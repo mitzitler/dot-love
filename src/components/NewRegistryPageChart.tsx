@@ -11,14 +11,16 @@ import { AxisTop } from "./chart/AxisTop";
 // doing this: https://www.react-graph-gallery.com/scatter-plot
 
 type DataPoint = {
-    id: number;
-    x: number;
-    y: number;
-    price: number;
+    item_id: number;
+    size_score: number;
+    function_score: number;
+    price_cents: number;
+    has_dollar_value: boolean;
     price_cat: string;
     name: string;
-    description: string;
-    claimed: boolean;
+    brand: string;
+    descr: string;
+    claim_state: boolean;
   };
   
   type ScatterplotProps = {
@@ -81,22 +83,22 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
         return (
           <circle
             key={i}
-            r={!d.claimed ? 8 : 5}
-            cx={xScale(d.x)}
-            cy={yScale(d.y)}
+            r={!d.claim_state ? 8 : 5}
+            cx={xScale(d.size_score)}
+            cy={yScale(d.function_score)}
             stroke={colorScale(d.price_cat)}
             fill={colorScale(d.price_cat)}
             fillOpacity={0.7}
             onMouseEnter={() =>
               setHovered({
-                xPos: xScale(d.x),
-                yPos: yScale(d.y),
+                xPos: xScale(d.size_score),
+                yPos: yScale(d.function_score),
                 name: d.name,
-                price: d.price
+                price: d.price_cents/100
               })
             }
             onMouseLeave={() => setHovered(null)}
-            onClick={() => setDisplayedId(d.id)}
+            onClick={() => setDisplayedId(d.item_id)}
           />
         );
       });

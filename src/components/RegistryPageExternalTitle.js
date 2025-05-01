@@ -6,7 +6,7 @@ export function RegistryPageExternalTitle({Data, displayedId}) {
     const [giftData, setGiftData] = useState({})
 
     useEffect(() => {
-        const gift_name = Data.find(gift => gift.id === displayedId)
+        const gift_name = Data.find(gift => gift.item_id === displayedId)
         setGiftData(gift_name)
     }, [displayedId])
 
