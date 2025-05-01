@@ -34,8 +34,8 @@ export function Info() {
             <NavLink className='btn-23' 
                 // disabled for x seconds after loading
                 // disabled={rsvpStatus === 'undecided' ? true : false} 
-                to='/about'
-                end><marquee>ABOUT US → </marquee></NavLink>
+                to='/registry'
+                end><marquee>REGISTRY → </marquee></NavLink>
         </CardStackFooter>
         <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}
