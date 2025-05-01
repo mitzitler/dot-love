@@ -3,25 +3,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
-import { useGetRegistryItemsQuery } from '../services/spectaculo.js';
 import '../App.css';
 
-export function RegistryTemp() {
+export function RegistryTemp({registryItems}) {
 
     const pageMainColor = "lilac" 
     const pageSecondaryColor = "babyblue" 
     const pageTertiaryColor = "raspberry" 
     const pageSection = "registry"
 
-    let loginHeader = 'mitzi_zitler'
-    let data_array = {}
-
-    // API Call - triggers only when loginHeader changes
-    const { data } = useGetRegistryItemsQuery( loginHeader );
-
-    data_array = data.items
-
-    console.log(data_array)
+    console.log('prop drilled the reg items: ', registryItems)
 
     return (
 
@@ -40,7 +31,7 @@ export function RegistryTemp() {
             <h1 className='py-4'>Temp Registry Page</h1>
 
                 <ul>
-                    {data_array.map((item) => (
+                    {registryItems.map((item) => (
                         <li key={item.item_id}>
                             {item.name}
                         </li>
