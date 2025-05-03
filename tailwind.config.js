@@ -28,6 +28,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+          "suse": ['SUSE', 'mono']
+      },
       colors: {
         ...colors,
         cyan: colors.cyan,

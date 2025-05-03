@@ -456,7 +456,7 @@ header {
   z-index: 4;
   position: absolute;
   top: 0;
-  transform: translateY(860px)
+  transform: translateY(920px)
 }
 
 .swipe-card:nth-child(8) {
@@ -464,21 +464,21 @@ header {
   position: absolute;
   top: 0;
   filter: brightness(0.95);
-  transform: translate(10px, 880px);
+  transform: translate(10px, 940px);
 }
 
 .swipe-card:nth-child(9) {
   z-index: 2;
   position: absolute;
   filter: brightness(0.9);
-  transform: translate(20px, 900px);
+  transform: translate(20px, 960px);
 }
 
 .swipe-card:nth-child(10) {
   z-index: 4;
   position: absolute;
   top: 0;
-  transform: translateY(1580px)
+  transform: translateY(1700px)
 }
 
 .swipe-card:nth-child(11) {
@@ -486,21 +486,21 @@ header {
   position: absolute;
   top: 0;
   filter: brightness(0.95);
-  transform: translate(10px, 1600px);
+  transform: translate(10px, 1720px);
 }
 
 .swipe-card:nth-child(12) {
   z-index: 2;
   position: absolute;
   filter: brightness(0.9);
-  transform: translate(20px, 1620px);
+  transform: translate(20px, 1740px);
 }
 
 .swipe-card:nth-child(13) {
   z-index: 4;
   position: absolute;
   top: 0;
-  transform: translateY(2300px)
+  transform: translateY(2480px)
 }
 
 .swipe-card:nth-child(14) {
@@ -508,14 +508,14 @@ header {
   position: absolute;
   top: 0;
   filter: brightness(0.95);
-  transform: translate(10px, 2320px);
+  transform: translate(10px, 2500px);
 }
 
 .swipe-card:nth-child(15) {
   z-index: 2;
   position: absolute;
   filter: brightness(0.9);
-  transform: translate(20px, 2340px);
+  transform: translate(20px, 2520px);
 }
 
 .button-container {

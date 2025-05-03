@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
-import { InfoBox } from '../components/InfoBox.js';
-import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
+import { InfoBox } from './InfoPages/InfoComponents/InfoBox.js';
+import { InfoBoxExpanded } from './InfoPages/InfoComponents/InfoBoxExpanded.js';
 import '../App.css';
 
 export function Info() {

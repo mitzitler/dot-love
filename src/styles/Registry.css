@@ -145,3 +145,12 @@
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
+/* styling for MUI table */
+.MuiTableContainer {
+  background-color: red
+}
+
+.table-div {
+  height: 10px
+}

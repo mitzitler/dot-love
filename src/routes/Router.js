@@ -6,8 +6,6 @@ import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
-// import Thanks from '../pages/Thanks';
-import { Data } from '../pages/Data';
 
 export function Router ({registryItems}) {
     return (
@@ -52,23 +50,6 @@ export function Router ({registryItems}) {
                     </Transitionizer>
                 }
             />
-            {/* <Route
-                path="/thanks"
-                element={
-                    <Transitionizer>
-                        <Thanks />
-                    </Transitionizer>
-                }
-            /> */}
-            {/* <Route
-                path="/data"
-                element={
-                    <Transitionizer>
-                        <Data />
-                    </Transitionizer>
-                }
-            /> */}
-
             <Route
                 path="/tempregistry"
                 element={

@@ -1,33 +1,23 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { giftClaimedToggle } from '../../../features/guest/extrasSlice';
-import '../App.css';
+import '../../../App.css';
 
-export function RegistryPageExternalCard({Data, displayedId}) {
+export function RegistryPageExternalCard({ Data, displayedId, children }) {
     const dispatch = useDispatch();
-    // const giftClaimed = useSelector((state) => state.extras.giftClaimed) 
     const [giftData, setGiftData] = useState({})
-    // const [giftClaimed, setGiftClaimed] = useState({})
-    // const [giftClaimed, setGiftClaimed] = useState(false)
 
     useEffect(() => {
         const gift_name = Data.find(gift => gift.item_id === displayedId)
         setGiftData(gift_name)
     }, [displayedId])
 
-    // const handleClaim = () => {
-    //     const gift_claimed = giftData.claimed
-    //     setGiftClaimed(!gift_claimed)
-    // }, [displayedId, giftClaimed])
-
     return ( 
         <div>
             {!giftData
             ?
             <div>
-                <p>
-                    This is a graph measuring function versus size. A small practical item will be totally opposite diagonally to a large piece of art.
-                    Please remember to click the popup when you buy an item so that we can remove it from the registry!
+                <p className = "font-suse">
+                    {children}
                 </p>
             </div>
             :

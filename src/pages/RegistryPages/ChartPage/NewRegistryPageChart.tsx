@@ -5,7 +5,7 @@ import 'react-tippy/dist/tippy.css'
 import { AxisBottom } from "./ChartComponents/AxisBottom";
 import { AxisLeft } from "./ChartComponents/AxisLeft";
 import { Tooltip, InteractionData } from "./ChartComponents/Tooltip";
-import '../styles/Registry.css'
+import '../../../styles/Registry.css'
 import { AxisTop } from "./ChartComponents/AxisTop";
 
 // doing this: https://www.react-graph-gallery.com/scatter-plot
