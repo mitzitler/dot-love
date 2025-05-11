@@ -7,7 +7,7 @@ import { RegistryTablePage } from './RegistryPages/RegistryTablePage.js';
 // import { RegistryClaimPage } from './RegistryPages/RegistryClaimPage.js';
 import useGetUserClaimsQuery from '../services/spectaculo.js'
 
-export function Registry({ loginHeader, registryItems,  claimedItems }) {
+export function Registry({ registryItems,  claimedItems }) {
 
     const pageMainColor = "khaki"  // temp colors
     const pageSecondaryColor = "lime"
@@ -32,12 +32,12 @@ export function Registry({ loginHeader, registryItems,  claimedItems }) {
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <RegistryChartPage loginHeader={loginHeader} registryItems={registryItems} />
+            <RegistryChartPage registryItems={registryItems} />
         </CardStackPage>
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <RegistryTablePage loginHeader={loginHeader} registryItems={registryItems} />
+            <RegistryTablePage registryItems={registryItems} />
         </CardStackPage>
 
         {/* used to have conditional rendering on claimedItems.length == 0 */}

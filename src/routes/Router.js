@@ -10,21 +10,15 @@ import { setloginHeaderState } from '../features/guest/extrasSlice';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
 
-export function Router ({ loginHeader, setLoginHeader}) {
+export function Router ({ setLoginHeader}) {
 
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
-
-
-    // router is only ever called if login success is true, i wonder if I can 
-    // call these funcs here and make them default login success = true?
     
     // dispatch(setloginHeaderState(loginHeader));
     const registryItems = useRegistryItems(true, loginHeader)
-    console.log(registryItems)
     const claimedItems = useClaimedItems(true, loginHeader)
-    console.log(claimedItems)
 
     return (
         <Routes>
@@ -59,7 +53,7 @@ export function Router ({ loginHeader, setLoginHeader}) {
                         <Registry 
                             registryItems={registryItems} 
                             claimedItems={claimedItems}
-                            loginHeader={loginHeader} />
+                            />
                     </Transitionizer>
                 }
             />

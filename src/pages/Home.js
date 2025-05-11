@@ -25,7 +25,8 @@ export function Home({ loginHeader, setLoginHeader }) {
             <main className="card-stack">
 
                     {/* <Router registryItems={registryItems} claimedItems={claimedItems} /> */}
-                    <Router loginHeader={loginHeader} setLoginHeader={setLoginHeader} />
+                    {/* <Router loginHeader={loginHeader} setLoginHeader={setLoginHeader} /> */}
+                    <Router/>
             </main>
         </div>
         

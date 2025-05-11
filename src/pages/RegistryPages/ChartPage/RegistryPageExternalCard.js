@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCreateClaimMutation } from '../../../services/spectaculo.js'
 import '../../../App.css';
 
-export function RegistryPageExternalCard({ loginHeader, Data, displayedId, children }) {
+export function RegistryPageExternalCard({ Data, displayedId, children }) {
     const dispatch = useDispatch();
     const [giftData, setGiftData] = useState({})
     const [createClaim, { isLoading }] = useCreateClaimMutation();
@@ -15,35 +15,35 @@ export function RegistryPageExternalCard({ loginHeader, Data, displayedId, child
     }, [displayedId])
 
     console.log('giftData: ', giftData)
-    console.log('loginHeader: ', loginHeader)
+    // console.log('loginHeader: ', loginHeader)
 
     const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
     console.log('loginHeaderState: ', loginHeaderState)
 
-    const handleClaimClick = async (makeApiCall) => {
+    // const handleClaimClick = async (makeApiCall) => {
 
-        // if this is not already claimed, we make a call
-        if (giftData.claim_state == 'UNCLAIMED'  || isLoading) return;
+    //     // if this is not already claimed, we make a call
+    //     if (giftData.claim_state == 'UNCLAIMED'  || isLoading) return;
 
-        // Make the API call
-        try {
-            const firstLast = loginHeader;
-            const claimData = giftData.item_id;
-            const result = await createClaim({
-                headers: { 'X-First-Last': firstLast },
-                // NOTE: so we don't run into a
-                body: claimData,
-            }).unwrap();
+    //     // Make the API call
+    //     try {
+    //         const firstLast = loginHeader;
+    //         const claimData = giftData.item_id;
+    //         const result = await createClaim({
+    //             headers: { 'X-First-Last': firstLast },
+    //             // NOTE: so we don't run into a
+    //             body: claimData,
+    //         }).unwrap();
 
-            if (result.code !== 200) {
-                console.error("Something went wrong with Spectaculo!", result);
-            }
+    //         if (result.code !== 200) {
+    //             console.error("Something went wrong with Spectaculo!", result);
+    //         }
 
-            console.log("Posted Claim to the Spectaculo, result:", result);
-        } catch (err) {
-            console.error("Post Claim API call failed:", err);
-        }
-    }
+    //         console.log("Posted Claim to the Spectaculo, result:", result);
+    //     } catch (err) {
+    //         console.error("Post Claim API call failed:", err);
+    //     }
+    // }
 
 
     return ( 
@@ -70,7 +70,7 @@ export function RegistryPageExternalCard({ loginHeader, Data, displayedId, child
                         onClick={()=>handleClaimClick()}
                         >
                             {/* if the user is the one who claimed it.. You claimed me! */}
-                        {giftData.claim_state == 'UNCLAIMED' ? "I'm claiming this!" :  giftData.claimant_id === loginHeader ? "You claimed me!" : "This is claimed!"}
+                        {/* {giftData.claim_state == 'UNCLAIMED' ? "I'm claiming this!" :  giftData.claimant_id === loginHeader ? "You claimed me!" : "This is claimed!"} */}
                     </button>
                 </span>
                 <div className="relative m-auto grid grid-cols-4" >

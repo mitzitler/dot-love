@@ -84,7 +84,7 @@ import '../../App.css';
 //      },
 // ]
 
-export function RegistryChartPage({ loginHeader, registryItems }) {
+export function RegistryChartPage({ registryItems }) {
     const [displayedId, setDisplayedId] = useState()
     const [claimedGift, setClaimedGift] = useState(false)
 
@@ -128,7 +128,7 @@ export function RegistryChartPage({ loginHeader, registryItems }) {
                     />
             </div>
             <RegistryPageExternalCard className="card col-span-1 static"
-                loginHeader = {loginHeader}
+                // loginHeader = {loginHeader}
                 displayedId = {displayedId}
                 Data = {registryItems}  
                 // setClaimedGift = {setClaimedGift}
