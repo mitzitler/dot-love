@@ -25,13 +25,25 @@
     text-align: center;
 }
 
+.registry h3 {
+  font-size: medium;
+  font-family: 'harmond';
+  font-weight: 'extra-bold';
+  color: black;
+  margin-top: 0.75em;
+  //margin-bottom: 0.5em;
+  text-align: center;
+}
+
 .registry p {
     //font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-family: 'bocalupo';
+    /* font-family: 'bocalupo'; */
+    /* font-family: 'suse'; */
     text-align: left;
     padding-left: 3em;
     padding-right: 3em;
     font-size: medium;
+    align: top
 }
 
 .registry button {
@@ -146,11 +158,23 @@
   transform: rotate(45deg);
 }
 
-/* styling for MUI table */
-.MuiTableContainer {
-  background-color: red
+.registry-item-description {
+  font-family: 'Suse';
+  font-size: 8;
+  font-weight: 400;
+  padding: 4px;
+  margin: 0 auto;
 }
 
-.table-div {
-  height: 10px
+.gift-info {
+  font-family: 'Suse';
+  font-weight: 100;
+  padding: 4px;
+  margin: auto
+}
+
+// this doesnt do anything
+.modal-button {
+  border-width: 2px;
+  border-color: green 
 }

@@ -1,13 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
-
 import { Transitionizer } from '../components/Transitionizer';
 import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
+import { setloginHeaderState } from '../features/guest/extrasSlice';
+import useRegistryItems from '../components/useRegistryItems';
+import useClaimedItems from '../components/useClaimedItems';
 
-export function Router ({registryItems}) {
+export function Router ({ loginHeader, setLoginHeader}) {
+
+    const dispatch = useDispatch();
+
+    // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+
+
+    // router is only ever called if login success is true, i wonder if I can 
+    // call these funcs here and make them default login success = true?
+    
+    // dispatch(setloginHeaderState(loginHeader));
+    const registryItems = useRegistryItems(true, loginHeader)
+    console.log(registryItems)
+    const claimedItems = useClaimedItems(true, loginHeader)
+    console.log(claimedItems)
+
     return (
         <Routes>
             {/* <Route
@@ -38,7 +56,10 @@ export function Router ({registryItems}) {
                 path="/registry"
                 element={
                     <Transitionizer>
-                        <Registry registryItems={registryItems} />
+                        <Registry 
+                            registryItems={registryItems} 
+                            claimedItems={claimedItems}
+                            loginHeader={loginHeader} />
                     </Transitionizer>
                 }
             />
@@ -50,14 +71,16 @@ export function Router ({registryItems}) {
                     </Transitionizer>
                 }
             />
-            <Route
+            {/* <Route
                 path="/tempregistry"
                 element={
                     <Transitionizer>
-                        <RegistryTemp registryItems={registryItems} />
+                        <RegistryTemp 
+                            registryItems={registryItems} 
+                            claimedItems={claimedItems} />
                     </Transitionizer>
                 }
-            />
+            /> */}
         </Routes>
     )
 }

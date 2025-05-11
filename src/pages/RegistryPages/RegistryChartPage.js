@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SpringModal from '../../components/Modal.js';
 import { NewRegistryPageChart } from "./ChartPage/NewRegistryPageChart.tsx";
 import { RegistryPageExternalTitle } from "./ChartPage/RegistryPageExternalTitle.js";
 import { RegistryPageExternalCard } from "./ChartPage/RegistryPageExternalCard.js";
@@ -83,7 +84,7 @@ import '../../App.css';
 //      },
 // ]
 
-export function NewRegistryPage({registryItems}) {
+export function RegistryChartPage({ loginHeader, registryItems }) {
     const [displayedId, setDisplayedId] = useState()
     const [claimedGift, setClaimedGift] = useState(false)
 
@@ -104,12 +105,19 @@ export function NewRegistryPage({registryItems}) {
 
     // console.log(data_array)
 
+    const modalLabel = "Help!"
+    const modalTitle = "What's going on?"
+    const modalText = "We are injecting whimsy into everything we do - yes, even if it means it is initially harder to use. The way our brains work, we like to think of a registry like a graph. On the horizontal, is 'size'. On the vertical, is 'artfullness'. All gifts were thoughtfully picked out and currated - we didn't choose anything that wouldn't fit in our apartment! If you hate this chart display, there is also a table below that you can scroll through. Above all, make sure that you hit 'I'm claiming this!', to claim your item!"
+
     return ( 
         <div>
-            <RegistryPageExternalTitle
+            <div className="inline-flex ">
+            <h1 className="px-4"> Registry Graph Mode </h1> <SpringModal modalLabel={modalLabel} modalTitle={modalTitle} modalText={modalText} />
+            </div>
+            {/* <RegistryPageExternalTitle
                 Data={registryItems}
                 displayedId = {displayedId} 
-                setDisplayedId={setDisplayedId} />
+                setDisplayedId={setDisplayedId} /> */}
             <div className="card place-self-center p-2 border-4 border-double rounded-lg bg-stone-200/50 border-stone-500">
                 <NewRegistryPageChart 
                     data={registryItems}
@@ -120,11 +128,15 @@ export function NewRegistryPage({registryItems}) {
                     />
             </div>
             <RegistryPageExternalCard className="card col-span-1 static"
+                loginHeader = {loginHeader}
                 displayedId = {displayedId}
                 Data = {registryItems}  
-                setClaimedGift = {setClaimedGift}>
+                // setClaimedGift = {setClaimedGift}
+                >
+                <div className="registry-item-description">
                 This is a graph measuring function versus size. A small practical item will be totally opposite diagonally to a large piece of art.
                     Please remember to click the popup when you buy an item so that we can remove it from the registry!
+                </div>
             </RegistryPageExternalCard>
         </div>
     )

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
 import { setloginHeaderState } from '../features/guest/extrasSlice.js';
@@ -7,13 +7,14 @@ import { toast } from 'react-toastify'; // Toast (yum!)
 import { useLocation } from 'react-router-dom';
 import '../App.css';
 
-export function HeaderHome({loginSuccess, setLoginSuccess}) {
+export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLoginHeader}) {
 
     const dispatch = useDispatch();
 
+    // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+
     const [entryValue, setEntryValue] = useState("")
     const entryValuePlaceholder = "First Last"
-    const [loginHeader, setLoginHeader] = useState(null);
 
     // Function to emit toast 🍞
     const notify = (input) => {
@@ -66,16 +67,19 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
          if (first1 && first2 && last1) {
             const firstLast = `${first1} ${first2}_${last1}`;
             console.log('first1 first2 and last: ', firstLast)
-            setLoginHeader({ 'X-First-Last': firstLast });
+            // setloginHeaderState(firstLast);
+            setLoginHeader({ 'X-First-Last': firstLast})
             dispatch(setloginHeaderState(firstLast))
         } else if (first && last) {
             const firstLast = `${first}_${last}`;
             console.log('first and last: ', firstLast)
-            setLoginHeader({ 'X-First-Last': firstLast });
-            dispatch(setloginHeaderState(firstLast))
+            // setloginHeaderState(firstLast);
+            setLoginHeader({ 'X-First-Last': firstLast})
+            dispatch(setloginHeaderState(firstLast));
         } else  {
-            setLoginHeader(null); // Prevent invalid API calls
+            setloginHeaderState(null); // Prevent invalid API calls
         }
+        
     };
 
     return (
@@ -89,7 +93,6 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
               <input placeholder={entryValuePlaceholder} type="text"
                   id="genericheader"
                   value={entryValue}
-                //   onFocus={handleClearField}
                   onInput={handleNameChange}
                   onKeyDown={handleKeyDown}/>
             </form>

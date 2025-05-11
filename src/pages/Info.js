@@ -29,6 +29,7 @@ export function Info() {
     return (
 
         <>
+        {/* perhaps something on click here renders a pop up suggesting desktop ? */}
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
             pageTertiaryColor={pageTertiaryColor} >
             <NavLink className='btn-23' 

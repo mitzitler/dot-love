@@ -16,7 +16,7 @@ export const spectaculoApi = createApi({
     // Get claims for a specific user
     getUserClaims: builder.query({
       query: (firstLast) => ({
-        url: `/claims/${firstLast}`,
+        url: `/claim`,
         method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),

@@ -1,12 +1,13 @@
-import React, {useRef} from 'react';
+import React, { useState } from 'react';
 import { RSVP } from './pages/RSVP'
-import { HeaderHome } from './pages/HeaderHome';
 import { Home } from './pages/Home';
 import { LightShow } from './components/LightShowVideo'
 import { Routes, Route } from 'react-router-dom';
 import { ToastContainer} from 'react-toastify'; // Toast (yum!)
 
 export default function App() {
+
+  const [loginHeader, setLoginHeader] = useState(null);
 
   return (
     <div id = "root">
@@ -18,7 +19,7 @@ export default function App() {
           toastStyle={{}}/>
       <Routes>
         <Route path="rsvp/*" element={<RSVP/>} />
-        <Route path="*" element={<Home/>} />
+        <Route path="*" element={<Home loginHeader={loginHeader} setLoginHeader={setLoginHeader} />} />
       </Routes>
     </div>
   );

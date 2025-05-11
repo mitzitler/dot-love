@@ -12,6 +12,7 @@ const useRegistryItems = (loginSuccess, loginHeader) => {
   useEffect(() => {
     if (isSuccess && registry_data?.items) {
       setItems(registry_data.items);
+      console.log('items API message: ', registry_data.message)
     }
   }, [isSuccess, registry_data]);
 

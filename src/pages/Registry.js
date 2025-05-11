@@ -2,11 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
-import { NewRegistryPage } from './RegistryPages/NewRegistryPage.js';
+import { RegistryChartPage } from './RegistryPages/RegistryChartPage.js';
 import { RegistryTablePage } from './RegistryPages/RegistryTablePage.js';
-import { RegistryClaim } from './RegistryPages/RegistryClaim.js';
+// import { RegistryClaimPage } from './RegistryPages/RegistryClaimPage.js';
+import useGetUserClaimsQuery from '../services/spectaculo.js'
 
-export function Registry({registryItems}) {
+export function Registry({ loginHeader, registryItems,  claimedItems }) {
 
     const pageMainColor = "khaki"  // temp colors
     const pageSecondaryColor = "lime"
@@ -14,7 +15,7 @@ export function Registry({registryItems}) {
 
     const pageSection = "registry"
 
-    
+    // console.log(claimedItems)
 
     return (
     
@@ -31,18 +32,23 @@ export function Registry({registryItems}) {
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <NewRegistryPage registryItems={registryItems} />
+            <RegistryChartPage loginHeader={loginHeader} registryItems={registryItems} />
         </CardStackPage>
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
             pageSection={pageSection}>
-            <RegistryTablePage registryItems={registryItems} />
+            <RegistryTablePage loginHeader={loginHeader} registryItems={registryItems} />
         </CardStackPage>
-        <CardStackPage pageMainColor={pageMainColor} 
-            pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
-            pageSection={pageSection}>
-            <RegistryClaim registryItems={registryItems} />
-        </CardStackPage>
+
+        {/* used to have conditional rendering on claimedItems.length == 0 */}
+        {/* { claimedItems.length == 0 ? <></> :  */}
+            {/* <CardStackPage pageMainColor={pageMainColor} 
+                pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
+                pageSection={pageSection}>
+                <RegistryClaimPage registryItems={registryItems}  claimedItems={registryItems} />
+            </CardStackPage> */}
+        {/* } */}
+
         </>
     )
 

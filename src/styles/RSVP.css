@@ -246,9 +246,21 @@
 .btn-23{
   animation: marquee 50s linear infinite;
   text-shadow: 
-  225px 0px maroon, 150px 0px maroon, 75px 0px maroon,
-  -75px 0px maroon, -150px 0px maroon, -225px 0px maroon,
-  -300px 0px maroon
+  525px 0px maroon,
+  450px 0px maroon,
+  375px 0px maroon,
+  300px 0px maroon,
+  225px 0px maroon, 
+  150px 0px maroon, 
+  75px 0px maroon,
+  -75px 0px maroon, 
+  -150px 0px maroon, 
+  -225px 0px maroon,
+  -300px 0px maroon,
+  -375px 0px maroon,
+  -450px 0px maroon,
+  -525px 0px maroon,
+  -600px 0px maroon
 }
 
 .btn-generic {
