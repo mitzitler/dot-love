@@ -16,10 +16,10 @@ const extrasSlice = createSlice({
       console.log('for item id', action.payload[0], 'the claimed state is now', action.payload[1])
     },
     setloginHeaderFirstLast(state, action) {
-      state.loginSuccessState = Object.values(action.payload)
+      state.loginHeaderFirstLast = Object.values(action.payload)
     },
     setloginHeaderState(state, action) {
-      state.loginSuccessState = Object.values(action.payload)[0]
+      state.loginHeaderState = Object.values(action.payload)[0]
       console.log('The login header for this session is: ', Object.values(action.payload)[0])
     }
   }

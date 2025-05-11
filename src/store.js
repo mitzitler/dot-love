@@ -11,7 +11,7 @@ import { spectaculoApi } from './services/spectaculo';
 const persistConfig = {
     key: 'root',
     storage, // storage mechanism
-    whitelist: ['rsvp', 'rsvpCompleted', 'user'], // this is the list of reducers to persist
+    whitelist: ['rsvp', 'rsvpCompleted', 'user', 'extras'], // this is the list of reducers to persist
 }
 
 const rootReducer = combineReducers({

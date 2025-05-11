@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useCreateClaimMutation } from '../../../services/spectaculo.js'
+import useRegistryItems from '../../../components/useRegistryItems';
 import '../../../App.css';
 
 export function RegistryPageExternalCard({ Data, displayedId, children }) {
@@ -20,30 +21,38 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
     const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
     console.log('loginHeaderState: ', loginHeaderState)
 
-    // const handleClaimClick = async (makeApiCall) => {
+    const handleClaimClick = async (makeApiCall) => {
 
-    //     // if this is not already claimed, we make a call
-    //     if (giftData.claim_state == 'UNCLAIMED'  || isLoading) return;
+        // if (giftData.claim_state == 'CLAIMED' && giftData.claimant_id != loginHeaderState) return;
 
-    //     // Make the API call
-    //     try {
-    //         const firstLast = loginHeader;
-    //         const claimData = giftData.item_id;
-    //         const result = await createClaim({
-    //             headers: { 'X-First-Last': firstLast },
-    //             // NOTE: so we don't run into a
-    //             body: claimData,
-    //         }).unwrap();
+        // if this is not already claimed, we make a call
+        // if (giftData.claim_state == 'UNCLAIMED'  || isLoading) return;
 
-    //         if (result.code !== 200) {
-    //             console.error("Something went wrong with Spectaculo!", result);
-    //         }
+        // Make the API call
+        try {
+            console.log('try loginHeaderState: ', loginHeaderState)
+            const claimData = {'item_id': giftData.item_id, 'claimant_id': loginHeaderState};
+            const result = await createClaim({
+                firstLast: loginHeaderState,
+                // NOTE: so we don't run into a
+                claimData,
+            }).unwrap();
 
-    //         console.log("Posted Claim to the Spectaculo, result:", result);
-    //     } catch (err) {
-    //         console.error("Post Claim API call failed:", err);
-    //     }
-    // }
+            
+
+            // to do: response code formatting of spectaculo endpoints differs 
+            // from gizmo format - need to console log request to see how to check 
+            // errors on code here
+            
+            // if (result.code !== 200) {
+            //     console.error("Something went wrong with Spectaculo!", result);
+            // }
+
+            console.log("Posted Claim to the Spectaculo, result:", result);
+        } catch (err) {
+            console.error("Post Claim API call failed:", err);
+        }
+    }
 
 
     return ( 
@@ -52,13 +61,13 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
             ?
             <div>
                 <p className = "registry-item-description">
-                    {!giftData ? children : giftData.descr}
+                    {giftData ? giftData.descr : children}
                 </p>
             </div>
             :
             <div>
 
-                <span className={!giftData.claim_state ? '' : 'grayscale' }>
+                <span className={giftData.claim_state == 'UNCLAIMED' ? '' : 'grayscale' }>
                     <button className="rounded-lg text-lg pt-1 my-2">
                         <a href={giftData.link} >
                             🪩  🌸  🪐   Buy me for $ {giftData.price_cents/100.0} !   🪐  🌸  🪩
@@ -69,8 +78,8 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
                     <button className="rounded-lg text-lg pt-1 px-2 my-2"
                         onClick={()=>handleClaimClick()}
                         >
-                            {/* if the user is the one who claimed it.. You claimed me! */}
-                        {/* {giftData.claim_state == 'UNCLAIMED' ? "I'm claiming this!" :  giftData.claimant_id === loginHeader ? "You claimed me!" : "This is claimed!"} */}
+                        {giftData.claim_state == 'UNCLAIMED' ? "I'm claiming this!" 
+                            :  giftData.claimant_id === loginHeaderState ? "You claimed me!" : "This is claimed!"}
                     </button>
                 </span>
                 <div className="relative m-auto grid grid-cols-4" >
@@ -82,10 +91,9 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
                         <span>
                             <h3 className="text-sm">{giftData.name} ⋆  ｡  °  ✩ from <em>{giftData.brand}</em> </h3>
                             {/* <h3 className="text-sm">{giftData.name.toUpperCase()} ⋆  ｡  °  ✩ from <em>{giftData.brand}</em> </h3> */}
-                            {/* <br/> */}
+
                             <p className="registry-item-description">
-                                {/* {giftData.descr} */}
-                                Sample description for an item. This description is probably several sentences long - it is our pitch for someone to buy the item. 
+                                {giftData.descr}
                             </p>
 
                         </span>

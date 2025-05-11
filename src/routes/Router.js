@@ -14,11 +14,15 @@ export function Router ({ setLoginHeader}) {
 
     // const dispatch = useDispatch();
 
-    // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
-    
+    const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+    const loginHeader = { 'X-First-Last': loginHeaderState}
+
+    console.log('loginHeaderState: ', loginHeaderState)
+    console.log('loginHeader: ', loginHeader)
+
     // dispatch(setloginHeaderState(loginHeader));
-    const registryItems = useRegistryItems(true, loginHeader)
-    const claimedItems = useClaimedItems(true, loginHeader)
+    const registryItems = useRegistryItems(true, loginHeaderState)
+    const claimedItems = useClaimedItems(true, loginHeaderState)
 
     return (
         <Routes>

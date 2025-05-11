@@ -25,7 +25,7 @@ export const spectaculoApi = createApi({
     // Create a claim on a registry item
     createClaim: builder.mutation({
       query: ({ firstLast, claimData }) => ({
-        url: '/claim/create',
+        url: '/claim',
         method: 'POST',
         body: claimData,
         headers: { 'X-First-Last': firstLast },
@@ -35,7 +35,7 @@ export const spectaculoApi = createApi({
     // Update a claim status (claimed/purchased/unclaimed)
     updateClaim: builder.mutation({
       query: ({ firstLast, updateData }) => ({
-        url: '/claim/update',
+        url: '/claim',
         method: 'PATCH',
         body: updateData,
         headers: { 'X-First-Last': firstLast },

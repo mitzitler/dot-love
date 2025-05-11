@@ -39,13 +39,14 @@ export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLogin
         if (data && data.code === 200) {
             setLoginSuccess(true);
             // dispatch(setLoginSuccessState())
+            dispatch(setloginHeaderState(loginHeader))
             console.log("Gizmo login success, result:", data);
             notify(`Welcome, ${data.body.user.first}! Please scroll down`)
         }
         if (error) {
             console.error("Login API call failed:", error);
         }
-    }, [data, error]);
+    }, [data, error, dispatch, loginHeader]);
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -60,24 +61,20 @@ export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLogin
         const [first, last] = value.trim().split(" ");
         const [first1, first2, last1] = value.trim().split(" ");
 
-        if(e.keyCode == 13){ 
+        if(e.keyCode == 13){
             e.preventDefault();
          }
       
          if (first1 && first2 && last1) {
             const firstLast = `${first1} ${first2}_${last1}`;
             console.log('first1 first2 and last: ', firstLast)
-            // setloginHeaderState(firstLast);
             setLoginHeader({ 'X-First-Last': firstLast})
-            dispatch(setloginHeaderState(firstLast))
         } else if (first && last) {
             const firstLast = `${first}_${last}`;
             console.log('first and last: ', firstLast)
-            // setloginHeaderState(firstLast);
             setLoginHeader({ 'X-First-Last': firstLast})
-            dispatch(setloginHeaderState(firstLast));
-        } else  {
-            setloginHeaderState(null); // Prevent invalid API calls
+        } else {
+            setLoginHeader(null); // Prevent invalid API calls
         }
         
     };
