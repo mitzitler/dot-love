@@ -256,9 +256,18 @@ class DotLoveCoreStack(Stack):
 
         # Search registry claim by claimant (composite first_last)
         registry_claim_table.add_global_secondary_index(
-            index_name="claimant-lookup-index",
+            index_name="claimant-id-lookup-index",
             partition_key=dynamodb.Attribute(
-                name="first_last",
+                name="claimant_id",
+                type=dynamodb.AttributeType.STRING,
+            ),
+        )
+
+        # Search registry claim by item id
+        registry_claim_table.add_global_secondary_index(
+            index_name="item-id-lookup-index",
+            partition_key=dynamodb.Attribute(
+                name="item_id",
                 type=dynamodb.AttributeType.STRING,
             ),
         )
@@ -372,6 +381,11 @@ class DotLoveCoreStack(Stack):
                 "TZ": "US/Eastern",
                 # for calling gizmo
                 "internal_api_key": self.internal_api_key,
+                # contact info
+                "mitzi_email": self.contact_info["mitzi"]["email"],
+                "mitzi_phone": self.contact_info["mitzi"]["phone"],
+                "matthew_email": self.contact_info["matthew"]["email"],
+                "matthew_phone": self.contact_info["matthew"]["phone"],
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
@@ -546,15 +560,23 @@ class DotLoveCoreStack(Stack):
         # /claim/create
         # Create a registry claim
         dot_love_api_gw.add_routes(
-            path="/spectaculo/claim/create",
+            path="/spectaculo/claim",
             methods=[apigw.HttpMethod.POST],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # /claim/create
+        # List registry claims
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/claim",
+            methods=[apigw.HttpMethod.GET],
             integration=spectaculo_service_integration,
         )
         #
         # /claim/update
         # Update a registry claim
         dot_love_api_gw.add_routes(
-            path="/spectaculo/claim/update",
+            path="/spectaculo/claim",
             methods=[apigw.HttpMethod.PATCH],
             integration=spectaculo_service_integration,
         )
@@ -562,24 +584,24 @@ class DotLoveCoreStack(Stack):
         # /items
         # Get all registry items
         dot_love_api_gw.add_routes(
-            path="/spectaculo/items",
+            path="/spectaculo/item",
             methods=[apigw.HttpMethod.GET],
             integration=spectaculo_service_integration,
         )
         #
-        # /item/{id}
-        # Get specific registry item
+        # POST /item
+        # Create an item
         dot_love_api_gw.add_routes(
-            path="/spectaculo/item/{id}",
-            methods=[apigw.HttpMethod.GET],
+            path="/spectaculo/item",
+            methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
         )
         #
-        # /claims/{first_last}
-        # Get claims for a user
+        # PATCH /item
+        # Create an item
         dot_love_api_gw.add_routes(
-            path="/spectaculo/claims/{first_last}",
-            methods=[apigw.HttpMethod.GET],
+            path="/spectaculo/item",
+            methods=[apigw.HttpMethod.PATCH],
             integration=spectaculo_service_integration,
         )
         #
