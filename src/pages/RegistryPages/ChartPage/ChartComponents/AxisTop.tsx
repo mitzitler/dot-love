@@ -4,35 +4,25 @@ import { ScaleLinear } from "d3";
 type AxisTopProps = {
     xScale: ScaleLinear<number, number>;
     pixelsPerTick: number;
-    height: number
+    height: number;
+    PRICE_CAT_DICT: Record<string, string>;
 }
 
 const TICK_LENGTH = 10
 
-export const AxisTop = ({ xScale, pixelsPerTick, height }: AxisTopProps) => {
+export const AxisTop = ({ xScale, pixelsPerTick, height, PRICE_CAT_DICT }: AxisTopProps) => {
 
     const ticksLegend = useMemo(() => {
-        const numberOfTicksTarget = 5
-        const PRICE_CAT_DICT: Record<string, string> = {
-            '0-50' : "#32a852",
-            '50-100' : "#e052eb",
-            '100-150' : "#5eb4ff",
-            '150+' : "#8037b8",
-            '??' : "#e35954"
-        }
-
         const PRICE_CAT_ARRAY = Object.keys(PRICE_CAT_DICT);
+        const step = xScale.range()[1] / PRICE_CAT_ARRAY.length;
     
-        return xScale.ticks(numberOfTicksTarget).map((value, index) => {
-            const category = PRICE_CAT_ARRAY[index] || "Unknown";
-            return { 
-                value,
-                xOffset: xScale(value),
-                category,
-                color: PRICE_CAT_DICT[category] || "Unknown"
-            }
-        })
-    }, [xScale])
+        return PRICE_CAT_ARRAY.map((category, index) => ({
+            value: index,
+            xOffset: step * index + step / 2, // center circles
+            category,
+            color: PRICE_CAT_DICT[category] || "Unknown",
+        }));
+    }, [xScale, PRICE_CAT_DICT]);
 
     return (
         <>

@@ -13,14 +13,14 @@ import { AxisTop } from "./ChartComponents/AxisTop";
 type DataPoint = {
     item_id: number;
     size_score: number;
-    function_score: number;
+    art_score: number;
     price_cents: number;
     has_dollar_value: boolean;
     price_cat: string;
     name: string;
     brand: string;
     descr: string;
-    claim_state: boolean;
+    claim_state: string;
   };
   
   type ScatterplotProps = {
@@ -29,10 +29,12 @@ type DataPoint = {
     margins: Array<number>;
     data: DataPoint[];
     displayedId: number;
-    setDisplayedId: React.Dispatch<React.SetStateAction<number>>
+    setDisplayedId: React.Dispatch<React.SetStateAction<number>>;
+    PRICE_CAT_DICT: Record<string, string>;
   };
 
-export const NewRegistryPageChart = ({ width, height, margins, data, displayedId, setDisplayedId }: ScatterplotProps) => {
+export const NewRegistryPageChart = ({ width, height, margins, data, displayedId, setDisplayedId,
+  PRICE_CAT_DICT }: ScatterplotProps) => {
 
     const [chartWidth, setChartWidth] = useState(width)
     const [chartHeight, setChartHeight] = useState(height)
@@ -72,10 +74,11 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
     const yScale = d3.scaleLinear().domain([-10,10]).range([boundsHeight, 0])
     const xScale = d3.scaleLinear().domain([-10,10]).range([0, boundsWidth])
     const allGroups = data.map((d) => String(d.price_cat))
+
     const colorScale = d3
     .scaleOrdinal<string>()
-    .domain(allGroups)
-    .range(["#32a852", "#e052eb", "#5eb4ff", "#8037b8", "#e35954"]);
+    .domain(Object.keys(PRICE_CAT_DICT))
+    .range(Object.values(PRICE_CAT_DICT));
 
     // this has the two axes being generated in other files too
 
@@ -83,16 +86,16 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
         return (
           <circle
             key={i}
-            r={!d.claim_state ? 8 : 5}
+            r={d.claim_state == 'UNCLAIMED' ? 7 : 5}
             cx={xScale(d.size_score)}
-            cy={yScale(d.function_score)}
+            cy={yScale(d.art_score)}
             stroke={colorScale(d.price_cat)}
             fill={colorScale(d.price_cat)}
             fillOpacity={0.7}
             onMouseEnter={() =>
               setHovered({
                 xPos: xScale(d.size_score),
-                yPos: yScale(d.function_score),
+                yPos: yScale(d.art_score),
                 name: d.name,
                 price: d.price_cents/100
               })
@@ -120,6 +123,7 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
                           xScale={xScale}
                           pixelsPerTick={40}
                           height={boundsHeight}
+                          PRICE_CAT_DICT={PRICE_CAT_DICT}
                         />
                     </g>
 

@@ -18,6 +18,7 @@ interface Data {
     price: number;
     price_string: string;
     descr: string;
+    claim_state: string
 }
 
 interface HeadCell {
@@ -156,14 +157,20 @@ export default function SortableVirtualizedTable({
   
     const rowContent = (index: number, row: Data) => {
         const isSelected = row.item_id === displayedId;
+        const isClaimed = row.claim_state === 'CLAIMED';
         return (
             <TableRow
                 key={row.item_id}
                 onClick={() => setDisplayedId(row.item_id)}
                 sx={{
-                    backgroundColor: isSelected ? 'khaki' : 'inherit',
+                    backgroundColor: isSelected 
+                        ? 'khaki' 
+                        : isClaimed 
+                            ? 'rgba(211, 211, 211, 0.5)'
+                            : 'inherit',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
+                    opacity: isClaimed ? 0.7 : 1
                 }}
             >
                 {headCells.map((column) => (
@@ -175,11 +182,17 @@ export default function SortableVirtualizedTable({
                             width: column.width,
                             maxWidth: column.width,
                             minWidth: column.width,
+                            textDecoration: isClaimed ? 'line-through' : 'none'
                         }}
                     >
                         {column.id === 'price' ? `$${row[column.id].toFixed(2)}` : row[column.id]}
                         
-                        
+                        {column.id === 'name' && isClaimed && (
+                            <span style={{ marginLeft: '5px', fontSize: '8px', color: 'green' }}>
+                                (Claimed)
+                            </span>
+                        )}
+
                     </TableCell>
                 ))}
             </TableRow>

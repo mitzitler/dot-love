@@ -90,7 +90,7 @@ export const AxisLeft = ({ yScale, pixelsPerTick, width }: AxisLeftProps) => {
                             transform: "rotate(-90deg)"
                         }}
                     >
-                        Function Score (Utility to Art)
+                        Art Score (Utility to Art)
                     </text>
                 </>
             ))}
