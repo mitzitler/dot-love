@@ -86,11 +86,11 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
         return (
           <circle
             key={i}
-            r={d.claim_state == 'UNCLAIMED' ? 7 : 5}
+            r={d.claim_state == 'UNCLAIMED' ? 7 : 4}
             cx={xScale(d.size_score)}
             cy={yScale(d.art_score)}
             stroke={colorScale(d.price_cat)}
-            fill={colorScale(d.price_cat)}
+            fill={d.claim_state == 'UNCLAIMED' ? colorScale(d.price_cat) : '#b5b5b5'}
             fillOpacity={0.7}
             onMouseEnter={() =>
               setHovered({
