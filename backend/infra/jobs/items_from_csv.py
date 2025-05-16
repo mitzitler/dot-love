@@ -33,6 +33,7 @@ with open("registry_items.csv", newline="", encoding="utf-8") as csvfile:
                 "art_score": float(Decimal(row.get("art_score", "0.0").strip())),
                 "link": row.get("link", "").strip(),
                 "img_url": row.get("image_name", "").strip(),
+                "display": parse_bool(row.get("display", "")),
                 "price_cents": int(float(row.get("price_cents", 0))),
             }
 

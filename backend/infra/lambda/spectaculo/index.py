@@ -165,6 +165,7 @@ class RegistryItem:
         img_url,
         price_cents,
         claim_state,
+        display,
         claimant_id=None,
     ):
         """
@@ -181,6 +182,7 @@ class RegistryItem:
         :param img_url (STR): s3 url for the item.
         :param price_cents (INT): cost of the item, in cents.
         :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
+        :param display (BOOL): whether the FE should display the item.
         :param claimant_id (STR): User id of the person who has claimed the item.
         """
         self.item_id = item_id
@@ -194,6 +196,7 @@ class RegistryItem:
         self.img_url = img_url
         self.price_cents = price_cents
         self.claim_state = claim_state
+        self.display = display
         self.claimant_id = claimant_id
 
     def as_map(self):
@@ -209,6 +212,7 @@ class RegistryItem:
             "img_url": self.img_url,
             "price_cents": self.price_cents,
             "claim_state": self.claim_state.name if self.claim_state else None,
+            "display": self.display,
             "claimant_id": self.claimant_id,
         }
 
@@ -255,6 +259,7 @@ class RegistryItem:
             img_url=deserialized_item.get("img_url"),
             price_cents=int(deserialized_item.get("price_cents", 0)),
             claim_state=claim_state,
+            display=deserialized_item.get("display", True),
             claimant_id=deserialized_item.get("claimant_id"),
         )
 
@@ -317,6 +322,7 @@ class RegistryItem:
             "link": self.link,
             "img_url": self.img_url,
             "price_cents": self.price_cents,
+            "display": self.display,
             "claim_state": (
                 self.claim_state.name if self.claim_state else ClaimState.UNCLAIMED.name
             ),
@@ -1069,8 +1075,9 @@ def get_registry_items():
         registry_items = RegistryItem.get_all_items_db(CW_DYNAMO_CLIENT)
 
         if not registry_items:
+            # This shouldn't happen
             return Response(
-                status_code=200,
+                status_code=500,
                 content_type="application/json",
                 body={"message": "No registry items found", "items": []},
             )
@@ -1115,6 +1122,7 @@ def add_registry_item():
             art_score=payload.get("art_score"),
             link=payload.get("link"),
             img_url=payload.get("img_url"),
+            display=payload.get("display"),
             price_cents=payload.get("price_cents"),
             claim_state=ClaimState.UNCLAIMED,
         )
