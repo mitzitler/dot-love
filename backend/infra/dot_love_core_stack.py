@@ -256,9 +256,18 @@ class DotLoveCoreStack(Stack):
 
         # Search registry claim by claimant (composite first_last)
         registry_claim_table.add_global_secondary_index(
-            index_name="claimant-lookup-index",
+            index_name="claimant-id-lookup-index",
             partition_key=dynamodb.Attribute(
-                name="first_last",
+                name="claimant_id",
+                type=dynamodb.AttributeType.STRING,
+            ),
+        )
+
+        # Search registry claim by item id
+        registry_claim_table.add_global_secondary_index(
+            index_name="item-id-lookup-index",
+            partition_key=dynamodb.Attribute(
+                name="item_id",
                 type=dynamodb.AttributeType.STRING,
             ),
         )
@@ -583,8 +592,16 @@ class DotLoveCoreStack(Stack):
         # GET /item/{id}
         # Get specific registry item
         dot_love_api_gw.add_routes(
-            path="/spectaculo/item/{id}",
-            methods=[apigw.HttpMethod.GET],
+            path="/spectaculo/item/{id}"
+            methods=[apigw.HttpMethod.POST],
+            integration=spectaculo_service_integration,
+        )
+        #
+        # PATCH /item
+        # Create an item
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/item",
+            methods=[apigw.HttpMethod.PATCH],
             integration=spectaculo_service_integration,
         )
         #

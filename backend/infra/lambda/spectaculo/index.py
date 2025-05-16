@@ -2,6 +2,7 @@ import json
 import os
 import random
 import string
+from datetime import datetime
 import time
 import traceback
 from functools import wraps
@@ -159,11 +160,10 @@ class RegistryItem:
         brand,
         descr,
         size_score,
-        function_score,
+        art_score,
         link,
         img_url,
         price_cents,
-        has_dollar_value,
         claim_state,
         claimant_id=None,
     ):
@@ -176,11 +176,10 @@ class RegistryItem:
         :param brand (STR): brand of the item.
         :param descr (STR): a description of the item.
         :param size_score (INT): used by the frontend to decide where the item falls on the size axis.
-        :param function_score (INT): used by the frontend to decide where the item falls on the function axis.
+        :param art_score (INT): used by the frontend to decide where the item falls on the function axis.
         :param link (STR): url to the item.
         :param img_url (STR): s3 url for the item.
         :param price_cents (INT): cost of the item, in cents.
-        :param has_dollar_value (BOOL): whether the item has a dollar value or not (like a craft, for example).
         :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
         :param claimant_id (STR): User id of the person who has claimed the item.
         """
@@ -190,11 +189,10 @@ class RegistryItem:
         self.brand = brand
         self.descr = descr
         self.size_score = size_score
-        self.function_score = function_score
+        self.art_score = art_score
         self.link = link
         self.img_url = img_url
         self.price_cents = price_cents
-        self.has_dollar_value = has_dollar_value
         self.claim_state = claim_state
         self.claimant_id = claimant_id
 
@@ -206,11 +204,10 @@ class RegistryItem:
             "brand": self.brand,
             "descr": self.descr,
             "size_score": self.size_score,
-            "function_score": self.function_score,
+            "art_score": self.art_score,
             "link": self.link,
             "img_url": self.img_url,
             "price_cents": self.price_cents,
-            "has_dollar_value": self.has_dollar_value,
             "claim_state": self.claim_state.name if self.claim_state else None,
             "claimant_id": self.claimant_id,
         }
@@ -252,12 +249,11 @@ class RegistryItem:
             last_checked=deserialized_item.get("last_checked"),
             brand=deserialized_item.get("brand"),
             descr=deserialized_item.get("descr"),
-            size_score=int(deserialized_item.get("size_score", 0)),
-            function_score=int(deserialized_item.get("function_score", 0)),
+            size_score=float(deserialized_item.get("size_score", 0.0)),
+            art_score=float(deserialized_item.get("art_score", 0.0)),
             link=deserialized_item.get("link"),
             img_url=deserialized_item.get("img_url"),
             price_cents=int(deserialized_item.get("price_cents", 0)),
-            has_dollar_value=bool(deserialized_item.get("has_dollar_value", True)),
             claim_state=claim_state,
             claimant_id=deserialized_item.get("claimant_id"),
         )
@@ -317,11 +313,10 @@ class RegistryItem:
             "brand": self.brand,
             "descr": self.descr,
             "size_score": self.size_score,
-            "function_score": self.function_score,
+            "art_score": self.art_score,
             "link": self.link,
             "img_url": self.img_url,
             "price_cents": self.price_cents,
-            "has_dollar_value": self.has_dollar_value,
             "claim_state": (
                 self.claim_state.name if self.claim_state else ClaimState.UNCLAIMED.name
             ),
@@ -341,18 +336,22 @@ class RegistryItem:
 
 
 class RegistryClaim:
-    def __init__(self, item_id, first_last, claim_state, updated_at=None):
+    def __init__(self, item_id, claimant_id, claim_state, updated_at=None, id=None):
         """
         Initialize a RegistryClaim, to keep track of who has claimed what.
 
         :param item_id(UUID): id of the Registry item that has been claimed.
-        :param first_last(STR): Primary key for the user (first_last format, e.g., "john_smith").
+        :param claimant_id(STR): Primary key for the user (first_last format, e.g., "john_smith").
         :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
         :param updated_at(DATETIME): datetime of the last time this record was updated.
         """
-        self.id = str(uuid.uuid4())
+        if id:
+            self.id = id
+        else:
+            self.id = str(uuid.uuid4())
+
         self.item_id = item_id
-        self.first_last = first_last
+        self.claimant_id = claimant_id
         self.claim_state = claim_state
         self.updated_at = updated_at or datetime.now().isoformat()
 
@@ -360,7 +359,7 @@ class RegistryClaim:
         return {
             "id": self.id,
             "item_id": self.item_id,
-            "first_last": self.first_last,
+            "claimant_id": self.claimant_id,
             "claim_state": self.claim_state.name if self.claim_state else None,
             "updated_at": self.updated_at,
         }
@@ -368,13 +367,13 @@ class RegistryClaim:
     def __str__(self):
         return (
             f"RegistryClaim(id={self.id}, item_id={self.item_id}, "
-            f"first_last={self.first_last}, claim_state={self.claim_state})"
+            f"claimant_id={self.claimant_id}, claim_state={self.claim_state})"
         )
 
     def __repr__(self):
         return (
             f"RegistryClaim(id={self.id!r}, item_id={self.item_id!r}, "
-            f"first_last={self.first_last!r}, claim_state={self.claim_state!r})"
+            f"claimant_id={self.claimant_id!r}, claim_state={self.claim_state!r})"
         )
 
     def create_db(self, dynamo_client):
@@ -384,7 +383,7 @@ class RegistryClaim:
         key_expression = {"id": {"S": self.id}}
         field_value_map = {
             "item_id": self.item_id,
-            "first_last": self.first_last,
+            "claimant_id": self.claimant_id,
             "claim_state": self.claim_state.name,
             "updated_at": self.updated_at,
         }
@@ -404,7 +403,7 @@ class RegistryClaim:
         key_expression = {"id": {"S": self.id}}
         field_value_map = {
             "item_id": self.item_id,
-            "first_last": self.first_last,
+            "claimant_id": self.claimant_id,
             "claim_state": self.claim_state.name,
             "updated_at": datetime.now().isoformat(),
         }
@@ -435,9 +434,10 @@ class RegistryClaim:
         try:
             return RegistryClaim(
                 item_id=claim.get("item_id"),
-                first_last=claim.get("first_last"),
+                claimant_id=claim.get("claimant_id"),
                 claim_state=ClaimState[claim.get("claim_state")],
                 updated_at=claim.get("updated_at"),
+                id=claim.get("id"),
             )
         except Exception as e:
             log.exception(f"Error creating RegistryClaim from data: {e}")
@@ -446,25 +446,28 @@ class RegistryClaim:
     @staticmethod
     def find_by_item_id(item_id, dynamo_client):
         """
-        Find registry claims by item ID.
+        Find registry claim by item ID.
 
-        :param item_id: The ID of the registry item
+        :param item_id: The item id UUID
         :param dynamo_client: The DynamoDB client
         :return: RegistryClaim object or None if not found
         """
         try:
-            # Use the improved get_all method with filter
-            items = dynamo_client.get_all(
+            claim_items = dynamo_client.query(
                 table_name=REGISTRY_CLAIM_TABLE_NAME,
-                filter_expression="item_id = :item_id",
+                index_name="item-id-lookup-index",
+                key_condition_expression="item_id = :item_id",
                 expression_attribute_values={":item_id": {"S": item_id}},
             )
 
-            if not items:
+            if not claim_items:
+                log.error("No claims found", item=item_id)
                 return None
 
-            # Return the first claim for the item
-            return RegistryClaim.from_db(items[0])
+            # Use the first matching item
+            claim = RegistryClaim.from_db(claim_items[0])
+            return claim
+
         except Exception as e:
             log.exception(f"Error finding registry claim by item_id: {e}")
             return None
@@ -482,9 +485,9 @@ class RegistryClaim:
             # Query the registry claims using the GSI
             claims_data = dynamo_client.query(
                 table_name=REGISTRY_CLAIM_TABLE_NAME,
-                index_name="claimant-lookup-index",
-                key_condition_expression="first_last = :first_last",
-                expression_attribute_values={":first_last": {"S": first_last}},
+                index_name="claimant-id-lookup-index",
+                key_condition_expression="claimant_id = :claimant_id",
+                expression_attribute_values={":claimant_id": {"S": first_last}},
             )
 
             if not claims_data:
@@ -1093,6 +1096,79 @@ def get_registry_items():
         )
 
 
+@app.post("/spectaculo/item")
+def add_registry_item():
+    """
+    Add an item to the registry.
+    """
+    payload = app.current_event.json_body
+
+    try:
+        # Get the registry item using the static method
+        item = RegistryItem(
+            item_id=str(uuid.uuid4()),
+            name=payload.get("name"),
+            last_checked=datetime.now().strftime("%m/%d/%Y"),
+            brand=payload.get("brand"),
+            descr=payload.get("descr"),
+            size_score=payload.get("size_score"),
+            art_score=payload.get("art_score"),
+            link=payload.get("link"),
+            img_url=payload.get("img_url"),
+            price_cents=payload.get("price_cents"),
+            claim_state=ClaimState.UNCLAIMED,
+        )
+        item.update_db(CW_DYNAMO_CLIENT)
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={
+                "message": "success",
+                "item": item.as_map(),
+            },
+        )
+    except Exception as e:
+        log.exception("Failed to create registry claim")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to create registry claim", "error": str(e)},
+        )
+
+
+@app.patch("/spectaculo/item")
+def add_registry_item():
+    """
+    Update an item to in registry.
+    """
+    payload = app.current_event.json_body
+
+    try:
+        # Get the registry item
+        item = RegistryItem.from_item_id_db(payload.get("item_id"), CW_DYNAMO_CLIENT)
+
+        # update the values
+        item.price_cents = payload.get("price_cents")
+        item.last_checked = datetime.now().strftime("%m/%d/%Y")
+        item.update_db(CW_DYNAMO_CLIENT)
+
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={
+                "message": "success",
+                "item": item.as_map(),
+            },
+        )
+    except Exception as e:
+        log.exception("Failed to update registry item")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to update registry item", "error": str(e)},
+        )
+
+
 @app.get("/spectaculo/item/<item_id>")
 def get_registry_item(item_id):
     """
@@ -1177,13 +1253,13 @@ def create_claim():
                 status_code=409,
                 content_type="application/json",
                 body={
-                    "message": f"Registry item with ID {item_id} already has a claim"
+                    "message": f"Registry item with ID {item_id} already has a claim by user {existing_claim.claimant_id}"
                 },
             )
 
         # Create registry claim
         registry_claim = RegistryClaim(
-            item_id=item_id, first_last=claimant_id, claim_state=ClaimState.CLAIMED
+            item_id=item_id, claimant_id=claimant_id, claim_state=ClaimState.CLAIMED
         )
 
         registry_claim.create_db(CW_DYNAMO_CLIENT)
@@ -1262,7 +1338,7 @@ def update_claim():
         # Find the existing claim
         existing_claim = RegistryClaim.find_by_item_id(item_id, CW_DYNAMO_CLIENT)
 
-        if not existing_claim and claim_state != ClaimState.UNCLAIMED:
+        if not existing_claim:
             return Response(
                 status_code=404,
                 content_type="application/json",
@@ -1271,29 +1347,23 @@ def update_claim():
 
         # If unclaiming, remove the claimant ID from the item
         if claim_state == ClaimState.UNCLAIMED:
-            item.claim_state = ClaimState.UNCLAIMED
             item.claimant_id = None
-        else:
-            item.claim_state = claim_state
+
+        item.claim_state = claim_state
 
         # Update the item
         item.update_db(CW_DYNAMO_CLIENT)
 
         # Update the claim if it exists
-        result = {}
-        if existing_claim:
-            existing_claim.claim_state = claim_state
-            existing_claim.update_db(CW_DYNAMO_CLIENT)
-            result["claim"] = existing_claim.as_map()
-
-        result["item"] = item.as_map()
+        existing_claim.claim_state = claim_state
+        existing_claim.update_db(CW_DYNAMO_CLIENT)
 
         return Response(
             status_code=200,
             content_type="application/json",
             body={
                 "message": f"Registry claim updated successfully to {claim_state.name}",
-                **result,
+                "claim": existing_claim.as_map(),
             },
         )
     except Exception as e:
@@ -1310,6 +1380,7 @@ def get_user_claims():
     """
     Retrieve all registry claims for a specific user.
     """
+    first_last = app.context.get("first_last", "guest")
     try:
         first_last = app.context.get("first_last", "guest")
 
