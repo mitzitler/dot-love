@@ -1,16 +1,20 @@
-// import { HomePageRoutes } from '../routes/HomePageRoutes';
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
+import { setloginHeaderState } from '../features/guest/extrasSlice.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
 import { useLocation } from 'react-router-dom';
 import '../App.css';
-import { useSelector } from 'react-redux';
 
-export function HeaderHome({loginSuccess, setLoginSuccess}) {
+export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLoginHeader}) {
+
+    const dispatch = useDispatch();
+
+    // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+
     const [entryValue, setEntryValue] = useState("")
     const entryValuePlaceholder = "First Last"
-    const [loginHeader, setLoginHeader] = useState(null);
 
     // Function to emit toast 🍞
     const notify = (input) => {
@@ -34,13 +38,15 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
     useEffect(() => {
         if (data && data.code === 200) {
             setLoginSuccess(true);
+            // dispatch(setLoginSuccessState())
+            dispatch(setloginHeaderState(loginHeader))
             console.log("Gizmo login success, result:", data);
             notify(`Welcome, ${data.body.user.first}! Please scroll down`)
         }
         if (error) {
             console.error("Login API call failed:", error);
         }
-    }, [data, error]);
+    }, [data, error, dispatch, loginHeader]);
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -55,35 +61,35 @@ export function HeaderHome({loginSuccess, setLoginSuccess}) {
         const [first, last] = value.trim().split(" ");
         const [first1, first2, last1] = value.trim().split(" ");
 
-        if(e.keyCode == 13){ 
+        if(e.keyCode == 13){
             e.preventDefault();
          }
       
          if (first1 && first2 && last1) {
             const firstLast = `${first1} ${first2}_${last1}`;
             console.log('first1 first2 and last: ', firstLast)
-            setLoginHeader({ 'X-First-Last': firstLast });
+            setLoginHeader({ 'X-First-Last': firstLast})
         } else if (first && last) {
             const firstLast = `${first}_${last}`;
             console.log('first and last: ', firstLast)
-            setLoginHeader({ 'X-First-Last': firstLast });
-        } else  {
+            setLoginHeader({ 'X-First-Last': firstLast})
+        } else {
             setLoginHeader(null); // Prevent invalid API calls
         }
+        
     };
 
     return (
         <>
         {/* TODO: only letters can be accepted */}
-        <GenericHeader class="h-screen transfom-scale-5"
+        <GenericHeader className="h-screen transfom-scale-5"
             placeholder={"Full name?"} entryValue={entryValue} 
             setEntryValue={setEntryValue}>
-            <div class= "egg backdrop-blur-xl" />
+            <div className= "egg backdrop-blur-xl" />
             <form>
               <input placeholder={entryValuePlaceholder} type="text"
                   id="genericheader"
                   value={entryValue}
-                //   onFocus={handleClearField}
                   onInput={handleNameChange}
                   onKeyDown={handleKeyDown}/>
             </form>

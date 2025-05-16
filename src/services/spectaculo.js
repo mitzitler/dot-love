@@ -3,45 +3,44 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const spectaculoApi = createApi({
   reducerPath: 'spectaculoApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://api.mitzimatthew.love/spectaculo' }),
+  tagTypes: ['RegistryItems', 'UserClaims'],
   endpoints: (builder) => ({
     // Get all registry items
     getRegistryItems: builder.query({
       query: (firstLast) => ({
-        url: '/items',
+        url: '/item',
+        method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
-    }),
-
-    // Get a specific registry item by ID
-    getRegistryItem: builder.query({
-      query: ({ itemId, firstLast }) => ({
-        url: `/item/${itemId}`,
-        headers: { 'X-First-Last': firstLast },
-      }),
+      providesTags: ['RegistryItems'],
     }),
 
     // Get claims for a specific user
     getUserClaims: builder.query({
       query: (firstLast) => ({
-        url: `/claims/${firstLast}`,
+        url: `/claim`,
+        method: 'GET',
         headers: { 'X-First-Last': firstLast },
       }),
+      providesTags: ['UserClaims'],
     }),
 
     // Create a claim on a registry item
     createClaim: builder.mutation({
       query: ({ firstLast, claimData }) => ({
-        url: '/claim/create',
+        url: '/claim',
         method: 'POST',
         body: claimData,
         headers: { 'X-First-Last': firstLast },
       }),
+      // Invalidate the registry items and user claims cache after a claim is created
+      invalidatesTags: ['RegistryItems', 'UserClaims']
     }),
 
     // Update a claim status (claimed/purchased/unclaimed)
     updateClaim: builder.mutation({
       query: ({ firstLast, updateData }) => ({
-        url: '/claim/update',
+        url: '/claim',
         method: 'PATCH',
         body: updateData,
         headers: { 'X-First-Last': firstLast },

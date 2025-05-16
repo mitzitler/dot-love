@@ -1036,8 +1036,8 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
             if first_last != "guest":
                 send_text_notification(
                     first_last=first_last,
-                    template=PAYMENT_RECEIVED_TEXT,
-                    template_details={"amount": f"{amount_dollars:.2f}"},
+                    template=RAW_TEXT,
+                    template_details={"raw": f"{amount_dollars:.2f}"},
                 )
 
         elif event.type == "payment_intent.payment_failed":
@@ -1235,8 +1235,8 @@ def create_claim():
 
         # Check if the item is already claimed
         if (
-            item.claim_state == ClaimState.CLAIMED
-            or item.claim_state == ClaimState.PURCHASED
+            item.claim_state is ClaimState.CLAIMED
+            or item.claim_state is ClaimState.PURCHASED
         ):
             return Response(
                 status_code=400,
@@ -1248,7 +1248,7 @@ def create_claim():
 
         # Check if there's already a claim for this item
         existing_claim = RegistryClaim.find_by_item_id(item_id, CW_DYNAMO_CLIENT)
-        if existing_claim:
+        if existing_claim and existing_claim.claim_state is ClaimState.CLAIMED:
             return Response(
                 status_code=409,
                 content_type="application/json",
@@ -1272,7 +1272,7 @@ def create_claim():
         # Send text notification to the claimant
         send_text_notification(
             first_last=claimant_id,
-            template=ITEM_CLAIMED_TEXT,
+            template=RAW_TEXT,
             template_details={"item_name": item.name},
         )
 
@@ -1382,10 +1382,11 @@ def get_user_claims():
     """
     first_last = app.context.get("first_last", "guest")
     try:
-        # Get claims for the user using the static method
-        claims = RegistryClaim.find_by_user_id(first_last, CW_DYNAMO_CLIENT)
+        first_last = app.context.get("first_last", "guest")
 
-        if not claims:
+        # Get claims for the user
+        raw_claims = RegistryClaim.find_by_user_id(first_last, CW_DYNAMO_CLIENT)
+        if not raw_claims:
             return Response(
                 status_code=200,
                 content_type="application/json",
@@ -1395,38 +1396,13 @@ def get_user_claims():
                 },
             )
 
-        # For each claim, get the corresponding registry item
-        claims_with_items = []
-
-        # Prepare batch keys for all items
-        item_keys = []
-        for claim in claims:
-            item_keys.append({"id": {"S": claim.item_id}})
-
-        # Batch get all items in one request
-        if item_keys:
-            item_data_list = CW_DYNAMO_CLIENT.batch_get_items(
-                REGISTRY_ITEM_TABLE_NAME, item_keys
-            )
-
-            # Create a map for quick lookup
-            item_map = {}
-            for item_data in item_data_list:
-                item = RegistryItem.from_db(item_data)
-                if item:
-                    item_map[item.item_id] = item.as_map()
-
-            # Match claims with items
-            for claim in claims:
-                if claim.item_id in item_map:
-                    claims_with_items.append(claim.as_map())
-
+        claims = [claim.as_map() for claim in raw_claims]
         return Response(
             status_code=200,
             content_type="application/json",
             body={
                 "message": "User claims retrieved successfully",
-                "claims": claims_with_items,
+                "claims": claims,
             },
         )
     except Exception as e:
@@ -1441,7 +1417,7 @@ def get_user_claims():
         )
 
 
-@app.post("/spectaculo/payment/create")
+@app.post("/spectaculo/payment")
 def payment_create():
     """
     Create a payment intent using Stripe.
@@ -1473,7 +1449,6 @@ def payment_create():
                 body={"message": "Amount must be a positive integer (in cents)"},
             )
 
-        # Create metadata for the payment
         metadata = {
             "description": description,
             "user_id": user_id,

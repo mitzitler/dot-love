@@ -1,21 +1,19 @@
 import '../../App.css';
-import { NavLink, useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
 import { FormSubmitLeft } from '../../components/FormSubmitLeft.js';
 import { FormSubmitRight } from '../../components/FormSubmitRight.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearForm, phoneNumberInput, phoneNumberCountryCodeInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
+import { clearForm, phoneNumberCountryCodeInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
-import { store } from '../../store'
 
 // TODO: on desktop all the information is pushed down too far
 
 export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryColor, pageSection}) {
     const dispatch = useDispatch();
-    const [registerRSVP, { isLoading, isSuccess, isError, error }] = useRegisterRSVPMutation();
+    const [registerRSVP, { isLoading }] = useRegisterRSVPMutation();
 
     const guestCode = useSelector((state) => state.rsvp.guestCode) 
     const rsvpCode = useSelector((state) => state.rsvp.rsvpCode);
@@ -84,10 +82,6 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
     const name = firstName + " " + lastName
     const rsvpString = rsvpStatus === "attending" ? "We are excited you are coming!" :
         "Sorry to hear you can't make it, but thank you for RSVPing anyway, and providing these details."
-
-    function handleDateLinkRequested() {
-        dispatch(dateLinkRequestedInput())
-    }
 
     if (phoneNumberCountryCode === null || phoneNumberCountryCode === "") {
         dispatch(phoneNumberCountryCodeInput('1'))

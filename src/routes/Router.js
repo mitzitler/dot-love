@@ -1,15 +1,26 @@
-import React from 'react';
-import {Routes, Route} from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Routes, Route } from 'react-router-dom';
+import { Transitionizer } from '../components/Transitionizer';
+import { Info } from '../pages/Info';
+import { RegistryTemp } from '../pages/RegistryTemp';
+import { Registry } from '../pages/Registry';
+import { AboutUs } from '../pages/AboutUs';
+import { setloginHeaderState } from '../features/guest/extrasSlice';
+import useRegistryItems from '../components/useRegistryItems';
+import useClaimedItems from '../components/useClaimedItems';
 
-import {Transitionizer} from '../components/Transitionizer';
-import {Info} from '../pages/Info';
-import { InfoDressCode } from '../pages/InfoPages/InfoDressCode.js'
-import {Registry} from '../pages/Registry';
-import {AboutUs} from '../pages/AboutUs';
-// import Thanks from '../pages/Thanks';
-import {Data} from '../pages/Data';
+export function Router ({ setLoginHeader}) {
 
-export function Router () {
+    // const dispatch = useDispatch();
+
+    const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+    const loginHeader = { 'X-First-Last': loginHeaderState}
+
+    // dispatch(setloginHeaderState(loginHeader));
+    const registryItems = useRegistryItems(true, loginHeaderState)
+    const claimedItems = useClaimedItems(true, loginHeaderState)
+
     return (
         <Routes>
             {/* <Route
@@ -36,22 +47,17 @@ export function Router () {
                     </Transitionizer>
                 }
             />
-            {/* <Route
-                path="/info/dresscode"
-                element={
-                    <Transitionizer>
-                        <InfoDressCode />
-                    </Transitionizer>
-                }
-            /> */}
-            {/* <Route
+            <Route
                 path="/registry"
                 element={
                     <Transitionizer>
-                        <Registry />
+                        <Registry 
+                            registryItems={registryItems} 
+                            claimedItems={claimedItems}
+                            />
                     </Transitionizer>
                 }
-            /> */}
+            />
             <Route
                 path="/about"
                 element={
@@ -61,18 +67,12 @@ export function Router () {
                 }
             />
             {/* <Route
-                path="/thanks"
+                path="/tempregistry"
                 element={
                     <Transitionizer>
-                        <Thanks />
-                    </Transitionizer>
-                }
-            /> */}
-            {/* <Route
-                path="/data"
-                element={
-                    <Transitionizer>
-                        <Data />
+                        <RegistryTemp 
+                            registryItems={registryItems} 
+                            claimedItems={claimedItems} />
                     </Transitionizer>
                 }
             /> */}

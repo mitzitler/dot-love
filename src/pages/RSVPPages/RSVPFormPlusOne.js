@@ -14,8 +14,6 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     // react hooks called at top level
     const dispatch = useDispatch();
     const rsvpStatus = useSelector((state) => state.rsvp.rsvpStatus)
-    const guestCode = useSelector((state) => state.rsvp.guestCode)
-    const submitted = useSelector((state) => state.rsvp.submitted)
 
     // handle guest code query param
     const [searchParams] = useSearchParams();
@@ -34,8 +32,8 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     }
 
     // API data
-    const { data, error, isLoading } = useGetUserByGuestLinkQuery(code);
-    const [guestData, setGuestData] = useState(null);
+    const { data, isLoading } = useGetUserByGuestLinkQuery(code);
+    const [, setGuestData] = useState(null);
     useEffect(() => {
       if (data) {
         setGuestData(data);

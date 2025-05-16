@@ -18,10 +18,19 @@ module.exports = {
     'border-lime-500/50',
     'bg-emerald-400/75',
     'border-emerald-500/50',
+    'bg-lime-400/75',
+    'border-lime-500/50',
+    'bg-fuchsia-400/75',
+    'border-fuchsia-500/50',
+    'bg-khaki-400/75',
+    'border-khaki-500/50',
 
   ],
   theme: {
     extend: {
+      fontFamily: {
+          "suse": ['SUSE', 'mono']
+      },
       colors: {
         ...colors,
         cyan: colors.cyan,
@@ -38,13 +47,20 @@ module.exports = {
           400: '#db5186',
           500: '#ed2872'
         },
+        khaki: {
+          400: '#d9d0b2',
+          500: '#b5a982'
+        },
         terracotta: {
+          400: "#DE6B54",
           500: "#DE6B54"
         },
         plum: {
+          400: "#902E6B",
           500: "#902E6B"
         },
         cream: {
+          400: "#FBFBF2",
           500: "#FBFBF2"
         }
       }

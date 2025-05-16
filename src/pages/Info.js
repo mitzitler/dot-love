@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
-import { InfoBox } from '../components/InfoBox.js';
-import { InfoBoxExpanded } from '../components/InfoBoxExpanded.js';
+import { InfoBox } from './InfoPages/InfoComponents/InfoBox.js';
+import { InfoBoxExpanded } from './InfoPages/InfoComponents/InfoBoxExpanded.js';
 import '../App.css';
 
 export function Info() {
@@ -29,13 +29,14 @@ export function Info() {
     return (
 
         <>
+        {/* perhaps something on click here renders a pop up suggesting desktop ? */}
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
             pageTertiaryColor={pageTertiaryColor} >
             <NavLink className='btn-23' 
                 // disabled for x seconds after loading
                 // disabled={rsvpStatus === 'undecided' ? true : false} 
-                to='/about'
-                end><marquee>ABOUT US → </marquee></NavLink>
+                to='/registry'
+                end><marquee>REGISTRY → </marquee></NavLink>
         </CardStackFooter>
         <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
         pageSecondaryColor={pageSecondaryColor}

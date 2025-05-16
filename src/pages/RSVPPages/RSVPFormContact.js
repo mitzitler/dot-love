@@ -47,7 +47,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                 
                 <div>
                     <h2>What do we call you?</h2>            
-                    <div class="name-info">
+                    <div className="name-info">
                         <input label="first-name" type="text" 
                             id="first-name" 
                             placeholder="First"
@@ -66,10 +66,10 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                                 dispatch(continueDietary())
                                 }
                             }></input>
-                        <button id="pronouns" class="dropdown">
+                        <button id="pronouns" className="dropdown">
                             {!pronouns ? <a>Pronouns</a> :
                             <a>{pronouns}</a>}
-                            <ul class="dropdown-content">
+                            <ul className="dropdown-content">
                                 {Object.keys(pronouns_list).map((pronounKey) => (
                                     <li key={pronounKey} 
                                         onClick={(e)=>
@@ -85,7 +85,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                     </div>
                     <h2>How do we reach you?</h2>
                     <h3>Make sure to give us your phone number AND country code </h3>
-                    <div class="contact-num">
+                    <div className="contact-num">
                         <span>+</span>
                         <input label="country_code"
                             id="country-code"
@@ -116,7 +116,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                             }></input>
                     </div>
     
-                    <div class="contact-info">
+                    <div className="contact-info">
                         <input label="street-address" type="text" 
                             id="address"
                             placeholder="Street address" 
@@ -143,7 +143,7 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                             }></input>
                     </div>
     
-                    <div class="state-country">  
+                    <div className="state-country">  
                         <input label="zipcode" type="text" 
                             id="zipcode"
                             placeholder="Zip" 
@@ -153,10 +153,10 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                                 dispatch(continueDietary())
                                 }
                             }></input>
-                        <button id="country" class="dropdown state-country-item">
+                        <button id="country" className="dropdown state-country-item">
                             {!country ? <a>Country</a> :
                             <a>{country}</a>}
-                            <ul class="dropdown-content">
+                            <ul className="dropdown-content">
                                 {Object.keys(countries).map((countryKey) => (
                                     <li key={countryKey} 
                                         onClick={()=>
@@ -169,10 +169,10 @@ export function RSVPFormContact({pageMainColor, pageSecondaryColor, pageTertiary
                                 ))}
                             </ul>
                         </button>
-                        <button id="state" class="dropdown state-country-item">
+                        <button id="state" className="dropdown state-country-item">
                             {!stateProvince ? <a>State/Province</a> :
                             <a>{stateProvince}</a>}
-                            <ul class="dropdown-content menu bg-neutral rounded-box z-[1] overflow-y-scroll max-h-72">
+                            <ul className="dropdown-content menu bg-neutral rounded-box z-[1] overflow-y-scroll max-h-72">
                                 {country === "United States"
                                 ? Object.keys(usStates).map((usStateKey) => (
                                     <li key={usStateKey}
