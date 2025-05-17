@@ -30,9 +30,11 @@ export function Registry({ registryItems,  claimedItems }) {
     };
       
     let registryItemsCat = Object.fromEntries(
-        Object.entries(registryItems).map(([key, value]) => [
-            key,
-            { ...value, price_cat: categorizePrice(value.price_cents) },
+        Object.entries(registryItems)
+            .filter(([_, value]) => value.display) 
+            .map(([key, value]) => [
+                key,
+                { ...value, price_cat: categorizePrice(value.price_cents) },
         ])
     );
 

@@ -6,6 +6,11 @@ const extrasSlice = createSlice({
     loginHeaderFirstLast: {},
     loginHeaderState: '',
     giftClaimed: {}, // id: , claimed: boolean, 
+    claimStorage: {
+      item_id: '',
+      claimant_id: '',
+      claim_state: ''
+    }
   },
   reducers: {
     giftClaimedToggle(state, action) {
@@ -21,9 +26,16 @@ const extrasSlice = createSlice({
     setloginHeaderState(state, action) {
       state.loginHeaderState = Object.values(action.payload)[0]
       console.log('The login header for this session is: ', Object.values(action.payload)[0])
+    },
+    setClaimStorage(state, action) {
+      let item_id = action.payload[0]
+      let claimant_id = action.payload[1]
+      let claim_state = action.payload[2]
+    },
+    setClaimStorageRefresh(state, action) {
+      let refresh = true
     }
-  }
-})
+}})
 
 export const { giftClaimedToggle, setloginHeaderFirstLast, setloginHeaderState } = extrasSlice.actions
   
