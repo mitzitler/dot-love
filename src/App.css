@@ -303,7 +303,7 @@ header {
   border-radius: 15px;
 }
 
-// height here gets overwritten by swipe-card below
+/* height here gets overwritten by swipe-card below */
 .section-content {
   border-radius: 15px; 
   height: 600px 
@@ -393,7 +393,7 @@ header {
   height: 80px;
   position: absolute;
   top: 0;
-  //transform: translateY(720px);
+  /*transform: translateY(720px);*/
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
     -2px 4px 4px hsla(0, 0%, 70%, 0.2),
@@ -407,7 +407,7 @@ header {
   z-index: 3;
   height: 80px;
   position: absolute;
-  //transform: translate(-8px, 740px);
+  /*/transform: translate(-8px, 740px);*/
   transform: translate(-8px, 20px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
@@ -421,7 +421,7 @@ header {
   z-index: 2;
   height: 80px;
   position: absolute;
-  //transform: translate(-16px, 760px);
+  /*transform: translate(-16px, 760px);*/
   transform: translate(-16px, 40px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
