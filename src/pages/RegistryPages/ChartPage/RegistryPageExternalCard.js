@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import SpringModal from '../../../components/Modal.js';
 import { useCreateClaimMutation, useUpdateClaimMutation } from '../../../services/spectaculo.js'
 import useRegistryItems from '../../../components/useRegistryItems';
 import '../../../App.css';
@@ -100,6 +102,8 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
     }
 
 
+    const isMobile = useMediaQuery('(max-width:480px)');
+
     return ( 
         <div className="w-[600px] m-auto mt-2 rounded-2xl bg-orange-200/50">
             {!giftData
@@ -132,17 +136,22 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
                         <img className="gift image w-24 h-24 my-4 mx-12 rounded-2xl flex justify-center items-center" 
                             src= {cdn_fronter + giftData.img_url} alt="Image of gift" /> 
                     </div>
+                    {/* conditionally render either the description in a block or in a modal */}
                     <div className="col-span-3">
-                        <span>
-                            <h3 className="text-sm">{giftData.name} ⋆  ｡  °  ✩ from <em>{giftData.brand}</em> </h3>
-                            {/* <h3 className="text-sm">{giftData.name.toUpperCase()} ⋆  ｡  °  ✩ from <em>{giftData.brand}</em> </h3> */}
-
-                            <p className="registry-item-description">
-                                {giftData.descr}
-                            </p>
-
-                        </span>
+                        {isMobile ? (
+                            <SpringModal
+                            modalLabel={giftData.name}
+                            modalTitle={`${giftData.name} by ${giftData.brand}`}
+                            modalText={giftData.descr}
+                            />
+                        ) : (
+                            <span>
+                            <h3 className="text-sm">{giftData.name} ⋆ ｡ ° ✩ from <em>{giftData.brand}</em> </h3>
+                            <p className="registry-item-description">{giftData.descr}</p>
+                            </span>
+                        )}
                     </div>
+
                 </div>
             </div>
             }

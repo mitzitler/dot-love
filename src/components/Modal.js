@@ -56,9 +56,12 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  maxWidth: '5vw',       // Max width relative to viewport
+  width: '300px',         // Preferred width (but responsive)
+  maxHeight: '90vh',      // Avoids overflow off-screen
+  overflowY: 'auto',      // Enables scroll if content too tall
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  borderRadius: 2,
   boxShadow: 24,
   p: 4,
 };
@@ -88,7 +91,13 @@ export default function SpringModal({modalLabel, modalTitle, modalText}) {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Typography id="spring-modal-title" variant="h6" component="h2">
+            <Typography id="spring-modal-title" 
+              variant="h6" 
+              component="h2" 
+              sx={{
+                fontSize: { xs: '0.5rem', sm: '0.5rem', md: '1.5rem' }, // Responsive sizes
+                mb: 2,
+              }}>
                 {modalTitle}
             </Typography>
             <Typography id="spring-modal-description" sx={{ mt: 2 }}>
