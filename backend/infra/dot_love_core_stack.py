@@ -589,10 +589,10 @@ class DotLoveCoreStack(Stack):
             integration=spectaculo_service_integration,
         )
         #
-        # GET /item/{id}
-        # Get specific registry item
+        # POST /item
+        # Create registry item
         dot_love_api_gw.add_routes(
-            path="/spectaculo/item/{id}"
+            path="/spectaculo/item",
             methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
         )
