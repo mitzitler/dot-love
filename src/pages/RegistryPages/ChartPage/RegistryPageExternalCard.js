@@ -123,7 +123,7 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
                             {/* the giftData clicks are recorded to the users data */}
                         </a>
                     </button>
-                    <span className="rounded-lg text-sm pt-1 my-2"> → </span>
+                    {isMobile ? <></> : <span className="rounded-lg text-sm pt-1 my-2">→</span>}
                     <button className="rounded-lg text-lg pt-1 px-2 my-2"
                         onClick={()=>handleClaimClick()}
                         >
@@ -137,21 +137,24 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
                             src= {cdn_fronter + giftData.img_url} alt="Image of gift" /> 
                     </div>
                     {/* conditionally render either the description in a block or in a modal */}
-                    <div className="col-span-3">
-                        {isMobile ? (
+                    {isMobile ? (
+                        <div className="col-span-3 translate-x-10 ">
                             <SpringModal
                             modalLabel={giftData.name}
                             modalTitle={`${giftData.name} by ${giftData.brand}`}
                             modalText={giftData.descr}
+                            modalHelp={false}
                             />
+                        </div>
                         ) : (
+                        <div className="col-span-3">
                             <span>
                             <h3 className="text-sm">{giftData.name} ⋆ ｡ ° ✩ from <em>{giftData.brand}</em> </h3>
                             <p className="registry-item-description">{giftData.descr}</p>
                             </span>
-                        )}
-                    </div>
-
+                        
+                        </div>
+                    )}
                 </div>
             </div>
             }

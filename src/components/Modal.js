@@ -56,24 +56,24 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  maxWidth: '5vw',       // Max width relative to viewport
-  width: '300px',         // Preferred width (but responsive)
-  maxHeight: '90vh',      // Avoids overflow off-screen
-  overflowY: 'auto',      // Enables scroll if content too tall
+  width: '100%',
+  maxWidth: '300px', // or even 260px
+  maxHeight: '90vh',
+  overflowY: 'auto',
   bgcolor: 'background.paper',
   borderRadius: 2,
   boxShadow: 24,
-  p: 4,
+  p: 3,
 };
 
-export default function SpringModal({modalLabel, modalTitle, modalText}) {
+export default function SpringModal({modalLabel, modalTitle, modalText, modalHelp}) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <div className="my-2">
-      <Button className="modal-button" onClick={handleOpen}>
+      <Button className="modal-button" onClick={handleOpen} sx={ modalHelp ?  {width: '50px'} : { width: '140px' }}>
         {modalLabel} 
       </Button>
       <Modal
@@ -95,7 +95,7 @@ export default function SpringModal({modalLabel, modalTitle, modalText}) {
               variant="h6" 
               component="h2" 
               sx={{
-                fontSize: { xs: '0.5rem', sm: '0.5rem', md: '1.5rem' }, // Responsive sizes
+                fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }, // Responsive sizes
                 mb: 2,
               }}>
                 {modalTitle}

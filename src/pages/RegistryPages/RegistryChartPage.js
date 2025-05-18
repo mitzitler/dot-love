@@ -51,7 +51,7 @@ export function RegistryChartPage({ registryItems }) {
     return ( 
         <div>
             <div className="inline-flex ">
-            <h1 className="px-4"> Registry Graph Mode </h1> <SpringModal modalLabel={modalLabel} modalTitle={modalTitle} modalText={modalText} />
+            <h1 className="px-4"> Registry Graph Mode </h1> <SpringModal modalLabel={modalLabel} modalTitle={modalTitle} modalText={modalText} modalHelp={true} />
             </div>
             {/* <RegistryPageExternalTitle
                 Data={registryItems}
