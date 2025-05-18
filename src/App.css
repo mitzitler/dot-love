@@ -407,7 +407,7 @@ header {
   z-index: 3;
   height: 80px;
   position: absolute;
-  /*/transform: translate(-8px, 740px);*/
+  /*transform: translate(-8px, 740px);*/
   transform: translate(-8px, 20px);
   box-shadow:
     -1px 2px 2px hsla(0, 0%, 70%, 0.2),
