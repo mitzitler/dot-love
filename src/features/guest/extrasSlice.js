@@ -24,7 +24,7 @@ const extrasSlice = createSlice({
       state.loginHeaderFirstLast = Object.values(action.payload)
     },
     setloginHeaderState(state, action) {
-      state.loginHeaderState = Object.values(action.payload)[0]
+      state.loginHeaderState = Object.values(action.payload)[0].toLowerCase()
       console.log('The login header for this session is: ', Object.values(action.payload)[0])
     },
     setClaimStorage(state, action) {
