@@ -40,6 +40,7 @@ module.exports = {
           500: '#87D6D9'
         },
         lilac: {
+          300: '#DDD9FF',
           400: '#CDC8FA',
           500: '#C3BEED'
         },
