@@ -10,7 +10,9 @@ export function RegistryClaimCard(props) {
     const [updateClaim, { isLoading }] = useUpdateClaimMutation();
     const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
 
-    const handleUnclaimClick = async (makeApiCall) => {
+    console.log(props)
+
+    const handleUnclaimClick = async () => {
 
         
         if (isLoading || props.claim_state == "UNCLAIMED") return;
@@ -33,13 +35,16 @@ export function RegistryClaimCard(props) {
             console.log("Patched Claim to the Spectaculo, result:", result);
 
             // temp update local state to show immediate feedback
-            setTempUnclaim(false)
+            setTempUnclaim(true)
 
         } catch (err) {
             console.error("Patch Claim API call failed:", err);
+            console.error("item_id used:", props.item_id, "claim_state setting:", "UNCLAIMED")
         }
         
     }
+
+    console.log(tempUnclaim)
     
     const cdn_fronter = "https://cdn.mitzimatthew.love/"
 
@@ -70,39 +75,46 @@ export function RegistryClaimCard(props) {
                 <div className="font-serif text-md mb-2">
                     <span className="text-orange-900">You claimed </span>
                     <span className="text-lg text-orange-700">{props.name}</span>
-                    <span className="text-orange-900"> on </span>
-                    <span className="text-lg text-orange-700">{claim_date}!</span>
+                    {isMobile ? <></> :
+                    <>
+                        <span className="text-orange-900"> on </span>
+                        <span className="text-lg text-orange-700">{claim_date}!</span>
+                    </>
+                    }
                 </div>
 
-                <div className="relative m-auto grid grid-cols-4" >
+                <div className="relative m-auto grid grid-cols-4 font-suse" >
                     <div className="col-span-3">
                         {isMobile ? <></> :
-                        <p className="text-sm">
-                            {props.descr.substring(0,150)}... 
+                        <p className="text-xs">
+                            {props.descr.substring(0,120)}... 
                         </p>    
                         }
-                        <p className="text-blue-700 pb-2">
+                        <p className="text-xs text-blue-700 pb-2">
                             (Click the image for the whole description)
                         </p>
-                        {/* <SpringModal
-                            modalLabel={"more"}
-                            modalTitle={`${props.name} by ${props.brand}`}
-                            modalText={props.descr}
-                            modalHelp={false}
-                            className="inline-block"
-                        /> */}
                         <span>Changed your mind? </span>
                         {isMedium ? <></> : <span>you can always.... </span>}
-                        <button className="!text-sm !font-mono font-bold !text-green-800 border-none p-1 !rounded-md !bg-lilac-300 hover:not-focus:bg-indigo-700"
-                            onClick={()=>handleUnclaimClick()}
-                            >
+                        {!tempUnclaim ?
+                            <button
+                                className="!text-sm !font-mono font-bold !text-green-800 !border-coolGray-100 border-y-1 p-1 !rounded-md !bg-lilac-300 hover:not-focus:bg-indigo-700"
+                                onClick={()=>handleUnclaimClick()}
+                                >
+                                unclaim it!
+                            </button> :
+                            <button
+                                className="!line-through !text-sm !font-mono font-bold !text-green-800 !border-coolGray-100 border-y-1 p-1 !rounded-md !bg-lilac-300 hover:not-focus:bg-indigo-700"
+                                >
                             unclaim it!
                         </button>
+                        }
                     </div>
                     <div className="col-span-1">
                     <SpringModal 
                         modalLabel={
-                            <img className="gift image w-28 h-28 my-4 mr-10 rounded-2xl flex justify-center items-center" 
+                            <img className=
+                                {isMobile ? "gift image w-16 h-16 my-2 mr-10 rounded-2xl flex justify-center items-center" :
+                                "gift image w-24 h-24 my-4 mr-10 rounded-2xl flex justify-center items-center"}
                             src= {cdn_fronter + props.img_url} alt="Image of gift" />
                             }
                         modalTitle={`${props.name} by ${props.brand}`}

@@ -29,6 +29,7 @@ export function RegistryClaimPage({ claimedItems, registryItems }) {
                     {claimedItemsLong.map((claim) => (
                         <RegistryClaimCard 
                             key={claim.item_id} 
+                            item_id={claim.item_id}
                             name={claim.name}
                             brand={claim.brand}
                             descr={claim.descr}
