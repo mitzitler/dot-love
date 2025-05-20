@@ -4,7 +4,7 @@ import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
 import { RegistryChartPage } from './RegistryPages/RegistryChartPage.js';
 import { RegistryTablePage } from './RegistryPages/RegistryTablePage.js';
-// import { RegistryClaimPage } from './RegistryPages/RegistryClaimPage.js';
+import { RegistryClaimPage } from './RegistryPages/RegistryClaimPage.js';
 import useGetUserClaimsQuery from '../services/spectaculo.js'
 
 export function Registry({ registryItems,  claimedItems }) {
@@ -18,6 +18,10 @@ export function Registry({ registryItems,  claimedItems }) {
     // here i need to make a modified vers of registry items with price_cat
     // which filters out display = true
     // and adds a flag for certain brands
+
+    console.log(registryItems)
+
+    console.log(claimedItems)
 
     const categorizePrice = (price_cents) => {
         if (price_cents == 0) return '??'
@@ -43,6 +47,17 @@ export function Registry({ registryItems,  claimedItems }) {
         id: key,
       }));
 
+    let claimedItemsFilter = Object.fromEntries(
+        Object.entries(claimedItems)
+            .filter(([_, value]) => value.claim_state == "CLAIMED")
+    )
+
+    let claimedItemsClaimed = Object.entries(claimedItemsFilter).map(([key, item]) => ({
+        ...item,
+        id: key,
+      }));
+
+
     return (
     
         <>
@@ -64,14 +79,13 @@ export function Registry({ registryItems,  claimedItems }) {
             <RegistryTablePage registryItems={registryItemsCat} />
         </CardStackPage>
 
-        {/* used to have conditional rendering on claimedItems.length == 0 */}
-        {/* { claimedItems.length == 0 ? <></> :  */}
-            {/* <CardStackPage pageMainColor={pageMainColor} 
+        { claimedItemsClaimed.length == 0 ? <></> :  
+            <CardStackPage pageMainColor={pageMainColor} 
                 pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 
                 pageSection={pageSection}>
-                <RegistryClaimPage registryItems={registryItems}  claimedItems={registryItems} />
-            </CardStackPage> */}
-        {/* } */}
+                <RegistryClaimPage registryItems={registryItemsCat}  claimedItems={claimedItemsClaimed} />
+            </CardStackPage>
+        }
 
         </>
     )

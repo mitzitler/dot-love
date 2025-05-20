@@ -27,37 +27,8 @@ export function RegistryPageExternalCard({ Data, displayedId, children }) {
 
         // you can unclaim if you are the claimant
         if (giftData.claim_state === 'CLAIMED' && giftData.claimant_id === loginHeaderState.toLowerCase()) {
-            console.log('You have claimed this item, so you can release it')
-
-            // dont proceed if loadin
-            if (isLoadingCreate || isLoadingUpdate) return;
-
-             // make the API call
-            try {
-                console.log('attempting to unclaim item, user: ', loginHeaderState)
-                const updateData = {'item_id': giftData.item_id, 'claim_state': "UNCLAIMED"};
-                const result = await updateClaim({
-                    firstLast: loginHeaderState,
-                    updateData,
-                }).unwrap();
-
-                // the cache invalidation will trigger a refresh of the items
-
-                // to do: response code formatting of spectaculo endpoints differs 
-                // from gizmo format - need to console log request to see how to check 
-                // errors on code here
-
-                console.log("Patched Claim to the Spectaculo, result:", result);
-
-                // temp update local state to show immediate feedback
-                setGiftData({
-                    ...giftData,
-                    claim_state: 'UNCLAIMED'
-                })
-
-            } catch (err) {
-                console.error("Patch Claim API call failed:", err);
-            }
+            console.log('You have claimed this item, so you can release it, but not with this button..')
+            return
         }
 
         // dont let them claim stuff already claimed

@@ -42,14 +42,8 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
     useEffect(() => {
       const handleResize = () => {
         if (window.innerWidth <= 450) {
-          // im not picky, it could also be 
-          console.log('the window innerwidth is less than or equal to 450')
-          // setChartWidth(window.innerWidth - margins[1] - margins[3]);
-          // setChartHeight(window.innerWidth - margins[1] - margins[3])
           setChartWidth(340)
           setChartHeight(340)
-          console.log('new width', chartWidth)
-          console.log('new height', chartHeight)
         } else {
           setChartWidth(width)
           setChartHeight(height)
@@ -105,9 +99,6 @@ export const NewRegistryPageChart = ({ width, height, margins, data, displayedId
           />
         );
       });
-
-    //   console.log("colorScale: ", colorScale)
-    //   console.log("allShapes: ", allShapes)
 
       return (
         <div className="text-center">
