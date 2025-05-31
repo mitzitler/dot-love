@@ -166,9 +166,16 @@ def text_registration_success(user, inviter):
         text_admins(f"{user.first} {user.last} isn't coming 🖕🙄🖕")
         return
 
+    # text admins
     admin_text_body = ADMIN_RSVP_ALERT_TEXT.format(first=user.first, last=user.last)
-    rsvp_text_body = RSVP_CONFIRMED_TEXT.format(first_name=user.first)
+    if user.guest_details.date_link_requested:
+        admin_text_body = ADMIN_RSVP_ALERT_PLUS_ONE_TEXT.format(
+            first=user.first, last=user.last
+        )
+    text_admins(admin_text_body)
 
+    # text user
+    rsvp_text_body = RSVP_CONFIRMED_TEXT.format(first_name=user.first)
     TWILIO_CLIENT.messages.create(
         body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
     )
@@ -177,9 +184,6 @@ def text_registration_success(user, inviter):
         first_name=user.first, guest_code=user.guest_details.link
     )
     if user.guest_details.date_link_requested:
-        admin_text_body = ADMIN_RSVP_ALERT_PLUS_ONE_TEXT.format(
-            first=user.first, last=user.last
-        )
         TWILIO_CLIENT.messages.create(
             body=plus_one_text_body.strip(),
             from_=TWILIO_SENDER_NUMBER,
@@ -194,8 +198,6 @@ def text_registration_success(user, inviter):
             from_=TWILIO_SENDER_NUMBER,
             to=inviter.address.phone,
         )
-
-    text_admins(admin_text_body)
 
 
 ########################################################

@@ -24,20 +24,9 @@ from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 import stripe
 import requests
 
-# Environment Variables for Stripe
-# TODO: Configure these environment variables in the CDK stack:
-# 1. STRIPE_SECRET - your Stripe API key for creating payments
-# 2. STRIPE_WEBHOOK_SECRET - secret for verifying webhooks from Stripe
-# 3. API_KEY - internal API key for communicating with gizmo service
-STRIPE_SECRET = os.environ.get("stripe_secret", "")
-STRIPE_WEBHOOK_SECRET = os.environ.get("stripe_webhook_secret", "")
-INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
-API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
-stripe.api_key = STRIPE_SECRET
-
 # Environment Variables
-REGISTRY_ITEM_TABLE_NAME = os.environ["registry_item_table_name"]
-REGISTRY_CLAIM_TABLE_NAME = os.environ["registry_claim_table_name"]
+WEDDONG_DAY_PHOTOS_TABLE_NAME = os.environ["wedding_day_photos_table_name"]
+WEDDING_DAY_PHOTOS_BUCKET_NAME = os.environ["wedding_day_photos_bucket_name"]
 
 # Powertools logger
 log = Logger(service="spectaculo")
@@ -47,335 +36,42 @@ app = APIGatewayHttpResolver()
 
 
 ########################################################
-# Notification Templates
-########################################################
-ITEM_CLAIMED_TEXT = """
-🎉 Registry Claim Confirmation 🎉
-
-Thank you for claiming "{item_name}" from Mitzi & Matthew's registry!
-
-This helps us keep track of gifts and avoid duplicates. We really appreciate your generosity! 💕
-
-If you'd like to discuss this item or have any questions, please reach out to us directly:
-
-Matthew:
-📨 {CONTACT_INFO['matthew']['email']}
-📱 {CONTACT_INFO['matthew']['phone']}
-
-Mitzi:
-📨 {CONTACT_INFO['mitzi']['email']}
-📱 {CONTACT_INFO['mitzi']['phone']}
-"""
-
-PAYMENT_RECEIVED_TEXT = """
-🎁 Thank You for Your Gift! 🎁
-
-We've received your generous gift of ${amount}.
-
-Your support means the world to us as we start our new life together. We're incredibly grateful for your generosity and thoughtfulness!
-
-With love and appreciation,
-Mitzi & Matthew 💕
-"""
-
-
-########################################################
-# Gizmo Service Client
-########################################################
-def send_text_notification(first_last, template, template_details):
-    """
-    Send a text notification via Gizmo service.
-
-    :param first_last: User ID in first_last format to send text to
-    :param template: The text template to use (raw text)
-    :param template_details: Dict of values to format into the template
-    :return: Response from Gizmo service
-    """
-    try:
-        # Format the text body
-        text_body = template.format(**template_details).strip()
-
-        # Prepare the request to Gizmo service
-        gizmo_endpoint = f"{API_BASE_URL}/gizmo/text"
-        payload = {
-            "is_blast": False,
-            "template_type": "ITEM_CLAIMED_TEXT",
-            "template_details": {"raw": text_body},  # TODO: Update this for template
-            # NOTE: Will be looked up by Gizmo based on first_last
-            "recipient_phone": None,
-            "trace": app.context.get("trace_id", "🤷"),
-        }
-
-        headers = {
-            "Content-Type": "application/json",
-            "Internal-Api-Key": INTERNAL_API_KEY,
-            "X-First-Last": first_last,
-        }
-
-        # Send the request to Gizmo
-        log.info(f"Sending text notification to {first_last}")
-        response = requests.post(gizmo_endpoint, json=payload, headers=headers)
-
-        if response.status_code != 200:
-            log.error(f"Failed to send text notification to Gizmo: {response.text}")
-            return False
-
-        log.info(f"Successfully sent text notification to {first_last}")
-        return True
-    except Exception as e:
-        log.exception(f"Error sending text notification: {str(e)}")
-        return False
-
-
-########################################################
 # Supporting Classes
 ########################################################
-class ClaimState(Enum):
-    CLAIMED = 1
-    PURCHASED = 2
-    UNCLAIMED = 3
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return f"ClaimState.{self.name}"
-
-
-class RegistryItem:
-    def __init__(
-        self,
-        item_id,
-        name,
-        last_checked,
-        brand,
-        descr,
-        size_score,
-        art_score,
-        link,
-        img_url,
-        price_cents,
-        claim_state,
-        display,
-        claimant_id=None,
-    ):
+class WeddingGuestPhoto:
+    def __init__(self, first_last):
         """
-        Initialize a RegistryItem, to track the stuff people will buy from us!
+        Initialize a WeddingGuestPhoto, to record a memory that will last forever 💕
 
-        :param item_id (STR): uuid.
-        :param name (STR): name of the item being claimed.
-        :param last_checked (DATETIME): datetime of the last time we checked on the availability of this item.
-        :param brand (STR): brand of the item.
-        :param descr (STR): a description of the item.
-        :param size_score (INT): used by the frontend to decide where the item falls on the size axis.
-        :param art_score (INT): used by the frontend to decide where the item falls on the function axis.
-        :param link (STR): url to the item.
-        :param img_url (STR): s3 url for the item.
-        :param price_cents (INT): cost of the item, in cents.
-        :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
-        :param display (BOOL): whether the FE should display the item.
-        :param claimant_id (STR): User id of the person who has claimed the item.
+        :param first_last: PK, first_last of the guest submitting the photo
         """
-        self.item_id = item_id
-        self.name = name
-        self.last_checked = last_checked
-        self.brand = brand
-        self.descr = descr
-        self.size_score = size_score
-        self.art_score = art_score
-        self.link = link
-        self.img_url = img_url
-        self.price_cents = price_cents
-        self.claim_state = claim_state
-        self.display = display
-        self.claimant_id = claimant_id
-
-    def as_map(self):
-        return {
-            "item_id": self.item_id,
-            "name": self.name,
-            "last_checked": self.last_checked,
-            "brand": self.brand,
-            "descr": self.descr,
-            "size_score": self.size_score,
-            "art_score": self.art_score,
-            "link": self.link,
-            "img_url": self.img_url,
-            "price_cents": self.price_cents,
-            "claim_state": self.claim_state.name if self.claim_state else None,
-            "display": self.display,
-            "claimant_id": self.claimant_id,
-        }
-
-    def __str__(self):
-        return (
-            f"RegistryItem(item_id={self.item_id}, name={self.name}, "
-            f"brand={self.brand}, claim_state={self.claim_state}, claimant_id={self.claimant_id})"
-        )
-
-    def __repr__(self):
-        return (
-            f"RegistryItem(item_id={self.item_id!r}, name={self.name!r}, "
-            f"brand={self.brand!r}, claim_state={self.claim_state!r}, claimant_id={self.claimant_id!r})"
-        )
-
-    @staticmethod
-    def from_db(item_data):
-        """
-        Create a RegistryItem object from DynamoDB data.
-        """
-        if not item_data:
-            return None
-
-        # Convert DynamoDB types to Python types
-        deserializer = TypeDeserializer()
-        deserialized_item = {
-            k: deserializer.deserialize(v) for k, v in item_data.items()
-        }
-
-        claim_state_str = deserialized_item.get("claim_state", "UNCLAIMED")
-        claim_state = (
-            ClaimState[claim_state_str] if claim_state_str else ClaimState.UNCLAIMED
-        )
-
-        return RegistryItem(
-            item_id=deserialized_item.get("id"),
-            name=deserialized_item.get("item_name"),
-            last_checked=deserialized_item.get("last_checked"),
-            brand=deserialized_item.get("brand"),
-            descr=deserialized_item.get("descr"),
-            size_score=float(deserialized_item.get("size_score", 0.0)),
-            art_score=float(deserialized_item.get("art_score", 0.0)),
-            link=deserialized_item.get("link"),
-            img_url=deserialized_item.get("img_url"),
-            price_cents=int(deserialized_item.get("price_cents", 0)),
-            claim_state=claim_state,
-            display=deserialized_item.get("display", True),
-            claimant_id=deserialized_item.get("claimant_id", "").lower(),
-        )
-
-    @staticmethod
-    def from_item_id_db(item_id, dynamo_client):
-        """
-        Get a registry item from the database by its ID.
-
-        :param item_id: The ID of the registry item
-        :param dynamo_client: The DynamoDB client
-        :return: RegistryItem object or None if not found
-        """
-        try:
-            key_expression = {"id": {"S": item_id}}
-            item_data = dynamo_client.get(REGISTRY_ITEM_TABLE_NAME, key_expression)
-
-            if not item_data:
-                log.info(f"No registry item found with ID: {item_id}")
-                return None
-
-            return RegistryItem.from_db(item_data)
-        except Exception as e:
-            log.exception(f"Error retrieving registry item with ID {item_id}: {str(e)}")
-            return None
-
-    @staticmethod
-    def get_all_items_db(dynamo_client):
-        """
-        Get all registry items from the database.
-
-        :param dynamo_client: The DynamoDB client
-        :return: List of RegistryItem objects
-        """
-        try:
-            items_data = dynamo_client.get_all(REGISTRY_ITEM_TABLE_NAME)
-
-            registry_items = []
-            for item_data in items_data:
-                item = RegistryItem.from_db(item_data)
-                if item:
-                    registry_items.append(item)
-
-            return registry_items
-        except Exception as e:
-            log.exception(f"Error retrieving all registry items: {str(e)}")
-            return []
-
-    def update_db(self, dynamo_client):
-        """
-        Update this registry item in the database.
-        """
-        key_expression = {"id": {"S": self.item_id}}
-        field_value_map = {
-            "item_name": self.name,
-            "last_checked": self.last_checked,
-            "brand": self.brand,
-            "descr": self.descr,
-            "size_score": self.size_score,
-            "art_score": self.art_score,
-            "link": self.link,
-            "img_url": self.img_url,
-            "price_cents": self.price_cents,
-            "display": self.display,
-            "claim_state": (
-                self.claim_state.name if self.claim_state else ClaimState.UNCLAIMED.name
-            ),
-        }
-
-        # Only include claimant_id if it's not None
-        if self.claimant_id:
-            field_value_map["claimant_id"] = self.claimant_id
-
-        res = dynamo_client.update(
-            REGISTRY_ITEM_TABLE_NAME,
-            key_expression,
-            field_value_map,
-        )
-
-        return res
-
-
-class RegistryClaim:
-    def __init__(self, item_id, claimant_id, claim_state, updated_at=None, id=None):
-        """
-        Initialize a RegistryClaim, to keep track of who has claimed what.
-
-        :param item_id(UUID): id of the Registry item that has been claimed.
-        :param claimant_id(STR): Primary key for the user (first_last format, e.g., "john_smith").
-        :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
-        :param updated_at(DATETIME): datetime of the last time this record was updated.
-        """
-        if id:
-            self.id = id
-        else:
-            self.id = str(uuid.uuid4())
-
-        self.item_id = item_id
-        self.claimant_id = claimant_id
-        self.claim_state = claim_state
-        self.updated_at = updated_at or datetime.now().isoformat()
+        self.id = str(uuid.uuid4())
+        self.first_last = first_last
+        self.created_at = datetime.now().isoformat()
+        self.s3_img_name = f"{first_last}_{self.id}"
 
     def as_map(self):
         return {
             "id": self.id,
-            "item_id": self.item_id,
-            "claimant_id": self.claimant_id,
-            "claim_state": self.claim_state.name if self.claim_state else None,
-            "updated_at": self.updated_at,
+            "first_last": self.item_id,
+            "s3_img_name": self.s3_img_name,
         }
 
     def __str__(self):
         return (
-            f"RegistryClaim(id={self.id}, item_id={self.item_id}, "
-            f"claimant_id={self.claimant_id}, claim_state={self.claim_state})"
+            f"WeddingGuestPhoto(id={self.id}, first_last={self.first_last}, "
+            f"s3_img_name={self.s3_img_name})"
         )
 
     def __repr__(self):
         return (
-            f"RegistryClaim(id={self.id!r}, item_id={self.item_id!r}, "
-            f"claimant_id={self.claimant_id!r}, claim_state={self.claim_state!r})"
+            f"WeddingGuestPhoto(id={self.id!r}, first_last={self.first_last!r}, "
+            f"s3_img_name={self.s3_img_name!r})"
         )
 
     def create_db(self, dynamo_client):
         """
-        Create this registry claim in the database.
+        Create a db record of this img in the database.
         """
         key_expression = {"id": {"S": self.id}}
         field_value_map = {
