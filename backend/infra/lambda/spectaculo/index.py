@@ -32,12 +32,13 @@ import requests
 STRIPE_SECRET = os.environ.get("stripe_secret", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("stripe_webhook_secret", "")
 INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
-API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
 stripe.api_key = STRIPE_SECRET
 
 # Environment Variables
 REGISTRY_ITEM_TABLE_NAME = os.environ["registry_item_table_name"]
 REGISTRY_CLAIM_TABLE_NAME = os.environ["registry_claim_table_name"]
+API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
+MITZI_MATTHEW_ADDRESS = os.environ.get("mitzi_matthew_address")
 
 # Powertools logger
 log = Logger(service="spectaculo")
@@ -82,7 +83,7 @@ Mitzi & Matthew 💕
 ########################################################
 # Gizmo Service Client
 ########################################################
-def send_text_notification(first_last, template, template_details):
+def send_text_notification(first_last, template_type, template_details):
     """
     Send a text notification via Gizmo service.
 
@@ -92,15 +93,12 @@ def send_text_notification(first_last, template, template_details):
     :return: Response from Gizmo service
     """
     try:
-        # Format the text body
-        text_body = template.format(**template_details).strip()
-
         # Prepare the request to Gizmo service
         gizmo_endpoint = f"{API_BASE_URL}/gizmo/text"
         payload = {
             "is_blast": False,
-            "template_type": "ITEM_CLAIMED_TEXT",
-            "template_details": {"raw": text_body},  # TODO: Update this for template
+            "template_type": template_type,
+            "template_details": template_details,
             # NOTE: Will be looked up by Gizmo based on first_last
             "recipient_phone": None,
             "trace": app.context.get("trace_id", "🤷"),
@@ -1031,11 +1029,7 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
 
             # Send a text notification to the user
             if first_last != "guest":
-                send_text_notification(
-                    first_last=first_last,
-                    template=RAW_TEXT,
-                    template_details={"raw": f"{amount_dollars:.2f}"},
-                )
+                send_text_notification()
 
         elif event.type == "payment_intent.payment_failed":
             payment_intent = event.data.object
@@ -1271,8 +1265,12 @@ def create_claim():
         # Send text notification to the claimant
         send_text_notification(
             first_last=claimant_id,
-            template=RAW_TEXT,
-            template_details={"item_name": item.name},
+            template_type="ITEM_CLAIMED_TEXT",
+            template_details={
+                "item_name": item.name,
+                "first_name": claimant_id.split("_")[0],
+                "mitzi_matthew_address": MITZI_MATTHEW_ADDRESS,
+            },
         )
 
         return Response(
@@ -1343,6 +1341,7 @@ def update_claim():
                 content_type="application/json",
                 body={"message": f"No existing claim found for item with ID {item_id}"},
             )
+        log.info(f"existing claim: {existing_claim.as_map()}")
 
         # If unclaiming, remove the claimant ID from the item
         if claim_state == ClaimState.UNCLAIMED:

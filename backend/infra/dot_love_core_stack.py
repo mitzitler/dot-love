@@ -84,6 +84,9 @@ class DotLoveCoreStack(Stack):
                     secret_name="/dot-love/guests/contact/mitzi/email"
                 ),
             },
+            "address": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/guests/contact/address"
+            ),
         }
 
         ##################################################
@@ -261,6 +264,7 @@ class DotLoveCoreStack(Stack):
                 name="claimant_id",
                 type=dynamodb.AttributeType.STRING,
             ),
+            projection_type=dynamodb.ProjectionType.ALL,
         )
 
         # Search registry claim by item id
@@ -270,6 +274,7 @@ class DotLoveCoreStack(Stack):
                 name="item_id",
                 type=dynamodb.AttributeType.STRING,
             ),
+            projection_type=dynamodb.ProjectionType.ALL,
         )
 
         return registry_claim_table
@@ -386,6 +391,9 @@ class DotLoveCoreStack(Stack):
                 "mitzi_phone": self.contact_info["mitzi"]["phone"],
                 "matthew_email": self.contact_info["matthew"]["email"],
                 "matthew_phone": self.contact_info["matthew"]["phone"],
+                "mitzi_matthew_address": self.contact_info["address"],
+                # to communicate to gizmo
+                "api_base_url": "https://api.mitzimatthew.love",
             },
             layers=[self.global_lambda_layer],
             memory_size=512,

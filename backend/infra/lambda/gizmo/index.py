@@ -175,7 +175,13 @@ def text_registration_success(user, inviter):
     text_admins(admin_text_body)
 
     # text user
-    rsvp_text_body = RSVP_CONFIRMED_TEXT.format(first_name=user.first)
+    rsvp_text_body = RSVP_CONFIRMED_TEXT.format(
+        first_name=user.first,
+        matthew_email=CONTACT_INFO["matthew"]["email"],
+        matthew_phone=CONTACT_INFO["matthew"]["phone"],
+        mitzi_email=CONTACT_INFO["mitzi"]["email"],
+        mitzi_phone=CONTACT_INFO["mitzi"]["phone"],
+    )
     TWILIO_CLIENT.messages.create(
         body=rsvp_text_body.strip(), from_=TWILIO_SENDER_NUMBER, to=user.address.phone
     )
@@ -210,6 +216,7 @@ class DotLoveMessageType(Enum):
     REGISTRATION_SUCCESS_TEXT = 4
     REGISTRATION_SUCCESS_NOT_COMING_TEXT = 5
     RAW_TEXT = 6
+    ITEM_CLAIMED_TEXT = 7
 
     def __str__(self):
         return self.name
@@ -297,40 +304,55 @@ class DotLoveMessageClient:
         message_type_enum = DotLoveMessageType[message_type]
         templates = {
             DotLoveMessageType.REGISTRATION_SUCCESS_TEXT: """
-                🎉 RSVP Confirmed! 🎉
+🎉 RSVP Confirmed! 🎉
 
-                Thank you so much for RSVP'ing to our wedding, {first_name}!
-                We are so excited for you to be there with us on our special day 💒💕
+Thank you so much for RSVP'ing to our wedding, {first_name}!
+We are so excited for you to be there with us on our special day 💒💕
 
-                Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
+Please save this number into your contacts 📲, as we will continue to use it to communicate important information regarding our wedding! 📢
 
-                We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
+We will be sure to reach out over text 📱 and email 📨 whenever we have updates to share - especially regarding our website, www.mitzimatthew.love!
 
-                Please note, responses to this phone number are not being recorded and we will not see them! 🙈
+Please note, responses to this phone number are not being recorded and we will not see them! 🙈
 
-                If you wish to contact us, please reach out directly via one of the following methods:
+If you wish to contact us, please reach out directly via one of the following methods:
 
-                Matthew:
-                📨 themattsaucedo@gmail.com
-                📱 +1 (352) 789-4244
+Matthew:
+📨 {matthew_email}
+📱 {matthew_phone}
 
-                Mitzi:
-                📨 mitzitler@gmail.com
-                📱 +1 (504) 638-7943
+Mitzi:
+📨 {mitzi_email}
+📱 {mitzi_phone}
 
-                """,
+""",
             DotLoveMessageType.REGISTRATION_SUCCESS_NOT_COMING_TEXT: """
-                ⛔ RSVP Confirmed ⛔
+⛔ RSVP Confirmed ⛔
 
-                Thank you so much for filling out your RSVP form for our wedding!
-                We are sorry you won't be able to attend, but we hope to see you soon anyway!
+Thank you so much for filling out your RSVP form for our wedding!
+We are sorry you won't be able to attend, but we hope to see you soon anyway!
 
-                We will be updating our website, www.mitzimatthew.love, soon with our registry! 🎁
-                We'll send an update to all those invited once that's done 😁
-            """,
+We will be updating our website, www.mitzimatthew.love, soon with our registry! 🎁
+We'll send an update to all those invited once that's done 😁
+""",
             DotLoveMessageType.RAW_TEXT: """
-                {raw}
-            """,
+{raw}
+""",
+            DotLoveMessageType.ITEM_CLAIMED_TEXT: """
+🎁 Registry Item Claimed! 🎁
+
+Thank you so much for claiming {item_name}, {first_name}! 💖
+This helps us keep track of gifts and avoid duplicates. We really appreciate your generosity! 💕
+
+If you would like, you can send this item directly to our address:
+{mitzi_matthew_address}
+
+If you change your mind or are no longer able to gift this item, no worries at all —
+just head over to www.mitzimatthew.love/registry and unclaim it when you can 🧑‍💻💫
+
+Much love,
+Mitzi & Matthew 💕
+""",
         }
         return templates[message_type_enum]
 
@@ -1377,7 +1399,8 @@ def send_text():
 
     # NOTE: this is important for calls from Spectaculo, where the number is not known
     # fetch the phone number if not provided
-    if payload["recipient_phone"] == "":
+    phone = payload["recipient_phone"]
+    if phone == "" or phone == None:
         try:
             user = User.from_first_last_db(app.context["first_last"], CW_DYNAMO_CLIENT)
         except Exception as e:
@@ -1395,12 +1418,12 @@ def send_text():
                 "message": err_msg,
             }
 
-        payload["recipient_phone"] = user.address.phone
+        phone = user.address.phone
 
     res = DOT_LOVE_MESSAGE_CLIENT.text(
         message_type=payload["template_type"],
         template_input=payload["template_details"],
-        recipient_phone=payload["recipient_phone"],
+        recipient_phone=phone,
     )
     return {"code": 200, "data": res}
 
