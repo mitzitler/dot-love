@@ -17,7 +17,7 @@ export function Info() {
     const pageSection = "info"
 
     const deity = {
-        name: 'Diety Events',
+        name: 'Deity Events',
         coordinates: [40.68725385467351, -73.98617663587743], 
       };
 
@@ -43,7 +43,7 @@ export function Info() {
         pageTertiaryColor={pageTertiaryColor}
         pageSection={pageSection}>
             <h1>Info</h1>
-            <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
+            <h2>Saucedo-Zitler Wedding, November 7th 2025 at Deity Events</h2>
             <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
                 <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
 
@@ -95,7 +95,7 @@ export function Info() {
             <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection} >
                 <h1>Info: Dress Code</h1>
-                <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2>
+                <h2>Saucedo-Zitler Wedding, November 7th 2025 at Deity Events</h2>
                 <div class="right-justify"> {/* this div right justifies a column thats 70% wide */}
                     <div class="collapsable-boxes"> {/* this div creates a vertical flexbox */}
 

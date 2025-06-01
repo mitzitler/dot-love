@@ -25,7 +25,7 @@ export function InfoDressCode(guestDressCode) {
         pageTertiaryColor={pageTertiaryColor}
         pageSection={pageSection}>
             <h1>Info</h1>
-            {/* <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2> */}
+            {/* <h2>Saucedo-Zitler Wedding, November 7th 2025 at Deity Events</h2> */}
             <div >
             <NavLink 
             to='/info' end>
