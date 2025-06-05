@@ -1241,21 +1241,28 @@ def create_claim():
 
         # Check if there's already a claim for this item
         existing_claim = RegistryClaim.find_by_item_id(item_id, CW_DYNAMO_CLIENT)
-        if existing_claim and existing_claim.claim_state is ClaimState.CLAIMED:
-            return Response(
-                status_code=409,
-                content_type="application/json",
-                body={
-                    "message": f"Registry item with ID {item_id} already has a claim by user {existing_claim.claimant_id}"
-                },
+        if existing_claim:
+            if existing_claim.claim_state is ClaimState.CLAIMED:
+                return Response(
+                    status_code=409,
+                    content_type="application/json",
+                    body={
+                        "message": f"Registry item with ID {item_id} already has a claim by user {existing_claim.claimant_id}"
+                    },
+                )
+            else:
+                # Update the existing unclaimed claim to CLAIMED
+                existing_claim.claim_state = ClaimState.CLAIMED
+                existing_claim.claimant_id = claimant_id
+                existing_claim.update_db(CW_DYNAMO_CLIENT)
+                registry_claim = existing_claim
+        else:
+            # Create registry claim
+            registry_claim = RegistryClaim(
+                item_id=item_id, claimant_id=claimant_id, claim_state=ClaimState.CLAIMED
             )
 
-        # Create registry claim
-        registry_claim = RegistryClaim(
-            item_id=item_id, claimant_id=claimant_id, claim_state=ClaimState.CLAIMED
-        )
-
-        registry_claim.create_db(CW_DYNAMO_CLIENT)
+            registry_claim.create_db(CW_DYNAMO_CLIENT)
 
         # Update the registry item with the claim state and claimant ID
         item.claim_state = ClaimState.CLAIMED
@@ -1341,7 +1348,6 @@ def update_claim():
                 content_type="application/json",
                 body={"message": f"No existing claim found for item with ID {item_id}"},
             )
-        log.info(f"existing claim: {existing_claim.as_map()}")
 
         # If unclaiming, remove the claimant ID from the item
         if claim_state == ClaimState.UNCLAIMED:
