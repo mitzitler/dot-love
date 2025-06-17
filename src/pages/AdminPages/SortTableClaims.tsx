@@ -11,14 +11,20 @@ import {
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 
+const cdn_fronter = "https://cdn.mitzimatthew.love/"
+
 interface Data {
-    item_id: number;
+    item_id: string;
+    id: string;
     name: string;
     brand: string;
-    price: number;
-    price_string: string;
-    descr: string;
-    claim_state: string
+    price_cents: number;
+    price_cat: string;
+    claimant_id: string;
+    received: boolean;
+    img_url: string;
+    art_score: number;
+    size_score: number;
 }
 
 interface HeadCell {
@@ -48,30 +54,90 @@ function getComparator<Key extends keyof any>(
 }
 
 const headCells: readonly HeadCell[] = [
+    // col for when it was claimed
+    {
+        id: 'img_url',
+        numeric: false,
+        disablePadding: true,
+        label: 'Icon',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+
     {
         id: 'name',
         numeric: false,
         disablePadding: true,
         label: 'Item',
-        width: 180,
-        smallScreenWidth: 120,
+        width: 80,
+        smallScreenWidth: 50,
+    },
+    // col of the claimant's name, after join with users
+    {
+        id: 'claimant_id',
+        numeric: false,
+        disablePadding: true,
+        label: 'Claimant',
+        width: 80,
+        smallScreenWidth: 50,
     },
     {
         id: 'brand',
         numeric: false,
         disablePadding: false,
         label: 'Brand',
-        width: 150,
-        smallScreenWidth: 100,
+        width: 80,
+        smallScreenWidth: 50,
     },
     {
-        id: 'price',
+        id: 'price_cents',
         numeric: true,
         disablePadding: false,
         label: 'Price',
-        width: 120,
-        smallScreenWidth: 80,
+        width: 80,
+        smallScreenWidth: 50,
     },
+    {
+        id: 'price_cat',
+        numeric: false,
+        disablePadding: false,
+        label: 'Bucket',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'id',
+        numeric: false,
+        disablePadding: false,
+        label: 'Id',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'received',
+        numeric: false,
+        disablePadding: false,
+        label: 'Received',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'art_score',
+        numeric: true,
+        disablePadding: false,
+        label: 'Art',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'size_score',
+        numeric: true,
+        disablePadding: false,
+        label: 'Size',
+        width: 80,
+        smallScreenWidth: 50,
+    },
+
 ];
 
 const VirtuosoTableComponents: TableComponents<Data> = {
@@ -80,14 +146,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
         component={Paper}
         ref={ref}
         {...props}
-        sx={{ backgroundColor: 'beige', width: 450 }}
+        sx={{ backgroundColor: 'beige', width: 800 }}
       />
     )),
     Table: (props) => (
       <Table
         {...props}
         size="small"
-        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 450 }}
+        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 800 }}
       />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
@@ -100,15 +166,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 };
 
 
-export default function SortTableClaims({
-        registryItemsMod,
-        displayedId,
-        setDisplayedId,
-    }: {
-        registryItemsMod: Data[];
-        displayedId: number;
-        setDisplayedId: (id: number) => void;
-    }) 
+export default function SortTableClaims({claimsData}: {claimsData: Data[]}) 
     {
     
     const [order, setOrder] = React.useState<Order>('asc');
@@ -121,8 +179,8 @@ export default function SortTableClaims({
     };
   
     const sortedRows = React.useMemo(
-        () => [...registryItemsMod].sort(getComparator(order, orderBy)),
-        [registryItemsMod, order, orderBy]
+        () => [...claimsData].sort(getComparator(order, orderBy)),
+        [claimsData, order, orderBy]
     );
   
     const fixedHeaderContent = () => (
@@ -154,55 +212,52 @@ export default function SortTableClaims({
         )}
       </TableRow>
     );
-  
+
     const rowContent = (index: number, row: Data) => {
-        const isSelected = row.item_id === displayedId;
-        const isClaimed = row.claim_state === 'CLAIMED';
+        // const isSelected = row.item_id === displayedId;
+        // const isClaimed = row.claim_state === 'CLAIMED';
         return (
             <TableRow
                 key={row.item_id}
-                onClick={() => setDisplayedId(row.item_id)}
+                // onClick={() => setDisplayedId(row.item_id)}
                 sx={{
-                    backgroundColor: isSelected 
-                        ? 'khaki' 
-                        : isClaimed 
-                            ? 'rgba(211, 211, 211, 0.5)'
-                            : 'inherit',
+                    backgroundColor: 'khaki',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
-                    opacity: isClaimed ? 0.7 : 1
+                    width: "100%",
+                    display: "inline-table"
                 }}
             >
                 {headCells.map((column) => (
                     <TableCell
                         key={column.id}
-                        align={column.numeric ? 'right' : 'left'}
+                        align={column.numeric ? 'left' : 'left'}
                         sx={{
                             fontSize: '10px',
                             width: column.width,
                             maxWidth: column.width,
-                            minWidth: column.width,
-                            textDecoration: isClaimed ? 'line-through' : 'none'
+                            minWidth: column.width
                         }}
                     >
-                        {column.id === 'price' ? `$${row[column.id].toFixed(2)}` : row[column.id]}
                         
-                        {column.id === 'name' && isClaimed && (
-                            <span style={{ marginLeft: '5px', fontSize: '8px', color: 'green' }}>
-                                (Claimed)
-                            </span>
-                        )}
+                        {column.id === 'img_url' ? 
+                            <div className='w-10 h-10 m-auto' >
+                                <img className="gift image" src= {cdn_fronter + row[column.id]}>
+                                </img>
+                            </div>
+                            : column.id === 'claimant_id' ?
+                                row[column.id].split('_').join(' ')
+                                : row[column.id]
+                        }
 
                     </TableCell>
                 ))}
             </TableRow>
         );
     };
-
-    console.log("i am a console log from within SortTableClaims.tsx")
   
     return (
-        <Paper style={{ height: 450, width: 450, margin: '0 auto' }}>
+        <Paper style={{ height: 600, width: 800, margin: '0 auto' }}>
             <TableVirtuoso
                 data={sortedRows}
                 components={VirtuosoTableComponents}

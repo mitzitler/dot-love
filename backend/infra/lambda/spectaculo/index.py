@@ -499,6 +499,29 @@ class RegistryClaim:
         except Exception as e:
             log.exception(f"Error finding registry claims by user_id: {e}")
             return []
+        
+    @staticmethod
+    def claim_list_db(dynamo_client):
+        """
+        Get all registry claims from the database.
+
+        :param dynamo_client: The DynamoDB client
+        :return: List of RegistryItem objects
+        """
+        try:
+            # Query the registry claims using the GSI
+            claims_data = dynamo_client.get_all(REGISTRY_CLAIM_TABLE_NAME)
+
+            claim_items = []
+            for claim in claims_data:
+                claim = RegistryClaim.from_db(claims_data)
+                if claim:
+                    claim_items.append(claim)
+
+            return claim_items
+        except Exception as e:
+            log.exception(f"Error retrieving all claim items: {str(e)}")
+            return []
 
 
 ########################################################
@@ -1050,6 +1073,19 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
 ########################################################
 # API Endpoints
 ########################################################
+def validate_internal_route(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        event = app.current_event
+        api_key = event.headers.get("Internal-Api-Key")
+
+        if not api_key or api_key != INTERNAL_API_KEY:
+            return {"code": 401, "message": "no valid api key"}
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
 @app.get("/spectaculo/item")
 def get_registry_items():
     """
@@ -1414,6 +1450,35 @@ def get_user_claims():
             },
         )
 
+# get a list of all claims
+@validate_internal_route
+@app.get("/spectaculo/claim/list")
+def list_claims():
+    """
+    Get a list of all claims and their ids
+    """
+    try:
+        raw_claims = RegistryClaim.claim_list_db(CW_DYNAMO_CLIENT)
+        
+    except Exception as e:
+        err_msg = "failed to list claims from db"
+        log.exception(err_msg)
+        return {
+            "code": 500,
+            "message": err_msg,
+        }
+        
+    claim_maps = []
+    for claim in raw_claims:
+        claim_maps.append(claim.as_map())
+        
+    return {
+        "code": 200,
+        "message": "list claims success",
+        "body" : {
+            "claims": claim_maps,
+        }
+    }
 
 @app.post("/spectaculo/payment")
 def payment_create():

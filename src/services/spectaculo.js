@@ -25,6 +25,16 @@ export const spectaculoApi = createApi({
       providesTags: ['UserClaims'],
     }),
 
+    // Get all claims
+    getAllClaims: builder.query({
+      query: (firstLast) => ({
+        url: `/claim/list`,
+        method: 'GET',
+        headers: { 'X-First-Last': firstLast },
+      }),
+      providesTags: ['UserClaims'],
+    }),
+
     // Create a claim on a registry item
     createClaim: builder.mutation({
       query: ({ firstLast, claimData }) => ({
@@ -63,6 +73,7 @@ export const {
   useGetRegistryItemsQuery,
   useGetRegistryItemQuery,
   useGetUserClaimsQuery,
+  useGetAllClaimsQuery,
   useCreateClaimMutation,
   useUpdateClaimMutation,
   useCreatePaymentMutation,

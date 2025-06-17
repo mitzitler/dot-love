@@ -596,6 +596,13 @@ class DotLoveCoreStack(Stack):
             integration=spectaculo_service_integration,
         )
         #
+        # Get all claims
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/claim/list",
+            methods=[apigw.HttpMethod.GET],
+            integration=spectaculo_service_integration,
+        )
+        #
         # GET /item
         # Get all registry items
         dot_love_api_gw.add_routes(

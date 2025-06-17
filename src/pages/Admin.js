@@ -4,24 +4,58 @@ import { CardStackFooter } from '../components/CardStackFooter';
 import { CardStackPage } from '../components/CardStackPage';
 import SortTableRSVPs from "./AdminPages/SortTableRSVPs";
 import { useGetAllUsersQuery } from "../services/gizmo";
+import { useGetAllClaimsQuery } from "../services/spectaculo";
 import useGetUsers from "../components/useGetUsers";
-// import SortTableClaims from "./AdminPages/SortTableClaims";
+import useGetClaims from "../components/useGetClaims";
+import SortTableClaims from "./AdminPages/SortTableClaims";
 import { NavLink } from 'react-router-dom';
 
-export function Admin() {
+export function Admin({ registryItems }) {
     const [adminPass, setAdminPass] = useState('');
+    const [receivedClaim, setReceivedClaim] = useState('');
     // const [getAllUsers, { isLoading }] = useGetAllUsersQuery();
     const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
 
     const adminPassAccept = '435o'
 
     const allUsers = useGetAllUsersQuery(loginHeaderState);
+    const allClaims = useGetAllClaimsQuery(loginHeaderState);
 
     const pageMainColor = "cyan" 
     const pageSecondaryColor = "terracotta"
     const pageTertiaryColor = "plum"
     
     const pageSection = "admin"
+
+    console.log('allUsers: ', allUsers)
+    console.log('allClaims: ', allClaims)
+    console.log('registryItems: ', registryItems)
+
+    const handleReceivedClaim = (e) => {
+        e.preventDefault(); // prevent page reload
+        const formData = new FormData(e.target);
+        const claim_item_id = formData.get("receivedClaim"); // assuming input name="adminPass"
+        setReceivedClaim(claim_item_id);
+    }
+
+    let registryItemsFilter = Object.fromEntries(
+        Object.entries(registryItems)
+        .filter(([_, value]) => value.claim_state == "CLAIMED"))
+
+    let registryItemsClaimed = Object.entries(registryItemsFilter).map(([key, item]) => ({
+        ...item,
+        id: key,
+        }));
+
+    // let claimedItemsFilter = Object.fromEntries(
+    //     Object.entries(allClaims)
+    //         .filter(([_, value]) => value.claim_state == "CLAIMED")
+    // )
+
+    // let claimedItemsClaimed = Object.entries(claimedItemsFilter).map(([key, item]) => ({
+    //     ...item,
+    //     id: key,
+    //   }));
 
 
     // const rsvpData = []
@@ -105,13 +139,23 @@ export function Admin() {
                         <div>
                             <h1>Claims info</h1>
 
-                            <div className="h-[454px]">
-                                {/* <SortTableClaims 
-                                    claimsData={claimsData} 
-                                /> */}
-                            </div>
+                            <div className="flex-col">
 
-                            {/* input  */}
+                                <div className="m-auto h-[600px] w-[820px]">
+                                    <SortTableClaims
+                                        // claimsData={claimedItemsClaimed} 
+                                        claimsData={registryItemsClaimed}
+                                    />
+                                </div>
+
+                                <div className="my-4">
+                                    <form onSubmit={handleReceivedClaim}>
+                                        <input type="claim_item_id" name="receivedClaim" />
+                                        <button type="submit">Submit</button>
+                                    </form>
+                                </div>
+
+                            </div>
 
                         </div>
                     </CardStackPage>
