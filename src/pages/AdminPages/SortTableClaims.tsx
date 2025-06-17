@@ -78,7 +78,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Claimant',
-        width: 80,
+        width: 100,
         smallScreenWidth: 50,
     },
     {
@@ -102,7 +102,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Bucket',
-        width: 80,
+        width: 120,
         smallScreenWidth: 50,
     },
     {
@@ -146,14 +146,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
         component={Paper}
         ref={ref}
         {...props}
-        sx={{ backgroundColor: 'beige', width: 800 }}
+        sx={{ backgroundColor: 'beige', width: 850 }}
       />
     )),
     Table: (props) => (
       <Table
         {...props}
         size="small"
-        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 800 }}
+        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 850 }}
       />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
@@ -231,7 +231,7 @@ export default function SortTableClaims({claimsData}: {claimsData: Data[]})
                 {headCells.map((column) => (
                     <TableCell
                         key={column.id}
-                        align={column.numeric ? 'left' : 'left'}
+                        align={column.numeric ? 'right' : 'left'}
                         sx={{
                             fontSize: '10px',
                             width: column.width,
@@ -257,7 +257,7 @@ export default function SortTableClaims({claimsData}: {claimsData: Data[]})
     };
   
     return (
-        <Paper style={{ height: 600, width: 800, margin: '0 auto' }}>
+        <Paper style={{ height: 600, width: 850, margin: '0 auto' }}>
             <TableVirtuoso
                 data={sortedRows}
                 components={VirtuosoTableComponents}

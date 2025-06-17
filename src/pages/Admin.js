@@ -141,7 +141,7 @@ export function Admin({ registryItems }) {
 
                             <div className="flex-col">
 
-                                <div className="m-auto h-[600px] w-[820px]">
+                                <div className="m-auto h-[600px] w-[900px]">
                                     <SortTableClaims
                                         // claimsData={claimedItemsClaimed} 
                                         claimsData={registryItemsClaimed}
@@ -149,8 +149,9 @@ export function Admin({ registryItems }) {
                                 </div>
 
                                 <div className="my-4">
-                                    <form onSubmit={handleReceivedClaim}>
-                                        <input type="claim_item_id" name="receivedClaim" />
+                                    <form className="" onSubmit={handleReceivedClaim}>
+                                        <label for="received">submit item id to mark as received: </label>
+                                        <input id="received" type="text" name="receivedClaim" value="item id" style={{width: "300px"}} className="w-48 px-2 mx-2"/>
                                         <button type="submit">Submit</button>
                                     </form>
                                 </div>
