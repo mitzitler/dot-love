@@ -198,6 +198,8 @@ export default function SortTableClaims({
             </TableRow>
         );
     };
+
+    console.log("i am a console log from within SortTableClaims.tsx")
   
     return (
         <Paper style={{ height: 450, width: 450, margin: '0 auto' }}>

@@ -48,6 +48,15 @@ export const gizmoApi = createApi({
       }),
     }),
 
+    // Get all users
+    getAllUsers: builder.query({
+      query: (firstLast) => ({
+        url: `/user/list`,
+        method: 'GET',
+        headers: { 'X-First-Last': firstLast },
+      }),
+    }),
+
     // Email a user
     emailUser: builder.mutation({
       query: (headers, emailData) => ({
@@ -76,6 +85,7 @@ export const {
   useRegisterRSVPMutation,
   useUpdateUserMutation,
   useGetUserByGuestLinkQuery,
+  useGetAllUsersQuery,
   useEmailUserMutation,
   useTextUserMutation,
 } = gizmoApi;

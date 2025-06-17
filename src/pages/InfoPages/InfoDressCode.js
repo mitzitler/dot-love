@@ -5,6 +5,8 @@ import { CardStackFooter } from '../../components/CardStackFooter.js';
 import { InfoBox } from '../../components/InfoBox.js';
 import '../../App.css';
 
+// this is conditional based on whos logged in for wedding party
+
 export function InfoDressCode(guestDressCode) {
 
     const pageMainColor = "babyblue" 

@@ -6,6 +6,7 @@ import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
+import { Admin } from '../pages/Admin';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
@@ -63,6 +64,14 @@ export function Router ({ setLoginHeader}) {
                 element={
                     <Transitionizer>
                         <AboutUs />
+                    </Transitionizer>
+                }
+            />
+            <Route
+                path="/admin"
+                element={
+                    <Transitionizer>
+                        <Admin />
                     </Transitionizer>
                 }
             />

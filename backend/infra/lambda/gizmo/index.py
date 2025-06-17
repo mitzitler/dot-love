@@ -775,6 +775,52 @@ class User:
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
         )
+        
+    @staticmethod
+    def list_db(dynamo_client):
+        db_users = dynamo_client.get_all(USER_TABLE_NAME)
+        if not db_users:
+            return None
+        
+        user_list = []
+        for db_user in db_users:
+            user = User(
+                first=db_user["first_last"]["S"].split("_")[0].lower(),
+                last=db_user["first_last"]["S"].split("_")[1].lower(),
+                rsvp_code=db_user["rsvp_code"]["S"],
+                rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
+                pronouns=Pronouns[db_user["pronouns"]["S"]],
+                address=UserAddress(
+                    street=db_user["street"]["S"],
+                    second_line=db_user["second_line"]["S"],
+                    city=db_user["city"]["S"],
+                    zipcode=db_user["zipcode"]["S"],
+                    country=db_user["country"]["S"],
+                    state_loc=db_user["state_loc"]["S"],
+                    phone=db_user["phone"]["S"],
+                ),
+                email=db_user["email"]["S"],
+                diet=UserDiet(
+                    alcohol=bool(db_user["alcohol"]["BOOL"]),
+                    meat=bool(db_user["meat"]["BOOL"]),
+                    dairy=bool(db_user["dairy"]["BOOL"]),
+                    fish=bool(db_user["fish"]["BOOL"]),
+                    shellfish=bool(db_user["shellfish"]["BOOL"]),
+                    eggs=bool(db_user["eggs"]["BOOL"]),
+                    gluten=bool(db_user["gluten"]["BOOL"]),
+                    peanuts=bool(db_user["peanuts"]["BOOL"]),
+                    restrictions=db_user["restrictions"]["S"],
+                ),
+                guest_details=GuestDetails(
+                    link=db_user["guest_link"]["S"],
+                    pair_first_last=db_user["guest_pair_first_last"]["S"],
+                    date_link_requested=db_user["date_link_requested"]["BOOL"],
+                ),
+            )
+            user_list.append(user)
+            
+        return user_list
+        
 
     @staticmethod
     def from_guest_link_db(guest_link, dynamo_client):
@@ -1169,6 +1215,19 @@ class CWDynamoClient:
 ########################################################
 # Controller Action Handler
 ########################################################
+def validate_internal_route(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        event = app.current_event
+        api_key = event.headers.get("Internal-Api-Key")
+
+        if not api_key or api_key != INTERNAL_API_KEY:
+            return {"code": 401, "message": "no valid api key"}
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
 @app.get("/gizmo/ping")
 def ping():
     return {"code": 200, "message": "ping success"}
@@ -1201,6 +1260,32 @@ def login():
         },
     }
 
+@validate_internal_route
+@app.get("/gizmo/user/list")
+def list_users():
+    try:
+        users = User.list_db(CW_DYNAMO_CLIENT)
+        
+    except Exception as e:
+        err_msg = "failed to list users from db"
+        log.exception(err_msg)
+        return {
+            "code" : 500,
+            "message" : err_msg,
+        }
+        
+    user_maps = []
+    for user in users:
+        user_maps.append(user.as_map())
+    
+    return {
+       "code": 200,
+       "message": "list users success",
+       "body": {
+           "users": user_maps,
+       }
+   }
+    
 
 @app.get("/gizmo/user/guest")
 def get_user_by_guest_link():
@@ -1347,20 +1432,6 @@ def update():
     log.info("succeeded updating user in db")
 
     return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
-
-
-def validate_internal_route(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        event = app.current_event
-        api_key = event.headers.get("Internal-Api-Key")
-
-        if not api_key or api_key != INTERNAL_API_KEY:
-            return {"code": 401, "message": "no valid api key"}
-
-        return func(*args, **kwargs)
-
-    return wrapper
 
 
 @validate_internal_route

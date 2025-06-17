@@ -541,6 +541,13 @@ class DotLoveCoreStack(Stack):
             integration=gizmo_service_integration,
         )
         #
+        # Get all users
+        dot_love_api_gw.add_routes(
+            path="/gizmo/user/list",
+            methods=[apigw.HttpMethod.GET],
+            integration=gizmo_service_integration,
+        )
+        #
         # Email a user
         dot_love_api_gw.add_routes(
             path="/gizmo/email",

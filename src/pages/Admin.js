@@ -1,12 +1,21 @@
 import React, { useState } from "react"
+import { useSelector } from 'react-redux';
 import { CardStackFooter } from '../components/CardStackFooter';
 import { CardStackPage } from '../components/CardStackPage';
 import SortTableRSVPs from "./AdminPages/SortTableRSVPs";
+import { useGetAllUsersQuery } from "../services/gizmo";
+import useGetUsers from "../components/useGetUsers";
 // import SortTableClaims from "./AdminPages/SortTableClaims";
 import { NavLink } from 'react-router-dom';
 
 export function Admin() {
-    const [adminPass, setAdminPass] = useState('')
+    const [adminPass, setAdminPass] = useState('');
+    // const [getAllUsers, { isLoading }] = useGetAllUsersQuery();
+    const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+
+    const adminPassAccept = '435o'
+
+    const allUsers = useGetAllUsersQuery(loginHeaderState);
 
     const pageMainColor = "cyan" 
     const pageSecondaryColor = "terracotta"
@@ -14,10 +23,54 @@ export function Admin() {
     
     const pageSection = "admin"
 
-    const adminPassAccept = '435o'
 
-    const rsvpData = []
-    const claimsData = []
+    // const rsvpData = []
+    // const claimsData = []
+    
+
+    // const usersItems = useGetUsers(true, adminPass)
+
+    // const handlePassword = async (e, makeApiCall) => {
+    //     e.preventDefault()
+    //     const formData = new FormData(e.target);
+    //     const password = formData.get("adminPass");
+    //     setAdminPass(password);
+    //     let passwordSuccess = false;
+
+    //     if (adminPass == adminPassAccept)
+    //         passwordSuccess = true;
+
+    //     if (!makeApiCall || isLoading) return;
+    //     try {
+    //         const adminPassAccept = '435o'
+    //         // api to recieve the password 
+    //         // const result = await getAllUsers({
+    //         //     headers: password,
+    //         // }).unwrap();
+    //         const { data: users_data, isSuccess } = useGetAllUsersQuery(password, {
+    //             skip: !passwordSuccess, // <- this prevents the query from running until passwordSuccess is true
+    //         })
+
+    //         if (result.code !== 200) {
+    //             console.log("Something went wrong with Gizmo!", result);
+    //             return;
+    //         }
+
+    //         if (adminPass == adminPassAccept) {
+    //             console.log("Got all users from the Gizmo, result", result);
+    //             return;
+    //         }
+
+    //         else {
+    //             console.error("Something went wrong with Gizmo!", result);
+    //             return;
+    //         }
+    //     } catch (err) {
+    //         console.error("Get users API call failed:", err);
+    //         return;
+    //     }
+
+    // }
 
     return (
         <>
@@ -39,9 +92,9 @@ export function Admin() {
                             <h1>RSVP'd guest info</h1>
 
                             <div className="h-[454px]">
-                                <SortTableRSVPs 
-                                    rsvpData={rsvpData} 
-                                />
+                                {/* <SortTableRSVPs  */}
+                                    {/* rsvpData={rsvpData}  */}
+                                {/* /> */}
                             </div>
 
                         </div>
@@ -57,6 +110,8 @@ export function Admin() {
                                     claimsData={claimsData} 
                                 /> */}
                             </div>
+
+                            {/* input  */}
 
                         </div>
                     </CardStackPage>
