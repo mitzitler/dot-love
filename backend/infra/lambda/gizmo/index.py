@@ -44,6 +44,9 @@ CONTACT_INFO = {
         "phone": os.environ["matthew_phone"],
         "email": os.environ["matthew_email"],
     },
+    "ginny": {
+        "phone": os.environ["ginny_phone"],
+    },
 }
 RSVP_CODE_OPEN_PLUS_ONE = os.environ["open_plus_one_code"]
 
@@ -154,6 +157,12 @@ def text_admins(message):
         from_=TWILIO_SENDER_NUMBER,
         to=CONTACT_INFO["matthew"]["phone"],
     )
+    # bc she asked
+    TWILIO_CLIENT.messages.create(
+        body=message.strip(),
+        from_=TWILIO_SENDER_NUMBER,
+        to=CONTACT_INFO["ginny"]["phone"],
+    )
 
 
 def text_registration_success(user, inviter):
@@ -217,6 +226,7 @@ class DotLoveMessageType(Enum):
     REGISTRATION_SUCCESS_NOT_COMING_TEXT = 5
     RAW_TEXT = 6
     ITEM_CLAIMED_TEXT = 7
+    ITEM_CLAIMED_TEXT_ADMINS = 8
 
     def __str__(self):
         return self.name
@@ -353,6 +363,13 @@ just head over to www.mitzimatthew.love/registry and unclaim it when you can �
 Much love,
 Mitzi & Matthew 💕
 """,
+            DotLoveMessageType.ITEM_CLAIMED_TEXT_ADMINS: """
+🎁 Registry Item Claimed! 🎁
+
+The item, {item_name}, was claimed by {first_name}! 🎉
+
+Woohoo! 💕
+""",
         }
         return templates[message_type_enum]
 
@@ -455,6 +472,16 @@ Mitzi & Matthew 💕
             from_=TWILIO_SENDER_NUMBER,
             to=recipient_phone,
         )
+
+        if message_type == DotLoveMessageType.ITEM_CLAIMED_TEXT.name:
+            # not used in this template
+            del template_input["mitzi_matthew_address"]
+
+            admin_template = self._get_text_template(
+                DotLoveMessageType.ITEM_CLAIMED_TEXT_ADMINS.name
+            )
+            text_body = admin_template.format(**template_input).strip()
+            text_admins(text_body)
 
     def text_blast(self, message_type, template_input, numbers):
         """
