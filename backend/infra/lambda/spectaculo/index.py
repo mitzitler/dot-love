@@ -48,39 +48,6 @@ app = APIGatewayHttpResolver()
 
 
 ########################################################
-# Notification Templates
-########################################################
-ITEM_CLAIMED_TEXT = """
-🎉 Registry Claim Confirmation 🎉
-
-Thank you for claiming "{item_name}" from Mitzi & Matthew's registry!
-
-This helps us keep track of gifts and avoid duplicates. We really appreciate your generosity! 💕
-
-If you'd like to discuss this item or have any questions, please reach out to us directly:
-
-Matthew:
-📨 {CONTACT_INFO['matthew']['email']}
-📱 {CONTACT_INFO['matthew']['phone']}
-
-Mitzi:
-📨 {CONTACT_INFO['mitzi']['email']}
-📱 {CONTACT_INFO['mitzi']['phone']}
-"""
-
-PAYMENT_RECEIVED_TEXT = """
-🎁 Thank You for Your Gift! 🎁
-
-We've received your generous gift of ${amount}.
-
-Your support means the world to us as we start our new life together. We're incredibly grateful for your generosity and thoughtfulness!
-
-With love and appreciation,
-Mitzi & Matthew 💕
-"""
-
-
-########################################################
 # Gizmo Service Client
 ########################################################
 def send_text_notification(first_last, template_type, template_details):
@@ -156,6 +123,7 @@ class RegistryItem:
         claim_state,
         display,
         claimant_id=None,
+        received=False,
     ):
         """
         Initialize a RegistryItem, to track the stuff people will buy from us!
@@ -173,6 +141,7 @@ class RegistryItem:
         :param claim_state (ClaimState): ClaimState of the item - Claimed, Purchased, or Unclaimed.
         :param display (BOOL): whether the FE should display the item.
         :param claimant_id (STR): User id of the person who has claimed the item.
+        :param received (BOOL): whether the item has been received by us or not
         """
         self.item_id = item_id
         self.name = name
@@ -187,6 +156,7 @@ class RegistryItem:
         self.claim_state = claim_state
         self.display = display
         self.claimant_id = claimant_id
+        self.received = received
 
     def as_map(self):
         return {
@@ -203,6 +173,7 @@ class RegistryItem:
             "claim_state": self.claim_state.name if self.claim_state else None,
             "display": self.display,
             "claimant_id": self.claimant_id,
+            "received": self.received,
         }
 
     def __str__(self):
@@ -250,6 +221,7 @@ class RegistryItem:
             claim_state=claim_state,
             display=deserialized_item.get("display", True),
             claimant_id=deserialized_item.get("claimant_id", "").lower(),
+            received=deserialized_item.get("received", False),
         )
 
     @staticmethod
@@ -315,6 +287,7 @@ class RegistryItem:
             "claim_state": (
                 self.claim_state.name if self.claim_state else ClaimState.UNCLAIMED.name
             ),
+            "received": self.received,
         }
 
         # Only include claimant_id if it's not None
@@ -1050,7 +1023,7 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
             first_last = metadata.get("user_id", "guest")
             amount_dollars = payment_intent.amount / 100
 
-            # Send a text notification to the user
+            # Send a text notification to the user and us
             if first_last != "guest":
                 send_text_notification()
 
@@ -1146,6 +1119,7 @@ def add_registry_item():
             display=payload.get("display"),
             price_cents=payload.get("price_cents"),
             claim_state=ClaimState.UNCLAIMED,
+            received=payload.get("display", False),
         )
         item.update_db(CW_DYNAMO_CLIENT)
         return Response(
@@ -1277,21 +1251,28 @@ def create_claim():
 
         # Check if there's already a claim for this item
         existing_claim = RegistryClaim.find_by_item_id(item_id, CW_DYNAMO_CLIENT)
-        if existing_claim and existing_claim.claim_state is ClaimState.CLAIMED:
-            return Response(
-                status_code=409,
-                content_type="application/json",
-                body={
-                    "message": f"Registry item with ID {item_id} already has a claim by user {existing_claim.claimant_id}"
-                },
+        if existing_claim:
+            if existing_claim.claim_state is ClaimState.CLAIMED:
+                return Response(
+                    status_code=409,
+                    content_type="application/json",
+                    body={
+                        "message": f"Registry item with ID {item_id} already has a claim by user {existing_claim.claimant_id}"
+                    },
+                )
+            else:
+                # Update the existing unclaimed claim to CLAIMED
+                existing_claim.claim_state = ClaimState.CLAIMED
+                existing_claim.claimant_id = claimant_id
+                existing_claim.update_db(CW_DYNAMO_CLIENT)
+                registry_claim = existing_claim
+        else:
+            # Create registry claim
+            registry_claim = RegistryClaim(
+                item_id=item_id, claimant_id=claimant_id, claim_state=ClaimState.CLAIMED
             )
 
-        # Create registry claim
-        registry_claim = RegistryClaim(
-            item_id=item_id, claimant_id=claimant_id, claim_state=ClaimState.CLAIMED
-        )
-
-        registry_claim.create_db(CW_DYNAMO_CLIENT)
+            registry_claim.create_db(CW_DYNAMO_CLIENT)
 
         # Update the registry item with the claim state and claimant ID
         item.claim_state = ClaimState.CLAIMED
@@ -1377,7 +1358,6 @@ def update_claim():
                 content_type="application/json",
                 body={"message": f"No existing claim found for item with ID {item_id}"},
             )
-        log.info(f"existing claim: {existing_claim.as_map()}")
 
         # If unclaiming, remove the claimant ID from the item
         if claim_state == ClaimState.UNCLAIMED:

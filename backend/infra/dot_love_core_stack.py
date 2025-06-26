@@ -84,6 +84,11 @@ class DotLoveCoreStack(Stack):
                     secret_name="/dot-love/guests/contact/mitzi/email"
                 ),
             },
+            "ginny": {
+                "phone": self.obtain_ssm_client_secret(
+                    secret_name="/dot-love/guests/contact/ginny/phone"
+                ),
+            },
             "address": self.obtain_ssm_client_secret(
                 secret_name="/dot-love/guests/contact/address"
             ),
@@ -335,6 +340,7 @@ class DotLoveCoreStack(Stack):
                 "mitzi_phone": contact_info["mitzi"]["phone"],
                 "matthew_email": contact_info["matthew"]["email"],
                 "matthew_phone": contact_info["matthew"]["phone"],
+                "ginny_phone": contact_info["ginny"]["phone"],
                 # for plus-one guest checking
                 "open_plus_one_code": "unf",
                 # for internal routes
