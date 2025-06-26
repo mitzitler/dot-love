@@ -39,6 +39,7 @@ REGISTRY_ITEM_TABLE_NAME = os.environ["registry_item_table_name"]
 REGISTRY_CLAIM_TABLE_NAME = os.environ["registry_claim_table_name"]
 API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
 MITZI_MATTHEW_ADDRESS = os.environ.get("mitzi_matthew_address")
+INTERNAL_ROUTE_LIST = ["list", "ping"]
 
 # Powertools logger
 log = Logger(service="spectaculo")
@@ -472,7 +473,7 @@ class RegistryClaim:
         except Exception as e:
             log.exception(f"Error finding registry claims by user_id: {e}")
             return []
-        
+
     @staticmethod
     def claim_list_db(dynamo_client):
         """
@@ -486,8 +487,8 @@ class RegistryClaim:
             claims_data = dynamo_client.get_all(REGISTRY_CLAIM_TABLE_NAME)
 
             claim_items = []
-            for claim in claims_data:
-                claim = RegistryClaim.from_db(claims_data)
+            for raw_claim in claims_data:
+                claim = RegistryClaim.from_db(raw_claim)
                 if claim:
                     claim_items.append(claim)
 
@@ -1059,6 +1060,7 @@ def validate_internal_route(func):
 
     return wrapper
 
+
 @app.get("/spectaculo/item")
 def get_registry_items():
     """
@@ -1430,6 +1432,7 @@ def get_user_claims():
             },
         )
 
+
 # get a list of all claims
 @validate_internal_route
 @app.get("/spectaculo/claim/list")
@@ -1439,7 +1442,7 @@ def list_claims():
     """
     try:
         raw_claims = RegistryClaim.claim_list_db(CW_DYNAMO_CLIENT)
-        
+
     except Exception as e:
         err_msg = "failed to list claims from db"
         log.exception(err_msg)
@@ -1447,18 +1450,19 @@ def list_claims():
             "code": 500,
             "message": err_msg,
         }
-        
+
     claim_maps = []
     for claim in raw_claims:
         claim_maps.append(claim.as_map())
-        
+
     return {
         "code": 200,
         "message": "list claims success",
-        "body" : {
+        "body": {
             "claims": claim_maps,
-        }
+        },
     }
+
 
 @app.post("/spectaculo/payment")
 def payment_create():
@@ -1593,7 +1597,7 @@ def not_found():
 @lambda_handler_decorator
 def middleware_before(handler, event, context):
     # Exclude middleware for stripe webhook
-    if event["rawPath"].split("/")[-1] == "ping":
+    if event["rawPath"].split("/")[-1] in INTERNAL_ROUTE_LIST:
         return handler(event, context)
 
     # append trace information

@@ -35,6 +35,7 @@ SES_ADMIN_LIST = os.environ["ses_admin_list"]
 TWILIO_AUTH_TOKEN = os.environ["twilio_auth_token"]
 TWILIO_ACCOUNT_SID = os.environ["twilio_account_sid"]
 TWILIO_SENDER_NUMBER = os.environ["twilio_sender_number"]
+INTERNAL_ROUTE_LIST = ["ping", "list", "text", "email"]
 CONTACT_INFO = {
     "mitzi": {
         "phone": os.environ["mitzi_phone"],
@@ -802,13 +803,13 @@ class User:
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
         )
-        
+
     @staticmethod
     def list_db(dynamo_client):
         db_users = dynamo_client.get_all(USER_TABLE_NAME)
         if not db_users:
             return None
-        
+
         user_list = []
         for db_user in db_users:
             user = User(
@@ -845,9 +846,8 @@ class User:
                 ),
             )
             user_list.append(user)
-            
+
         return user_list
-        
 
     @staticmethod
     def from_guest_link_db(guest_link, dynamo_client):
@@ -1104,9 +1104,55 @@ class CWDynamoClient:
             "Item", None
         )
 
-    # NOTE: This only works for 1mb of data atm (need to add logic for pagination)
-    def get_all(self, table_name):
-        return self.client.scan(TableName=table_name)["Items"]
+    def get_all(
+        self, table_name, filter_expression=None, expression_attribute_values=None
+    ):
+        """
+        Get all items from a DynamoDB table with automatic pagination.
+        Optionally filter results using a filter expression.
+
+        :param table_name: Name of the DynamoDB table
+        :param filter_expression: Optional filter expression
+        :param expression_attribute_values: Values for the filter expression
+        :return: List of all matching items
+        """
+        scan_kwargs = {"TableName": table_name}
+
+        # Add filter if provided
+        if filter_expression:
+            scan_kwargs["FilterExpression"] = filter_expression
+            if expression_attribute_values:
+                scan_kwargs["ExpressionAttributeValues"] = expression_attribute_values
+
+        # Initialize results list and pagination variables
+        items = []
+        last_evaluated_key = None
+
+        # Paginate through results
+        while True:
+            # Include ExclusiveStartKey if we're continuing from a previous page
+            if last_evaluated_key:
+                scan_kwargs["ExclusiveStartKey"] = last_evaluated_key
+
+            # Execute the scan
+            response = self.client.scan(**scan_kwargs)
+
+            # Add items from this page
+            items.extend(response.get("Items", []))
+
+            # Check if there are more pages
+            last_evaluated_key = response.get("LastEvaluatedKey")
+            if not last_evaluated_key:
+                break
+
+            # Add logging for large datasets
+            if len(items) > 1000:
+                log.info(
+                    f"Continuing pagination for table {table_name}, retrieved {len(items)} items so far"
+                )
+
+        log.info(f"Retrieved {len(items)} total items from {table_name}")
+        return items
 
     # NOTE: This only works for 1mb of data atm (need to add logic for pagination)
     def get_all_of_col(self, table_name, col_name):
@@ -1255,6 +1301,7 @@ def validate_internal_route(func):
 
     return wrapper
 
+
 @app.get("/gizmo/ping")
 def ping():
     return {"code": 200, "message": "ping success"}
@@ -1287,32 +1334,33 @@ def login():
         },
     }
 
+
 @validate_internal_route
 @app.get("/gizmo/user/list")
 def list_users():
     try:
         users = User.list_db(CW_DYNAMO_CLIENT)
-        
+
     except Exception as e:
         err_msg = "failed to list users from db"
         log.exception(err_msg)
         return {
-            "code" : 500,
-            "message" : err_msg,
+            "code": 500,
+            "message": err_msg,
         }
-        
+
     user_maps = []
     for user in users:
         user_maps.append(user.as_map())
-    
+
     return {
-       "code": 200,
-       "message": "list users success",
-       "body": {
-           "users": user_maps,
-       }
-   }
-    
+        "code": 200,
+        "message": "list users success",
+        "body": {
+            "users": user_maps,
+        },
+    }
+
 
 @app.get("/gizmo/user/guest")
 def get_user_by_guest_link():
@@ -1538,14 +1586,8 @@ def not_found():
 @lambda_handler_decorator
 def middleware_before(handler, event, context):
     # Exclude middleware for healthcheck
-    if event["rawPath"].split("/")[-1] == "ping":
+    if event["rawPath"].split("/")[-1] in INTERNAL_ROUTE_LIST:
         return handler(event, context)
-
-    # internal auth handling
-    if event["rawPath"].split("/")[-1] in ["text", "email"]:
-        api_key = event["headers"].get("internal-api-key")
-        if not api_key or api_key != INTERNAL_API_KEY:
-            return {"code": 401, "message": "no valid api key"}
 
     # append trace information
     trace_id = str(uuid.uuid4())
