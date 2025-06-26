@@ -1054,7 +1054,11 @@ def validate_internal_route(func):
         api_key = event.headers.get("Internal-Api-Key")
 
         if not api_key or api_key != INTERNAL_API_KEY:
-            return {"code": 401, "message": "no valid api key"}
+            return Response(
+                status_code=401,
+                content_type="application/json",
+                body={"message": "no valid api key"},
+            )
 
         return func(*args, **kwargs)
 
@@ -1446,22 +1450,30 @@ def list_claims():
     except Exception as e:
         err_msg = "failed to list claims from db"
         log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-        }
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={
+                "message": err_msg,
+                "error": str(e),
+            },
+        )
 
     claim_maps = []
     for claim in raw_claims:
         claim_maps.append(claim.as_map())
 
-    return {
-        "code": 200,
-        "message": "list claims success",
         "body": {
-            "claims": claim_maps,
         },
     }
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={
+            "message": "list claims success",
+            "claims": claim_maps,
+        },
+    )
 
 
 @app.post("/spectaculo/payment")

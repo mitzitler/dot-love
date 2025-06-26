@@ -1295,7 +1295,11 @@ def validate_internal_route(func):
         api_key = event.headers.get("Internal-Api-Key")
 
         if not api_key or api_key != INTERNAL_API_KEY:
-            return {"code": 401, "message": "no valid api key"}
+            return Response(
+                status_code=401,
+                content_type="application/json",
+                body={"message": "no valid api key"},
+            )
 
         return func(*args, **kwargs)
 
