@@ -1445,7 +1445,7 @@ def list_claims():
     Get a list of all claims and their ids
     """
     try:
-        raw_claims = RegistryClaim.claim_list_db(CW_DYNAMO_CLIENT)
+        claims = RegistryClaim.claim_list_db(CW_DYNAMO_CLIENT)
 
     except Exception as e:
         err_msg = "failed to list claims from db"
@@ -1460,12 +1460,9 @@ def list_claims():
         )
 
     claim_maps = []
-    for claim in raw_claims:
+    for claim in claims:
         claim_maps.append(claim.as_map())
 
-        "body": {
-        },
-    }
     return Response(
         status_code=200,
         content_type="application/json",
