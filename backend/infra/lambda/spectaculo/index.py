@@ -70,6 +70,7 @@ def send_text_notification(first_last, template_type, template_details):
             # NOTE: Will be looked up by Gizmo based on first_last
             "recipient_phone": None,
             "trace": app.context.get("trace_id", "🤷"),
+            "first_last": first_last,
         }
 
         headers = {
@@ -430,7 +431,7 @@ class RegistryClaim:
             )
 
             if not claim_items:
-                log.error("No claims found", item=item_id)
+                log.info("No claims found", item=item_id)
                 return None
 
             # Use the first matching item

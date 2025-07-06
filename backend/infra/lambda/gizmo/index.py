@@ -1314,7 +1314,9 @@ def ping():
 @app.get("/gizmo/user")
 def login():
     try:
-        user = User.from_first_last_db(app.context["first_last"], CW_DYNAMO_CLIENT)
+        user = User.from_first_last_db(
+            app.current_event.headers.get("x-first-last"), CW_DYNAMO_CLIENT
+        )
     except Exception as e:
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
@@ -1525,7 +1527,6 @@ def send_email():
     return {"code": 200, "data": res}
 
 
-@validate_internal_route
 @app.post("/gizmo/text")
 def send_text():
     payload = app.current_event.json_body
@@ -1552,7 +1553,7 @@ def send_text():
     phone = payload["recipient_phone"]
     if phone == "" or phone == None:
         try:
-            user = User.from_first_last_db(app.context["first_last"], CW_DYNAMO_CLIENT)
+            user = User.from_first_last_db(payload["first_last"], CW_DYNAMO_CLIENT)
         except Exception as e:
             err_msg = "failed to fetch user from db"
             log.exception(err_msg)
@@ -1614,6 +1615,7 @@ def middleware_before(handler, event, context):
             "message": "First and last name not included in headers",
         }
     log.append_keys(first_last=first_last)
+    # TODO: DO NOT USE THIS - IT PERSISTS ACROSS INVOCATIONS
     app.append_context(first_last=first_last)
 
     return handler(event, context)
