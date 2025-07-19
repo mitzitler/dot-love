@@ -11,78 +11,19 @@ import {
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 
-// interface Address {
-//     street: string;
-//     second_line: string;
-//     city: string;
-//     zipcode: string;
-//     country: string;
-//     state_loc: string;
-// }
-  
-// interface Diet {
-//     alcohol: boolean;
-//     meat: boolean;
-//     dairy: boolean;
-//     fish: boolean;
-//     shellfish: boolean;
-//     eggs: boolean;
-//     gluten: boolean;
-//     peanuts: boolean;
-//     restrictions: string;
-// }
-
-// interface GuestDetails {
-//     date_link_requested: boolean;
-//     link: string;
-//     pair_first_last: string;
-// }
-
-// export interface Data {
-//     first: string;
-//     last: string;
-//     email: string;
-//     phone: string;
-//     pronouns: string;
-//     rsvp_code: string;
-//     rsvp_status: string;
-
-//     address: Address;
-//     diet: Diet;
-//     guest_details: GuestDetails;
-// }
-
 export interface Data {
-    // Basic info
     first: string;
     last: string;
     first_last: string;
     email: string;
     phone: string;
     pronouns: string;
-    rsvp_code: string;
     rsvp_status: string;
   
-    // Address (flattened)
-    street: string;
-    second_line: string;
-    city: string;
-    zipcode: string;
-    country: string;
-    state_loc: string;
+    address_info: string,
   
-    // Dietary info (flattened)
-    alcohol: boolean;
-    meat: boolean;
-    dairy: boolean;
-    fish: boolean;
-    shellfish: boolean;
-    eggs: boolean;
-    gluten: boolean;
-    peanuts: boolean;
-    restrictions: string;
+    dietary: string,
   
-    // Guest details (flattened)
     date_link_requested: boolean;
     link: string;
     pair_first_last: string;
@@ -114,13 +55,16 @@ function getComparator<Key extends keyof any>(
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+const numCols = 7;
+const overallWidth = 850;
+
 const headCells: readonly HeadCell[] = [
     {
         id: 'first',
         numeric: false,
         disablePadding: true,
         label: 'First',
-        width: 50,
+        width: overallWidth/numCols,
         smallScreenWidth: 40,
     },
     {
@@ -128,47 +72,47 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Last',
-        width: 50,
-        smallScreenWidth: 40,
-    },
-    {
-        id: 'pair_first_last',
-        numeric: false,
-        disablePadding: false,
-        label: 'Date Pair',
-        width: 50,
-        smallScreenWidth: 40,
-    },
-    {
-        id: 'date_link_requested',
-        numeric: false,
-        disablePadding: false,
-        label: 'Date Link Req',
-        width: 50,
+        width: overallWidth/numCols,
         smallScreenWidth: 40,
     },
     {
         id: 'phone',
         numeric: false,
-        disablePadding: false,
+        disablePadding: true,
         label: 'Phone',
-        width: 50,
+        width: overallWidth/numCols,
         smallScreenWidth: 40,
     },
     {
-        id: 'rsvp_status',
+        id: 'pair_first_last',
         numeric: false,
-        disablePadding: false,
-        label: 'RSVP',
-        width: 50,
+        disablePadding: true,
+        label: 'Date Pair',
+        width: overallWidth/numCols,
         smallScreenWidth: 40,
     },
     {
-        id: 'country',
+        id: 'address_info',
         numeric: false,
-        disablePadding: false,
-        label: 'Country',
-        width: 50,
+        disablePadding: true,
+        label: 'Address',
+        width: overallWidth/numCols,
+        smallScreenWidth: 40,
+    },
+    {
+        id: 'dietary',
+        numeric: false,
+        disablePadding: true,
+        label: 'Dietary Info',
+        width: overallWidth/numCols,
+        smallScreenWidth: 40,
+    },
+    {
+        id: 'email',
+        numeric: false,
+        disablePadding: true,
+        label: 'Email',
+        width: overallWidth/numCols,
         smallScreenWidth: 40,
     },
     // more fields also
@@ -180,14 +124,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
         component={Paper}
         ref={ref}
         {...props}
-        sx={{ backgroundColor: 'beige', width: 450 }}
+        sx={{ backgroundColor: 'beige', width: 850 }}
       />
     )),
     Table: (props) => (
       <Table
         {...props}
         size="small"
-        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 450 }}
+        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 850 }}
       />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
@@ -210,11 +154,11 @@ export default function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
-  
+
     const sortedRows = React.useMemo(
-        () => [...rsvpData].sort(getComparator(order, orderBy)),
+        () => [...(rsvpData || [])].sort(getComparator(order, orderBy)),
         [rsvpData, order, orderBy]
-    );
+      );
   
     const fixedHeaderContent = () => (
         <TableRow>
@@ -250,12 +194,14 @@ export default function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
         const notComing = row.rsvp_status != 'ATTENDING';
         return (
             <TableRow
-                key={row.first_last}
+                key={row.email}
                 sx={{
                     backgroundColor: 'khaki',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
-                    opacity: notComing ? 0.7 : 1
+                    width: "100%",
+                    display: "inline-table",
+                    opacity: notComing ? 0.5 : 1
                 }}
             >
                 {headCells.map((column) => (
@@ -270,27 +216,17 @@ export default function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
                             textDecoration: notComing ? 'line-through' : 'none'
                         }}
                     >
-                        {/* {column.id === 'price' ? `$${row[column.id].toFixed(2)}` : row[column.id]}
-                        
-                        {column.id === 'name' && isClaimed && (
-                            <span style={{ marginLeft: '5px', fontSize: '8px', color: 'green' }}>
-                                (Claimed)
-                            </span>
-                        )} */}
 
-                        row[column.id]
+                        {row[column.id]}
 
                     </TableCell>
                 ))}
             </TableRow>
         );
     };
-
-
-    console.log("i am a console log from within SortTableRSVPs.tsx")
   
     return (
-        <Paper style={{ height: 450, width: 450, margin: '0 auto' }}>
+        <Paper style={{ height: 600, width: 850, margin: '0 auto' }}>
             <TableVirtuoso
                 data={sortedRows}
                 components={VirtuosoTableComponents}
