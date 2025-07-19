@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit'
 const extrasSlice = createSlice({
   name: "extras",
   initialState: {
-    loginHeaderFirstLast: {},
     loginHeaderState: '',
+    adminHeaderState: '',
     giftClaimed: {}, // id: , claimed: boolean, 
     claimStorage: {
       item_id: '',
@@ -20,12 +20,13 @@ const extrasSlice = createSlice({
       state.giftClaimed[action.payload[0]] = !action.payload[1] 
       console.log('for item id', action.payload[0], 'the claimed state is now', action.payload[1])
     },
-    setloginHeaderFirstLast(state, action) {
-      state.loginHeaderFirstLast = Object.values(action.payload)
-    },
     setloginHeaderState(state, action) {
       state.loginHeaderState = Object.values(action.payload)[0].toLowerCase()
       console.log('The login header for this session is: ', Object.values(action.payload)[0])
+    },
+    setAdminHeaderState(state, action) {
+      state.adminHeaderState = Object.values(action.payload)[0].toLowerCase()
+      console.log('The admin header for this session is: ', Object.values(action.payload)[0])
     },
     setClaimStorage(state, action) {
       let item_id = action.payload[0]
@@ -37,6 +38,6 @@ const extrasSlice = createSlice({
     }
 }})
 
-export const { giftClaimedToggle, setloginHeaderFirstLast, setloginHeaderState } = extrasSlice.actions
+export const { giftClaimedToggle, setloginHeaderState, setAdminHeaderState } = extrasSlice.actions
   
 export default extrasSlice.reducer
