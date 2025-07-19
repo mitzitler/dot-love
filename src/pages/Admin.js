@@ -3,14 +3,15 @@ import { useSelector } from 'react-redux';
 import { CardStackFooter } from '../components/CardStackFooter';
 import { CardStackPage } from '../components/CardStackPage';
 import SortTableRSVPs from "./AdminPages/SortTableRSVPs";
-import { useGetAllUsersQuery } from "../services/gizmo";
+import { useLazyGetAllUsersQuery } from "../services/gizmo"
 // import useGetAllUsers from "../components/useGetUsers";
 import { NavLink } from 'react-router-dom';
 
 export function Admin({ registryItems, key }) {
-    const [getAllUsers, { isLoading }] = useGetAllUsersQuery();
     const loginHeaderState = useSelector((state) => state.extras.loginHeaderState)
+    const [inputPass, setInputPass] = useState('');
     const [userList, setUserList] = useState(false)
+    const [triggerGetAllUsers, { data: userData, isLoading, isError }] = useLazyGetAllUsersQuery();
 
     const pageMainColor = "cyan"
     const pageSecondaryColor = "terracotta"
@@ -18,16 +19,15 @@ export function Admin({ registryItems, key }) {
     const pageSection = "admin"
 
     const handlePassword = async (e) => {
-        const formData = new FormData(e.target);
-        const password = formData.get("adminPass");
+        e.preventDefault();
+        console.log(e);
+        const password = ""; 
 
         // api to receive the password
         try {
             console.log('attempting to get all users, for: ', loginHeaderState)
-            const result = await getAllUsers(password).unwrap();
+            const result = await triggerGetAllUsers(password).unwrap();
             console.log("made getAllUsers call to Gizmo, result:", result);
-
-
             if (result.code === 200) {
                 console.log("Got all users from the Gizmo, result", result);
                 setUserList(result)
@@ -36,11 +36,11 @@ export function Admin({ registryItems, key }) {
                 console.log("Something went wrong with Gizmo!", result);
                 return;
             }
-
-
         } catch (err) {
             console.error("Get users API call failed:", err);
         }
+
+        // TODO: Set users to var for table
 
     }
 
@@ -50,7 +50,12 @@ export function Admin({ registryItems, key }) {
             {/* links to all pages */}
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} >
-              <input onChange={(e)=> handlePassword(e)} ></input>
+                    <form onSubmit={handlePassword}>
+                        <label htmlFor="password">password</label>
+                        <input type="text" id="password" name="password" />
+                        <button type="submit">Submit</button>
+                    </form>
+              {/* <input onSubmit={(e)=>handlePassword(e)} ></input> */}
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/info' end>INFO</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/about' end>ABOUT</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/registry' end>REGISTRY</NavLink>
@@ -63,9 +68,9 @@ export function Admin({ registryItems, key }) {
                             <h1>RSVP'd guest info</h1>
 
                             <div className="h-[454px]">
-                                <SortTableRSVPs 
+                                {/*<SortTableRSVPs 
                                     rsvpData={userList}
-                                />
+                                /> */}
                             </div>
 
                         </div>

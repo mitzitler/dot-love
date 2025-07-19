@@ -85,7 +85,7 @@ export const {
   useRegisterRSVPMutation,
   useUpdateUserMutation,
   useGetUserByGuestLinkQuery,
-  useGetAllUsersQuery,
+  useLazyGetAllUsersQuery,
   useEmailUserMutation,
   useTextUserMutation,
 } = gizmoApi;
