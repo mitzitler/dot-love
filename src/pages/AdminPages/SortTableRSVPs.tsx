@@ -11,25 +11,67 @@ import {
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 
-interface Data {
-    first_last: string;
+// interface Address {
+//     street: string;
+//     second_line: string;
+//     city: string;
+//     zipcode: string;
+//     country: string;
+//     state_loc: string;
+// }
+  
+// interface Diet {
+//     alcohol: boolean;
+//     meat: boolean;
+//     dairy: boolean;
+//     fish: boolean;
+//     shellfish: boolean;
+//     eggs: boolean;
+//     gluten: boolean;
+//     peanuts: boolean;
+//     restrictions: string;
+// }
+
+// interface GuestDetails {
+//     date_link_requested: boolean;
+//     link: string;
+//     pair_first_last: string;
+// }
+
+// export interface Data {
+//     first: string;
+//     last: string;
+//     email: string;
+//     phone: string;
+//     pronouns: string;
+//     rsvp_code: string;
+//     rsvp_status: string;
+
+//     address: Address;
+//     diet: Diet;
+//     guest_details: GuestDetails;
+// }
+
+export interface Data {
+    // Basic info
     first: string;
     last: string;
-    rsvp_status: string; // if its not accepted, then do the cross out formatting
-    name: string;
-    phone: string; // if its not country code usa, make a not they are not textable
+    first_last: string;
     email: string;
-    // these make up phyiscal address
+    phone: string;
+    pronouns: string;
+    rsvp_code: string;
+    rsvp_status: string;
+  
+    // Address (flattened)
     street: string;
     second_line: string;
     city: string;
     zipcode: string;
     country: string;
     state_loc: string;
-    // plus one info
-    pair_first_last: string;
-    date_link_requested: boolean;
-    // dietary info
+  
+    // Dietary info (flattened)
     alcohol: boolean;
     meat: boolean;
     dairy: boolean;
@@ -38,9 +80,13 @@ interface Data {
     eggs: boolean;
     gluten: boolean;
     peanuts: boolean;
-    restrictions: string
-
-}
+    restrictions: string;
+  
+    // Guest details (flattened)
+    date_link_requested: boolean;
+    link: string;
+    pair_first_last: string;
+  }
 
 interface HeadCell {
     disablePadding: boolean;
@@ -70,10 +116,18 @@ function getComparator<Key extends keyof any>(
 
 const headCells: readonly HeadCell[] = [
     {
-        id: 'first_last',
+        id: 'first',
         numeric: false,
         disablePadding: true,
-        label: 'Name',
+        label: 'First',
+        width: 50,
+        smallScreenWidth: 40,
+    },
+    {
+        id: 'last',
+        numeric: false,
+        disablePadding: true,
+        label: 'Last',
         width: 50,
         smallScreenWidth: 40,
     },
@@ -86,10 +140,34 @@ const headCells: readonly HeadCell[] = [
         smallScreenWidth: 40,
     },
     {
+        id: 'date_link_requested',
+        numeric: false,
+        disablePadding: false,
+        label: 'Date Link Req',
+        width: 50,
+        smallScreenWidth: 40,
+    },
+    {
         id: 'phone',
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: 'Phone',
+        width: 50,
+        smallScreenWidth: 40,
+    },
+    {
+        id: 'rsvp_status',
+        numeric: false,
+        disablePadding: false,
+        label: 'RSVP',
+        width: 50,
+        smallScreenWidth: 40,
+    },
+    {
+        id: 'country',
+        numeric: false,
+        disablePadding: false,
+        label: 'Country',
         width: 50,
         smallScreenWidth: 40,
     },
@@ -125,7 +203,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 export default function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
     
     const [order, setOrder] = React.useState<Order>('asc');
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('last');
   
     const handleSort = (property: keyof Data) => {
         const isAsc = orderBy === property && order === 'asc';

@@ -4,22 +4,22 @@ import { CardStackFooter } from '../components/CardStackFooter';
 import { CardStackPage } from '../components/CardStackPage';
 import SortTableRSVPs from "./AdminPages/SortTableRSVPs";
 import { useGetAllUsersQuery } from "../services/gizmo";
-import { useGetAllClaimsQuery } from "../services/spectaculo";
+// import { useGetAllClaimsQuery } from "../services/spectaculo";
 import useGetUsers from "../components/useGetUsers";
-import useGetClaims from "../components/useGetClaims";
-import SortTableClaims from "./AdminPages/SortTableClaims";
+// import useGetClaims from "../components/useGetClaims";
+// import SortTableClaims from "./AdminPages/SortTableClaims";
 import { NavLink } from 'react-router-dom';
 
-export function Admin({ registryItems }) {
+export function Admin({ registryItems, key }) {
     const [adminPass, setAdminPass] = useState('');
-    const [receivedClaim, setReceivedClaim] = useState('');
-    // const [getAllUsers, { isLoading }] = useGetAllUsersQuery();
-    const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
+    // const [receivedClaim, setReceivedClaim] = useState('');
+    // const [getAllUsers, { isLoading }] = useGetAllUsersQuery(key);
+    // const loginHeaderState = useSelector((state) => state.extras.loginHeaderState) 
 
     const adminPassAccept = '435o'
 
-    const allUsers = useGetAllUsersQuery(loginHeaderState);
-    const allClaims = useGetAllClaimsQuery(loginHeaderState);
+    const allUsers = useGetAllUsersQuery(key);
+    // const allClaims = useGetAllClaimsQuery(loginHeaderState);
 
     const pageMainColor = "cyan" 
     const pageSecondaryColor = "terracotta"
@@ -28,15 +28,17 @@ export function Admin({ registryItems }) {
     const pageSection = "admin"
 
     console.log('allUsers: ', allUsers)
-    console.log('allClaims: ', allClaims)
+    const listUsers = allUsers?.data?.body?.users
+    console.log('allUsers?.data?.body?.users: ', allUsers?.data?.body?.users)
+    // console.log('allClaims: ', allClaims)
     console.log('registryItems: ', registryItems)
 
-    const handleReceivedClaim = (e) => {
-        e.preventDefault(); // prevent page reload
-        const formData = new FormData(e.target);
-        const claim_item_id = formData.get("receivedClaim"); // assuming input name="adminPass"
-        setReceivedClaim(claim_item_id);
-    }
+    // const handleReceivedClaim = (e) => {
+    //     e.preventDefault(); // prevent page reload
+    //     const formData = new FormData(e.target);
+    //     const claim_item_id = formData.get("receivedClaim"); // assuming input name="adminPass"
+    //     setReceivedClaim(claim_item_id);
+    // }
 
     let registryItemsFilter = Object.fromEntries(
         Object.entries(registryItems)
@@ -46,6 +48,10 @@ export function Admin({ registryItems }) {
         ...item,
         id: key,
         }));
+
+    Object.entries(listUsers)['first_last'] =  Object.entries(listUsers)['first'] + Object.entries(listUsers)['last']
+
+    console.log('registryItemsClaimed: ', registryItemsClaimed)
 
     // let claimedItemsFilter = Object.fromEntries(
     //     Object.entries(allClaims)
@@ -119,23 +125,22 @@ export function Admin({ registryItems }) {
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/rsvp' end>RSVP</NavLink>
             </CardStackFooter>
 
-            { adminPass == adminPassAccept ?
                 <>
                     <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                         <div>
                             <h1>RSVP'd guest info</h1>
 
                             <div className="h-[454px]">
-                                {/* <SortTableRSVPs  */}
-                                    {/* rsvpData={rsvpData}  */}
-                                {/* /> */}
+                                <SortTableRSVPs 
+                                    rsvpData={listUsers} 
+                                />
                             </div>
 
                         </div>
                     </CardStackPage>
 
 
-                    <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+                    {/* <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                         <div>
                             <h1>Claims info</h1>
 
@@ -159,11 +164,11 @@ export function Admin({ registryItems }) {
                             </div>
 
                         </div>
-                    </CardStackPage>
+                    </CardStackPage> */}
                 </>
-                :
+                {/* :
                 <></>
-            }
+            } */}
         </>
     )
 }

@@ -50,10 +50,10 @@ export const gizmoApi = createApi({
 
     // Get all users
     getAllUsers: builder.query({
-      query: (firstLast) => ({
+      query: (apiKey) => ({
         url: `/user/list`,
         method: 'GET',
-        headers: { 'X-First-Last': firstLast },
+        headers: { 'Internal-Api-Key': apiKey },
       }),
     }),
 
