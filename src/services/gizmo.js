@@ -48,6 +48,15 @@ export const gizmoApi = createApi({
       }),
     }),
 
+    // Get all users
+    getAllUsers: builder.query({
+      query: (apiKey) => ({
+        url: `/user/list`,
+        method: 'GET',
+        headers: { 'Internal-Api-Key': apiKey },
+      }),
+    }),
+
     // Email a user
     emailUser: builder.mutation({
       query: (headers, emailData) => ({
@@ -76,6 +85,7 @@ export const {
   useRegisterRSVPMutation,
   useUpdateUserMutation,
   useGetUserByGuestLinkQuery,
+  useLazyGetAllUsersQuery,
   useEmailUserMutation,
   useTextUserMutation,
 } = gizmoApi;

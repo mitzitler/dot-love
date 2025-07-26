@@ -15,9 +15,9 @@ export function RegistryClaimCard(props) {
     const handleUnclaimClick = async () => {
 
         
-        if (isLoading || props.claim_state == "UNCLAIMED") return;
+        if (isLoading || props.claim_state === "UNCLAIMED") return;
 
-            // make the API call
+        // make the API call
         try {
             console.log('attempting to unclaim item, user: ', loginHeaderState)
             const updateData = {'item_id': props.item_id, 'claim_state': "UNCLAIMED"};
@@ -126,4 +126,4 @@ export function RegistryClaimCard(props) {
             </div>
         </div>
     )
-} 
+}

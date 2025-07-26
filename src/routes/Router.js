@@ -6,6 +6,7 @@ import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
+import { Admin } from '../pages/Admin';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
@@ -20,6 +21,40 @@ export function Router ({ setLoginHeader}) {
     // dispatch(setloginHeaderState(loginHeader));
     const registryItems = useRegistryItems(true, loginHeaderState)
     const claimedItems = useClaimedItems(true, loginHeaderState)
+
+    const categorizePrice = (price_cents) => {
+        if (price_cents == 0) return '??'
+        if (price_cents > 0 && price_cents <= 7500) return '$0-75';
+        if (price_cents <= 15000) return '$75-150';
+        if (price_cents <= 25000) return '$150-225';
+        if (price_cents <= 30000) return '$225-300';
+        if (price_cents > 30000) return '$300+';
+        return '$300+'
+    };
+      
+    let registryItemsCat = Object.fromEntries(
+        Object.entries(registryItems)
+            .filter(([_, value]) => value.display) 
+            .map(([key, value]) => [
+                key,
+                { ...value, price_cat: categorizePrice(value.price_cents) },
+        ])
+    );
+
+    registryItemsCat = Object.entries(registryItemsCat).map(([key, item]) => ({
+        ...item,
+        id: key,
+      }));
+
+    let claimedItemsFilter = Object.fromEntries(
+        Object.entries(claimedItems)
+            .filter(([_, value]) => value.claim_state == "CLAIMED")
+    )
+
+    let claimedItemsClaimed = Object.entries(claimedItemsFilter).map(([key, item]) => ({
+        ...item,
+        id: key,
+      }));
 
     return (
         <Routes>
@@ -52,8 +87,8 @@ export function Router ({ setLoginHeader}) {
                 element={
                     <Transitionizer>
                         <Registry 
-                            registryItems={registryItems} 
-                            claimedItems={claimedItems}
+                            registryItems={registryItemsCat} 
+                            claimedItems={claimedItemsClaimed}
                             />
                     </Transitionizer>
                 }
@@ -63,6 +98,17 @@ export function Router ({ setLoginHeader}) {
                 element={
                     <Transitionizer>
                         <AboutUs />
+                    </Transitionizer>
+                }
+            />
+            <Route
+                path="/admin"
+                element={
+                    <Transitionizer>
+                        <Admin 
+                            registryItems={registryItemsCat}
+                            claimedItems={claimedItemsClaimed}
+                            />
                     </Transitionizer>
                 }
             />

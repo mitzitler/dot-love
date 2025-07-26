@@ -24,6 +24,14 @@ module.exports = {
     'border-fuchsia-500/50',
     'bg-khaki-400/75',
     'border-khaki-500/50',
+    'bg-pink-400/75',
+    'border-pink-500/50',
+    'bg-cyan-400/75',
+    'border-cyan-500/50',
+    'bg-terracotta-400/75',
+    'border-terracotta-500/50',
+    'bg-plum-400/75',
+    'border-plum-500/50',
 
   ],
   theme: {

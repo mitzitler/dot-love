@@ -39,6 +39,7 @@ REGISTRY_ITEM_TABLE_NAME = os.environ["registry_item_table_name"]
 REGISTRY_CLAIM_TABLE_NAME = os.environ["registry_claim_table_name"]
 API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
 MITZI_MATTHEW_ADDRESS = os.environ.get("mitzi_matthew_address")
+INTERNAL_ROUTE_LIST = ["list", "ping"]
 
 # Powertools logger
 log = Logger(service="spectaculo")
@@ -69,6 +70,7 @@ def send_text_notification(first_last, template_type, template_details):
             # NOTE: Will be looked up by Gizmo based on first_last
             "recipient_phone": None,
             "trace": app.context.get("trace_id", "🤷"),
+            "first_last": first_last,
         }
 
         headers = {
@@ -429,7 +431,7 @@ class RegistryClaim:
             )
 
             if not claim_items:
-                log.error("No claims found", item=item_id)
+                log.info("No claims found", item=item_id)
                 return None
 
             # Use the first matching item
@@ -471,6 +473,29 @@ class RegistryClaim:
             return registry_claims
         except Exception as e:
             log.exception(f"Error finding registry claims by user_id: {e}")
+            return []
+
+    @staticmethod
+    def claim_list_db(dynamo_client):
+        """
+        Get all registry claims from the database.
+
+        :param dynamo_client: The DynamoDB client
+        :return: List of RegistryItem objects
+        """
+        try:
+            # Query the registry claims using the GSI
+            claims_data = dynamo_client.get_all(REGISTRY_CLAIM_TABLE_NAME)
+
+            claim_items = []
+            for raw_claim in claims_data:
+                claim = RegistryClaim.from_db(raw_claim)
+                if claim:
+                    claim_items.append(claim)
+
+            return claim_items
+        except Exception as e:
+            log.exception(f"Error retrieving all claim items: {str(e)}")
             return []
 
 
@@ -1023,6 +1048,24 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
 ########################################################
 # API Endpoints
 ########################################################
+def validate_internal_route(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        event = app.current_event
+        api_key = event.headers.get("Internal-Api-Key")
+
+        if not api_key or api_key != INTERNAL_API_KEY:
+            return Response(
+                status_code=401,
+                content_type="application/json",
+                body={"message": "no valid api key"},
+            )
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 @app.get("/spectaculo/item")
 def get_registry_items():
     """
@@ -1395,6 +1438,42 @@ def get_user_claims():
         )
 
 
+# get a list of all claims
+@validate_internal_route
+@app.get("/spectaculo/claim/list")
+def list_claims():
+    """
+    Get a list of all claims and their ids
+    """
+    try:
+        claims = RegistryClaim.claim_list_db(CW_DYNAMO_CLIENT)
+
+    except Exception as e:
+        err_msg = "failed to list claims from db"
+        log.exception(err_msg)
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={
+                "message": err_msg,
+                "error": str(e),
+            },
+        )
+
+    claim_maps = []
+    for claim in claims:
+        claim_maps.append(claim.as_map())
+
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={
+            "message": "list claims success",
+            "claims": claim_maps,
+        },
+    )
+
+
 @app.post("/spectaculo/payment")
 def payment_create():
     """
@@ -1528,7 +1607,7 @@ def not_found():
 @lambda_handler_decorator
 def middleware_before(handler, event, context):
     # Exclude middleware for stripe webhook
-    if event["rawPath"].split("/")[-1] == "ping":
+    if event["rawPath"].split("/")[-1] in INTERNAL_ROUTE_LIST:
         return handler(event, context)
 
     # append trace information

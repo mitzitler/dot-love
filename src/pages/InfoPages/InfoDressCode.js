@@ -5,6 +5,25 @@ import { CardStackFooter } from '../../components/CardStackFooter.js';
 import { InfoBox } from '../../components/InfoBox.js';
 import '../../App.css';
 
+// this is conditional based on whos logged in for wedding party
+
+weddingPartyMap = [
+    {"first_last" : "anne_larkin", "side" : "bride", "color" : "burgundy", "color_hex" : "", "suit": "false"},
+    {"first_last" : "alexis_martinez", "side" : "bride", "color" : "burgundy", "color_hex" : "", "suit": "false"},
+
+
+    {"first_last" : "sadie_baker_wacks", "side" : "bride", "color" : "terracotta", "color_hex" : "", "suit": "false"},
+    {"first_last" : "meridian_gill", "side" : "bride", "color" : "terracotta", "color_hex" : "", "suit": "false"},
+
+
+    {"first_last" : "lou_hewitt", "side" : "bride", "color" : "merlot", "color_hex" : "", "suit": "false"},
+    {"first_last" : "militsa_zaklan_miller", "side" : "bride", "color" : "merlot", "color_hex" : "", "suit": "false"},
+
+
+    {"first_last" : "chris_caudle", "side" : "bride", "color" : "burgundy", "color_hex" : "", "suit": "true"},
+
+]
+
 export function InfoDressCode(guestDressCode) {
 
     const pageMainColor = "babyblue" 
