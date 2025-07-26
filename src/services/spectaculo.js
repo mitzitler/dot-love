@@ -27,10 +27,10 @@ export const spectaculoApi = createApi({
 
     // Get all claims
     getAllClaims: builder.query({
-      query: (firstLast) => ({
+      query: (apiKey) => ({
         url: `/claim/list`,
         method: 'GET',
-        headers: { 'X-First-Last': firstLast },
+        headers: { 'Internal-Api-Key': apiKey },
       }),
       providesTags: ['UserClaims'],
     }),
@@ -73,7 +73,8 @@ export const {
   useGetRegistryItemsQuery,
   useGetRegistryItemQuery,
   useGetUserClaimsQuery,
-  useGetAllClaimsQuery,
+  // useGetAllClaimsQuery,
+  useLazyGetAllClaimsQuery,
   useCreateClaimMutation,
   useUpdateClaimMutation,
   useCreatePaymentMutation,
