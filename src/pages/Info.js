@@ -66,8 +66,37 @@ export function Info() {
                         {expandedBox === "stay" && (
                             <InfoBoxExpanded>
                                 <ul>
-                                    <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
-                                    <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
+                                    <li>🟡 For locals.. the venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
+                                </ul>
+                                <ul>
+                                    <li>🟡 For lodging near the venue, try
+                                        <a href='https://www.ihg.com/evenhotels/hotels/us/en/brooklyn/bxyev/hoteldetail'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;the EVEN Hotel
+                                        </a> by IHG on 46 Nevins St, 
+                                        <a href='https://www.marriott.com/en-us/hotels/nycys-sheraton-brooklyn-new-york-hotel/overview/'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;Sheraton Brooklyn 
+                                        </a> by Marriott on 228 Duffield St, and 
+                                        <a href='https://www.guestreservations.com/the-baltic-hotel/booking?checkIn=11%2F06%2F2025&checkOut=11%2F08%2F2025&rooms=1&adults%5B1%5D=2&children%5B1%5D=0&currency=USD'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;The Baltic Hotel 
+                                        </a> on 489 Baltic St
+                                    </li>
+                                    <li>🟡 For lodging near our apartment, try 
+                                        <a href='https://www.thepodhotel.com/pod-bk'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;The POD Hotel
+                                        </a> on 247 Metropolitan Ave,
+                                        <a href='https://www.codahotels.com/rooms'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;CODA Williamsburg
+                                        </a> on 160 N 12th St, and
+                                        <a href='https://www.penny-hotel.com/?utm_source=local-listings&utm_medium=organic&utm_campaign=local-listings'
+                                        class='underline italic font-extrabold text-indigo-600 py-2'>
+                                        &nbsp;The Penny Hotel
+                                        </a> on 288 N 8th St
+                                    </li>
                                 </ul>
                             </InfoBoxExpanded>
                         )}
