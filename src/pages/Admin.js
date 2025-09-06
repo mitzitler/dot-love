@@ -73,8 +73,7 @@ export function Admin({ registryItems }) {
 
     const handlePassword = async (e) => {
         e.preventDefault();
-        console.log(e);
-        const password = ""; 
+        const password = e.target.password.value;
 
         // TODO: this needs to grab the claims list data as well, 
         // and we should join it with registry data being passed in
