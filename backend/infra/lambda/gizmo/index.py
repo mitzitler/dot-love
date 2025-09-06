@@ -8,6 +8,8 @@ from boto3.dynamodb.types import TypeDeserializer
 import uuid
 from enum import Enum
 
+from aws_lambda_powertools.event_handler import Response
+
 # TODO: from aws_lambda_powertools.event_handler import Response
 # ex:
 # return Response(
@@ -1293,6 +1295,8 @@ def validate_internal_route(func):
     def wrapper(*args, **kwargs):
         event = app.current_event
         api_key = event.headers.get("Internal-Api-Key")
+        if not api_key:
+            api_key = event.headers.get("internal-api-key")
 
         if not api_key or api_key != INTERNAL_API_KEY:
             return Response(
@@ -1341,8 +1345,8 @@ def login():
     }
 
 
-@validate_internal_route
 @app.get("/gizmo/user/list")
+@validate_internal_route
 def list_users():
     try:
         users = User.list_db(CW_DYNAMO_CLIENT)
@@ -1515,8 +1519,8 @@ def update():
     return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
 
 
-@validate_internal_route
 @app.post("/gizmo/email")
+@validate_internal_route
 def send_email():
     payload = app.current_event.json_body
     res = DOT_LOVE_MESSAGE_CLIENT.email(

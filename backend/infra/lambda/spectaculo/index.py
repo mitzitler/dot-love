@@ -1053,6 +1053,8 @@ def validate_internal_route(func):
     def wrapper(*args, **kwargs):
         event = app.current_event
         api_key = event.headers.get("Internal-Api-Key")
+        if not api_key:
+            api_key = event.headers.get("internal-api-key")
 
         if not api_key or api_key != INTERNAL_API_KEY:
             return Response(
@@ -1439,8 +1441,8 @@ def get_user_claims():
 
 
 # get a list of all claims
-@validate_internal_route
 @app.get("/spectaculo/claim/list")
+@validate_internal_route
 def list_claims():
     """
     Get a list of all claims and their ids
