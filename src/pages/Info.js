@@ -65,9 +65,33 @@ export function Info() {
                     </InfoBox>
                         {expandedBox === "stay" && (
                             <InfoBoxExpanded>
+                                <p>For locals...</p>
                                 <ul>
-                                    <li>🟡 We will announce hotels in the downtown Brooklyn area</li>
                                     <li>🟡 The venue is close to the G and A/C lines at Hoyt-Shemerhorn</li>
+                                </ul>
+                                <p>For those looking to stay near the venue in DT Brooklyn...</p>
+                                <ul>
+                                    <li>🟡 EVEN Hotel by IHG on 46 Nevins St - 
+                                        <a href='https://www.ihg.com/evenhotels/hotels/us/en/brooklyn/bxyev/hoteldetail'>book me!</a>
+                                    </li>
+                                    <li>🟡 Sheraton Brooklyn by Marriott on 228 Duffield St - 
+                                        <a href='https://www.marriott.com/en-us/hotels/nycys-sheraton-brooklyn-new-york-hotel/overview/'>book me!</a>
+                                    </li>
+                                    <li>🟡 The Baltic Hotel on 489 Baltic St - 
+                                        <a href='https://www.guestreservations.com/the-baltic-hotel/booking?checkIn=11%2F06%2F2025&checkOut=11%2F08%2F2025&rooms=1&adults%5B1%5D=2&children%5B1%5D=0&currency=USD'>book me!</a>
+                                    </li>
+                                </ul>
+                                <p>For those looking to stay near our home in Williamsburg...</p>
+                                <ul>
+                                    <li>🟡 The POD Hotel on 247 Metropolitan Ave - 
+                                        <a href='https://www.thepodhotel.com/pod-bk'>book me!</a>
+                                    </li>
+                                    <li>🟡 CODA Williamsburg on 160 N 12th St - 
+                                        <a href='https://www.codahotels.com/rooms'>book me!</a>
+                                    </li>
+                                    <li>🟡 The Penny Hotel on 288 N 8th St - 
+                                        <a href='https://www.penny-hotel.com/?utm_source=local-listings&utm_medium=organic&utm_campaign=local-listings'>book me!</a>
+                                    </li>
                                 </ul>
                             </InfoBoxExpanded>
                         )}
