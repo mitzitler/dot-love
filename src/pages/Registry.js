@@ -22,8 +22,8 @@ export function Registry({ registryItems,  claimedItems }) {
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
             pageTertiaryColor={pageTertiaryColor} >
             <NavLink className='btn-23' 
-                to='/about'
-                end><marquee>ABOUT US → </marquee></NavLink>
+                to='/update'
+                end><marquee>CONTACT INFO → </marquee></NavLink>
         </CardStackFooter>
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 

@@ -5,6 +5,7 @@ import { Transitionizer } from '../components/Transitionizer';
 import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
+import { UpdateContact } from '../pages/UpdateContact';
 import { AboutUs } from '../pages/AboutUs';
 import { Admin } from '../pages/Admin';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
@@ -94,6 +95,14 @@ export function Router ({ setLoginHeader}) {
                 }
             />
             <Route
+                path="/update"
+                element={
+                    <Transitionizer>
+                        <UpdateContact />
+                    </Transitionizer>
+                }
+            />
+            <Route
                 path="/about"
                 element={
                     <Transitionizer>
@@ -112,16 +121,6 @@ export function Router ({ setLoginHeader}) {
                     </Transitionizer>
                 }
             />
-            {/* <Route
-                path="/tempregistry"
-                element={
-                    <Transitionizer>
-                        <RegistryTemp 
-                            registryItems={registryItems} 
-                            claimedItems={claimedItems} />
-                    </Transitionizer>
-                }
-            /> */}
         </Routes>
     )
 }
