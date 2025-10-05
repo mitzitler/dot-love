@@ -30,6 +30,7 @@ from twilio.rest import Client
 
 # Environment Variables
 USER_TABLE_NAME = os.environ["user_table_name"]
+SURVEY_RESULTS_TABLE_NAME = os.environ["survey_results_table_name"]
 INTERNAL_API_KEY = os.environ["internal_api_key"]
 SES_SENDER_EMAIL = os.environ["ses_sender_email"]
 SES_CONFIG_ID = os.environ["ses_config_id"]
@@ -230,6 +231,7 @@ class DotLoveMessageType(Enum):
     RAW_TEXT = 6
     ITEM_CLAIMED_TEXT = 7
     ITEM_CLAIMED_TEXT_ADMINS = 8
+    SURVEY_ALERT = 9
 
     def __str__(self):
         return self.name
@@ -372,6 +374,17 @@ Mitzi & Matthew 💕
 The item, {item_name}, was claimed by {first_name}! 🎉
 
 Woohoo! 💕
+""",
+            DotLoveMessageType.SURVEY_ALERT: """
+📋 Quick Survey! 📋
+
+Hi {first_name}! We have a short survey for you to help us plan the perfect wedding day 💒
+
+Please take a moment to fill it out at:
+www.mitzimatthew.love/survey
+
+Thank you so much! 💕
+Mitzi & Matthew
 """,
         }
         return templates[message_type_enum]
@@ -655,6 +668,8 @@ class User:
         email,
         diet,
         guest_details=None,
+        guest_type=None,
+        rehearsal_dinner_invited=False,
     ):
         self.first = first
         self.last = last
@@ -665,6 +680,8 @@ class User:
         self.address = address
         self.diet = diet
         self.guest_details = guest_details
+        self.guest_type = guest_type
+        self.rehearsal_dinner_invited = rehearsal_dinner_invited
 
     def as_map(self):
         return {
@@ -679,20 +696,24 @@ class User:
             "guest_details": (
                 self.guest_details.as_map() if self.guest_details else None
             ),
+            "guest_type": self.guest_type,
+            "rehearsal_dinner_invited": self.rehearsal_dinner_invited,
         }
 
     def __str__(self):
         return (
             f"User(first={self.first}, last={self.last}, rsvp_code={self.rsvp_code}, "
             f"rsvp_status={self.rsvp_status}, pronouns={self.pronouns}, email={self.email}, "
-            f"address={self.address}, diet={self.diet}, guest_details={self.guest_details})"
+            f"address={self.address}, diet={self.diet}, guest_details={self.guest_details}, "
+            f"guest_type={self.guest_type}, rehearsal_dinner_invited={self.rehearsal_dinner_invited})"
         )
 
     def __repr__(self):
         return (
             f"User(first={self.first!r}, last={self.last!r}, rsvp_code={self.rsvp_code!r}, "
             f"rsvp_status={self.rsvp_status!r}, pronouns={self.pronouns!r}, email={self.email!r}, "
-            f"address={self.address!r}, diet={self.diet!r}, guest_details={self.guest_details!r})"
+            f"address={self.address!r}, diet={self.diet!r}, guest_details={self.guest_details!r}, "
+            f"guest_type={self.guest_type!r}, rehearsal_dinner_invited={self.rehearsal_dinner_invited!r})"
         )
 
     def as_html_table(self, has_guest):
@@ -804,6 +825,8 @@ class User:
                 pair_first_last=db_user["guest_pair_first_last"]["S"],
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
+            guest_type=db_user.get("guest_type", {}).get("S"),
+            rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
         )
 
     @staticmethod
@@ -846,6 +869,8 @@ class User:
                     pair_first_last=db_user["guest_pair_first_last"]["S"],
                     date_link_requested=db_user["date_link_requested"]["BOOL"],
                 ),
+                guest_type=db_user.get("guest_type", {}).get("S"),
+                rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
             )
             user_list.append(user)
 
@@ -899,6 +924,8 @@ class User:
                 pair_first_last=db_user["guest_pair_first_last"]["S"],
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
+            guest_type=db_user.get("guest_type", {}).get("S"),
+            rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
         )
 
     @staticmethod
@@ -1013,7 +1040,13 @@ class User:
             "country": self.address.country,
             "state_loc": self.address.state_loc,
             "phone": self.address.phone,
+            # guest classification
+            "rehearsal_dinner_invited": self.rehearsal_dinner_invited,
         }
+
+        # Add guest_type only if it's not None (nullable field)
+        if self.guest_type is not None:
+            field_value_map["guest_type"] = self.guest_type
 
         dynamo_client.create(
             USER_TABLE_NAME,
@@ -1049,7 +1082,13 @@ class User:
             "country": self.address.country,
             "state_loc": self.address.state_loc,
             "phone": self.address.phone,
+            # guest classification
+            "rehearsal_dinner_invited": self.rehearsal_dinner_invited,
         }
+
+        # Add guest_type only if it's not None (nullable field)
+        if self.guest_type is not None:
+            field_value_map["guest_type"] = self.guest_type
 
         res = dynamo_client.update(
             USER_TABLE_NAME,
@@ -1312,7 +1351,11 @@ def validate_internal_route(func):
 
 @app.get("/gizmo/ping")
 def ping():
-    return {"code": 200, "message": "ping success"}
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={"message": "ping success"},
+    )
 
 
 @app.get("/gizmo/user")
@@ -1324,25 +1367,28 @@ def login():
     except Exception as e:
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-        }
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": err_msg},
+        )
 
     if not user:
         err_msg = "no such user exists in db"
         log.info(err_msg)
-        return {
-            "code": 404,
-            "message": err_msg,
-        }
-    return {
-        "code": 200,
-        "message": "login success",
-        "body": {
+        return Response(
+            status_code=404,
+            content_type="application/json",
+            body={"message": err_msg},
+        )
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={
+            "message": "login success",
             "user": user.as_map(),
         },
-    }
+    )
 
 
 @app.get("/gizmo/user/list")
@@ -1354,57 +1400,66 @@ def list_users():
     except Exception as e:
         err_msg = "failed to list users from db"
         log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-        }
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": err_msg},
+        )
 
     user_maps = []
     for user in users:
         user_maps.append(user.as_map())
 
-    return {
-        "code": 200,
-        "message": "list users success",
-        "body": {
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={
+            "message": "list users success",
             "users": user_maps,
         },
-    }
+    )
 
 
 @app.get("/gizmo/user/guest")
 def get_user_by_guest_link():
     guest_link = app.current_event.get_query_string_value("code", "")
     if not guest_link:
-        return {"code": 400, "message": "no guest code provided in query param"}
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body={"message": "no guest code provided in query param"},
+        )
 
     try:
         user = User.from_guest_link_db(guest_link, CW_DYNAMO_CLIENT)
     except Exception as e:
         err_msg = "failed to fetch user from db"
         log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-        }
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": err_msg},
+        )
 
     if not user:
         err_msg = "no such user exists in db"
         log.warn(err_msg)
-        return {
-            "code": 404,
-            "message": err_msg,
-        }
+        return Response(
+            status_code=404,
+            content_type="application/json",
+            body={"message": err_msg},
+        )
 
     log.append_keys(user=user.__repr__())
     log.info("success retrieving user from guest link")
-    return {
-        "code": 200,
-        "message": "guest lookup success",
-        "body": {
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={
+            "message": "guest lookup success",
             "user": user.as_map(),
         },
-    }
+    )
 
 
 @app.post("/gizmo/user")
@@ -1431,10 +1486,11 @@ def register():
             )
         except Exception as e:
             log.exception("failed lookup of our actual friend")
-            return {
-                "code": 500,
-                "message": "failed lookup of our actual friend",
-            }
+            return Response(
+                status_code=500,
+                content_type="application/json",
+                body={"message": "failed lookup of our actual friend"},
+            )
 
     # NOTE: Due to "Closed Plus Ones", we might get more than one rsvp as
     #       users with a "Closed Plus One" will fill out two rsvps at once.
@@ -1450,10 +1506,11 @@ def register():
             err_msg = "failed to register user in db"
             log.append_keys(failed_user=user.first)
             log.exception(err_msg)
-            return {
-                "code": 500,
-                "message": err_msg,
-            }
+            return Response(
+                status_code=500,
+                content_type="application/json",
+                body={"message": err_msg},
+            )
     log.append_keys(users=log_users)
     log.info("succeeded registering user in db")
 
@@ -1466,10 +1523,11 @@ def register():
             our_actual_friend.update_db(CW_DYNAMO_CLIENT)
         except Exception as e:
             log.exception("failed updating guest_first_last of our actual friend")
-            return {
-                "code": 500,
-                "message": "failed lookup of our actual friend",
-            }
+            return Response(
+                status_code=500,
+                content_type="application/json",
+                body={"message": "failed lookup of our actual friend"},
+            )
 
     # tether users if two are included
     if len(users) == 2:
@@ -1490,7 +1548,11 @@ def register():
             log.exception(err_msg)
 
     users_registered = [user.as_map() for user in users]
-    return {"code": 200, "message": "success", "body": users_registered}
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={"message": "success", "users": users_registered},
+    )
 
 
 @app.patch("/gizmo/user")
@@ -1504,19 +1566,27 @@ def update():
         # damn
         err_msg = "failed to update user in db"
         log.exception(err_msg)
-        return {
-            "code": 500,
-            "message": err_msg,
-            "error": e,
-        }
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": err_msg, "error": str(e)},
+        )
     if err:
         log.append_keys(dynamo_err=err)
         log.error("encountered error updating user in dynamo")
-        return {"code": 400, "message": err}
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body={"message": err},
+        )
     log.append_keys(user=user.__repr__())
     log.info("succeeded updating user in db")
 
-    return {"code": 200, "message": "success", "body": {"user": user.as_map()}}
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={"message": "success", "user": user.as_map()},
+    )
 
 
 @app.post("/gizmo/email")
@@ -1528,7 +1598,11 @@ def send_email():
         template_input=payload["template_details"],
         recipient_email=payload["recipient_email"],
     )
-    return {"code": 200, "data": res}
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={"message": "email sent successfully", "data": res},
+    )
 
 
 @app.post("/gizmo/text")
@@ -1550,7 +1624,11 @@ def send_text():
             template_input=payload["template_details"],
             numbers=numbers,
         )
-        return {"code": 200, "data": res}
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={"message": "text blast sent successfully", "data": res},
+        )
 
     # NOTE: this is important for calls from Spectaculo, where the number is not known
     # fetch the phone number if not provided
@@ -1561,17 +1639,19 @@ def send_text():
         except Exception as e:
             err_msg = "failed to fetch user from db"
             log.exception(err_msg)
-            return {
-                "code": 500,
-                "message": err_msg,
-            }
+            return Response(
+                status_code=500,
+                content_type="application/json",
+                body={"message": err_msg},
+            )
         if not user:
             err_msg = "no such user exists in db"
             log.info(err_msg)
-            return {
-                "code": 404,
-                "message": err_msg,
-            }
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body={"message": err_msg},
+            )
 
         phone = user.address.phone
 
@@ -1580,7 +1660,280 @@ def send_text():
         template_input=payload["template_details"],
         recipient_phone=phone,
     )
-    return {"code": 200, "data": res}
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body={"message": "text sent successfully", "data": res},
+    )
+
+
+@app.post("/gizmo/survey")
+def submit_survey():
+    """
+    Submit survey results for a user.
+
+    Request body:
+    {
+        "responses": {
+            "question1": "answer1",
+            "question2": true,
+            "question3": "written response"
+        }
+    }
+
+    Uses X-First-Last header for user identification.
+    """
+    try:
+        first_last = app.current_event.headers.get("x-first-last")
+        if not first_last:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Missing X-First-Last header"},
+            )
+
+        payload = app.current_event.json_body
+        responses = payload.get("responses")
+
+        if not responses:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Missing responses field"},
+            )
+
+        # Store survey results in DynamoDB
+        survey_item = {
+            "first_last": {"S": first_last},
+            "responses": {"S": json.dumps(responses)},
+            "submitted_at": {"S": str(uuid.uuid4())},  # Using uuid as timestamp placeholder
+        }
+
+        CW_DYNAMO_CLIENT.client.put_item(
+            TableName=SURVEY_RESULTS_TABLE_NAME,
+            Item=survey_item
+        )
+
+        log.info(f"Survey submitted successfully for {first_last}")
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={"message": "Survey submitted successfully"},
+        )
+
+    except Exception as e:
+        log.exception("Failed to submit survey")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to submit survey", "error": str(e)},
+        )
+
+
+@app.get("/gizmo/survey")
+def get_survey():
+    """
+    Get survey results for a user.
+    Uses X-First-Last header for user identification.
+    """
+    try:
+        first_last = app.current_event.headers.get("x-first-last")
+        if not first_last:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Missing X-First-Last header"},
+            )
+
+        result = CW_DYNAMO_CLIENT.client.get_item(
+            TableName=SURVEY_RESULTS_TABLE_NAME,
+            Key={"first_last": {"S": first_last}}
+        )
+
+        if "Item" not in result:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body={"message": "No survey found for this user"},
+            )
+
+        responses = json.loads(result["Item"]["responses"]["S"])
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={"message": "Survey found", "responses": responses},
+        )
+
+    except Exception as e:
+        log.exception("Failed to get survey")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to get survey", "error": str(e)},
+        )
+
+
+@app.get("/gizmo/survey/all")
+@validate_internal_route
+def get_all_surveys():
+    """
+    Get all survey results (admin only).
+    Requires Internal-Api-Key header.
+    """
+    try:
+        results = CW_DYNAMO_CLIENT.get_all(SURVEY_RESULTS_TABLE_NAME)
+
+        surveys = []
+        for item in results:
+            surveys.append({
+                "first_last": item["first_last"]["S"],
+                "responses": json.loads(item["responses"]["S"]),
+            })
+
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={"message": "All surveys retrieved", "surveys": surveys},
+        )
+
+    except Exception as e:
+        log.exception("Failed to get all surveys")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to get all surveys", "error": str(e)},
+        )
+
+
+@app.post("/gizmo/text/cohort")
+@validate_internal_route
+def send_cohort_text():
+    """
+    Send text messages to a cohort of users based on a filter.
+
+    Request body (simple):
+    {
+        "filter_field": "first" or "diet.meat" or "rsvp_status" etc,
+        "filter_value": "tom" or "false" or "ATTENDING" etc,
+        "message": "Your custom message here"
+    }
+
+    OR use template directly:
+    {
+        "filter_field": "rsvp_status",
+        "filter_value": "ATTENDING",
+        "template_type": "RAW_TEXT",
+        "template_details": {"raw": "Your message"}
+    }
+    """
+    try:
+        payload = app.current_event.json_body
+        filter_field = payload.get("filter_field")
+        filter_value = payload.get("filter_value")
+
+        # Support simple "message" field OR template_type/template_details
+        simple_message = payload.get("message")
+        template_type = payload.get("template_type")
+        template_details = payload.get("template_details")
+
+        if not filter_field or not filter_value:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Missing required fields: filter_field, filter_value"},
+            )
+
+        # If simple message is provided, use RAW_TEXT template
+        if simple_message:
+            template_type = "RAW_TEXT"
+            template_details = {"raw": simple_message}
+        elif not template_type or not template_details:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Must provide either 'message' or both 'template_type' and 'template_details'"},
+            )
+
+        # Get all users
+        all_users = User.list_db(CW_DYNAMO_CLIENT)
+        if not all_users:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body={"message": "No users found in database"},
+            )
+
+        # Filter users based on the field and value
+        filtered_users = []
+        for user in all_users:
+            user_map = user.as_map()
+
+            # Navigate nested fields (e.g., "diet.meat" -> check user_map["diet"]["meat"])
+            field_parts = filter_field.split(".")
+            current_value = user_map
+
+            try:
+                for part in field_parts:
+                    current_value = current_value[part]
+
+                # Convert both to strings for comparison
+                if str(current_value).lower() == str(filter_value).lower():
+                    filtered_users.append(user)
+            except (KeyError, TypeError):
+                # Field doesn't exist or can't navigate - skip this user
+                continue
+
+        if not filtered_users:
+            return Response(
+                status_code=200,
+                content_type="application/json",
+                body={
+                    "message": f"No users matched filter {filter_field}={filter_value}",
+                    "matched_count": 0,
+                    "users_checked": len(all_users)
+                },
+            )
+
+        # Send texts to filtered users
+        numbers = [user.address.phone for user in filtered_users if user.address.phone]
+
+        if not numbers:
+            return Response(
+                status_code=200,
+                content_type="application/json",
+                body={
+                    "message": "No valid phone numbers found for matched users",
+                    "matched_count": len(filtered_users),
+                    "phone_numbers_found": 0
+                },
+            )
+
+        res = DOT_LOVE_MESSAGE_CLIENT.text_blast(
+            message_type=template_type,
+            template_input=template_details,
+            numbers=numbers,
+        )
+
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={
+                "message": f"Cohort text sent successfully to {len(numbers)} users",
+                "filter_field": filter_field,
+                "filter_value": filter_value,
+                "matched_count": len(filtered_users),
+                "texts_sent": len(numbers),
+                "data": res
+            },
+        )
+
+    except Exception as e:
+        log.exception("Failed to send cohort text")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to send cohort text", "error": str(e)},
+        )
 
 
 # Fallback for unhandled routes
@@ -1589,7 +1942,11 @@ def send_text():
 @app.patch("/*")
 def not_found():
     log.info(f"route not found route={app.current_event.path}")
-    return {"code": 404, "message": "Route not found"}
+    return Response(
+        status_code=404,
+        content_type="application/json",
+        body={"message": "Route not found"},
+    )
 
 
 @lambda_handler_decorator

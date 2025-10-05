@@ -113,6 +113,8 @@ class DotLoveCoreStack(Stack):
         self.dot_love_registry_item_table = self.create_dot_love_registry_item_table()
         # Create RegistryClaim database
         self.dot_love_registry_claim_table = self.create_dot_love_registry_claim_table()
+        # Create Survey Results database
+        self.dot_love_survey_results_table = self.create_dot_love_survey_results_table()
 
         ###################################################
         # DOT LOVE API GATEWAY 🖥
@@ -131,6 +133,7 @@ class DotLoveCoreStack(Stack):
         # Create Gizmo Service Lambda and associate w/ API Gateway
         self.dot_love_gizmo_lambda = self.create_dot_love_gizmo_lambda(
             user_table=self.dot_love_user_table,
+            survey_results_table=self.dot_love_survey_results_table,
             ses_sender_email=ses_sender_email,
             ses_admin_list=ses_admin_list,
             twilio_auth_token=self.twilio_auth_token,
@@ -284,12 +287,29 @@ class DotLoveCoreStack(Stack):
 
         return registry_claim_table
 
+    def create_dot_love_survey_results_table(self):
+        survey_results_table = dynamodb.Table(
+            scope=self,
+            id=f"{self.stack_env}-survey_results",
+            # PK: composite first_last (same as user table)
+            partition_key=dynamodb.Attribute(
+                name="first_last",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            encryption=dynamodb.TableEncryption.AWS_MANAGED,
+        )
+
+        return survey_results_table
+
     ###################################################
     # DOT LOVE SERVICES
     ###################################################
     def create_dot_love_gizmo_lambda(
         self,
         user_table,
+        survey_results_table,
         ses_sender_email,
         ses_admin_list,
         twilio_auth_token,
@@ -302,7 +322,7 @@ class DotLoveCoreStack(Stack):
             scope=self,
             id=f"{self.stack_env}-dot-love-gizmo-service-role",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Lambda Role with access to User table",
+            description="Lambda Role with access to User and Survey Results tables",
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name(
                     "service-role/AWSLambdaBasicExecutionRole"
@@ -312,6 +332,7 @@ class DotLoveCoreStack(Stack):
 
         # Grant db access
         user_table.grant_read_write_data(gizmo_lambda_role)
+        survey_results_table.grant_read_write_data(gizmo_lambda_role)
 
         gizmo_lambda = lambdaFx.Function(
             scope=self,
@@ -328,6 +349,7 @@ class DotLoveCoreStack(Stack):
                 "TZ": "US/Eastern",
                 # Resource ARNs
                 "user_table_name": user_table.table_name,
+                "survey_results_table_name": survey_results_table.table_name,
                 # SES Email config
                 "ses_sender_email": ses_sender_email,
                 "ses_admin_list": ses_admin_list,
@@ -565,6 +587,27 @@ class DotLoveCoreStack(Stack):
         dot_love_api_gw.add_routes(
             path="/gizmo/text",
             methods=[apigw.HttpMethod.POST],
+            integration=gizmo_service_integration,
+        )
+        #
+        # Text a cohort of users based on filter
+        dot_love_api_gw.add_routes(
+            path="/gizmo/text/cohort",
+            methods=[apigw.HttpMethod.POST],
+            integration=gizmo_service_integration,
+        )
+        #
+        # Submit survey
+        dot_love_api_gw.add_routes(
+            path="/gizmo/survey",
+            methods=[apigw.HttpMethod.POST, apigw.HttpMethod.GET],
+            integration=gizmo_service_integration,
+        )
+        #
+        # Get all surveys (admin)
+        dot_love_api_gw.add_routes(
+            path="/gizmo/survey/all",
+            methods=[apigw.HttpMethod.GET],
             integration=gizmo_service_integration,
         )
 
