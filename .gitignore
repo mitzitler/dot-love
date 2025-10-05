@@ -11,6 +11,11 @@
 # production
 /build
 
+# backend
+backend/cdk.out/
+backend/.venv/
+backend/infra/lambda/*/layer/
+
 # misc
 .DS_Store
 .env.local

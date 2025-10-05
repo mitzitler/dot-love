@@ -25,6 +25,14 @@ export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLogin
         })
     }
 
+    const notifyError = (input) => {
+        toast.error(input, {
+            theme: "dark",
+            position: "top-right",
+            autoClose: 5000,
+        })
+    }
+
     const location = useLocation();
     useEffect(() => {
         window.scrollTo(0, 0); 
@@ -36,17 +44,19 @@ export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLogin
     });
 
     useEffect(() => {
-        if (data && data.code === 200) {
+        if (data) {
             setLoginSuccess(true);
             // dispatch(setLoginSuccessState())
             dispatch(setloginHeaderState(loginHeader))
             console.log("Gizmo login success, result:", data);
-            notify(`Welcome, ${data.body.user.first}! Please scroll down`)
+            notify(`Welcome, ${data.user.first}! Please scroll down`)
         }
         if (error) {
             console.error("Login API call failed:", error);
+            setLoginSuccess(false);
+            // No toast notifications for login errors - bad UX as it triggers on each keystroke
         }
-    }, [data, error, dispatch, loginHeader]);
+    }, [data, error, dispatch, loginHeader, setLoginSuccess]);
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
