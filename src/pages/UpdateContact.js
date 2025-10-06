@@ -1,14 +1,14 @@
 import React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useSelector } from 'react';
 import { useGetUserQuery, useRegisterRSVPMutation } from '../services/gizmo.js';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
 // TODO: update with dispatching?
-import { firstNameInput, lastNameInput, pronounsInput, 
-    phoneNumberCountryCodeInput, phoneNumberInput, emailInput,
-    streetAddressInput, secondAddressInput, cityInput, zipcodeInput,
-    countryInput, stateProvinceInput, continueDietary } from '../../features/guest/rsvpSlice';
+// import { firstNameInput, lastNameInput, pronounsInput, 
+//     phoneNumberCountryCodeInput, phoneNumberInput, emailInput,
+//     streetAddressInput, secondAddressInput, cityInput, zipcodeInput,
+//     countryInput, stateProvinceInput, continueDietary } from '../features/guest/rsvpSlice';
 import '../App.css';
 
 export function UpdateContact() {
@@ -20,28 +20,33 @@ export function UpdateContact() {
 
     // TODO: for option 1 input boxes
     const email = useSelector((state) => state.rsvp.email)
+    const loginHeader = useSelector((state) => state.extras.loginHeaderState)
+
+    const handleUpdate(v, field) = {
+        
+    }
 
     // TODO: Redux to grab the login header from state to call this api
 
     // API Call - triggers only when loginHeader changes
-        const { data, error, isLoading } = useGetUserQuery(loginHeader, {
-            skip: !loginHeader, // Skip API call if header is null
-        });
+    const { data, error, isLoading } = useGetUserQuery(loginHeader, {
+        skip: !loginHeader, // Skip API call if header is null
+    });
     
-        useEffect(() => {
-            if (data && data.code === 200) {
-                setLoginSuccess(true);
-                // dispatch(setLoginSuccessState())
-                dispatch(setloginHeaderState(loginHeader))
-                console.log("Gizmo login success, result:", data);
-                notify(`Welcome, ${data.body.user.first}! Please scroll down`)
-            }
-            if (error) {
-                console.error("Login API call failed:", error);
-            }
-        }, [data, error, dispatch, loginHeader]);
+    // useEffect(() => {
+    //     if (data && data.code === 200) {
+    //         setLoginSuccess(true);
+    //         // dispatch(setLoginSuccessState())
+    //         dispatch(setloginHeaderState(loginHeader))
+    //         console.log("Gizmo login success, result:", data);
+    //         notify(`Welcome, ${data.body.user.first}! Please scroll down`)
+    //     }
+    //     if (error) {
+    //         console.error("Login API call failed:", error);
+    //     }
+    // }, [data, error, dispatch, loginHeader]);
     
-        // TODO: useRegisterRSVPMutation to write update function
+    // TODO: useRegisterRSVPMutation to write update function
 
     return (
 
