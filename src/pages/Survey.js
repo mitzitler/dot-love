@@ -72,7 +72,7 @@ export function Survey() {
     const pageMainColor = "cyan";
     const pageSecondaryColor = "terracotta";
     const pageTertiaryColor = "plum";
-    const pageSection = "survey";
+    const pageSection = "info";
 
     if (!loginHeaderState) {
         return (
@@ -95,87 +95,83 @@ export function Survey() {
 
     return (
         <>
-            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
-                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-                <div className="survey-container">
-                    <h1>Wedding Survey</h1>
-                    {hasSubmitted && (
-                        <p className="text-green-600 mb-4">✓ You've already submitted this survey. You can update your responses below.</p>
-                    )}
-                    <form onSubmit={handleSubmit} className="survey-form">
-
-                        <div className="form-group">
-                            <label htmlFor="attending_events">
-                                Which events are you planning to attend?
-                            </label>
-                            <textarea
-                                id="attending_events"
-                                value={responses.attending_events}
-                                onChange={(e) => handleInputChange('attending_events', e.target.value)}
-                                placeholder="e.g., Ceremony, Reception, After-party..."
-                                rows="3"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="song_requests">
-                                Any song requests for the reception?
-                            </label>
-                            <textarea
-                                id="song_requests"
-                                value={responses.song_requests}
-                                onChange={(e) => handleInputChange('song_requests', e.target.value)}
-                                placeholder="Artist - Song Title"
-                                rows="3"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={responses.accommodation_needed}
-                                    onChange={(e) => handleInputChange('accommodation_needed', e.target.checked)}
-                                />
-                                I need help finding accommodation
-                            </label>
-                        </div>
-
-                        <div className="form-group">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={responses.transportation_needed}
-                                    onChange={(e) => handleInputChange('transportation_needed', e.target.checked)}
-                                />
-                                I need help with transportation
-                            </label>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="additional_comments">
-                                Any additional comments or questions?
-                            </label>
-                            <textarea
-                                id="additional_comments"
-                                value={responses.additional_comments}
-                                onChange={(e) => handleInputChange('additional_comments', e.target.value)}
-                                placeholder="Let us know if you have any questions or special needs..."
-                                rows="4"
-                            />
-                        </div>
-
-                        <button type="submit" disabled={isSubmitting} className="submit-button">
-                            {isSubmitting ? 'Submitting...' : hasSubmitted ? 'Update Survey' : 'Submit Survey'}
-                        </button>
-                    </form>
-                </div>
-            </CardStackPage>
-
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor}>
                 <a href="/" className="btn-23"><marquee>Home</marquee></a>
             </CardStackFooter>
+            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+                <h1>Wedding Survey</h1>
+                {hasSubmitted && (
+                    <p style={{color: 'green', marginBottom: '1rem', textAlign: 'center'}}>✓ You've already submitted this survey. You can update your responses below.</p>
+                )}
+                <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+
+                    <div style={{width: '100%', maxWidth: '600px'}}>
+                        <h2>Which events are you planning to attend?</h2>
+                        <textarea
+                            id="attending_events"
+                            value={responses.attending_events}
+                            onChange={(e) => handleInputChange('attending_events', e.target.value)}
+                            placeholder="e.g., Ceremony, Reception, After-party..."
+                            rows="3"
+                            style={{width: '100%', padding: '0.5em', marginBottom: '1.5em', borderRadius: '7px', border: '1px solid #ccc'}}
+                        />
+                    </div>
+
+                    <div style={{width: '100%', maxWidth: '600px'}}>
+                        <h2>Any song requests for the reception?</h2>
+                        <textarea
+                            id="song_requests"
+                            value={responses.song_requests}
+                            onChange={(e) => handleInputChange('song_requests', e.target.value)}
+                            placeholder="Artist - Song Title"
+                            rows="3"
+                            style={{width: '100%', padding: '0.5em', marginBottom: '1.5em', borderRadius: '7px', border: '1px solid #ccc'}}
+                        />
+                    </div>
+
+                    <div style={{width: '100%', maxWidth: '600px', marginBottom: '1.5rem', textAlign: 'left'}}>
+                        <label className="checkbox-guest">
+                            <input
+                                type="checkbox"
+                                checked={responses.accommodation_needed}
+                                onChange={(e) => handleInputChange('accommodation_needed', e.target.checked)}
+                            />
+                            <span className="checkmark"></span>
+                            I need help finding accommodation
+                        </label>
+                    </div>
+
+                    <div style={{width: '100%', maxWidth: '600px', marginBottom: '1.5rem', textAlign: 'left'}}>
+                        <label className="checkbox-guest">
+                            <input
+                                type="checkbox"
+                                checked={responses.transportation_needed}
+                                onChange={(e) => handleInputChange('transportation_needed', e.target.checked)}
+                            />
+                            <span className="checkmark"></span>
+                            I need help with transportation
+                        </label>
+                    </div>
+
+                    <div style={{width: '100%', maxWidth: '600px'}}>
+                        <h2>Any additional comments or questions?</h2>
+                        <textarea
+                            id="additional_comments"
+                            value={responses.additional_comments}
+                            onChange={(e) => handleInputChange('additional_comments', e.target.value)}
+                            placeholder="Let us know if you have any questions or special needs..."
+                            rows="4"
+                            style={{width: '100%', padding: '0.5em', marginBottom: '1.5em', borderRadius: '7px', border: '1px solid #ccc'}}
+                        />
+                    </div>
+
+                    <button type="submit" disabled={isSubmitting} className="btn-generic" style={{marginTop: '1em'}}>
+                        {isSubmitting ? 'Submitting...' : hasSubmitted ? 'Update Survey' : 'Submit Survey'}
+                    </button>
+                </form>
+            </CardStackPage>
         </>
     );
 }
