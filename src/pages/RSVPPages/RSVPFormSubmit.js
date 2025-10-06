@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearForm, phoneNumberCountryCodeInput, dateLinkRequestedInput } from '../../features/guest/rsvpSlice';
 import { storeCompletedRSVP, clearCompleteRSVPs, setSubmitted } from '../../features/guest/rsvpCompletedSlice.js'
 import { useRegisterRSVPMutation } from '../../services/gizmo.js'
+import { toast } from 'react-toastify';
 
 // TODO: on desktop all the information is pushed down too far
 
@@ -60,16 +61,33 @@ export function RSVPFormSubmit({pageMainColor, pageSecondaryColor, pageTertiaryC
                 rsvpData: uniqueRsvpsToSubmit,
             }).unwrap();
 
-            if (result.code !== 200) {
-                console.error("Something went wrong with Gizmo!", result);
-                return cleanup();
-            }
-
             console.log("Submitted RSVP(s) to the Gizmo, result:", result);
+            toast.success("RSVP submitted successfully! Thank you!", {
+                theme: "dark",
+                position: "top-right",
+                autoClose: 5000,
+            });
             cleanup();
         } catch (err) {
             console.error("RSVP(s) API call failed:", err);
-            cleanup();
+
+            // Handle different error types
+            let errorMessage = "Failed to submit RSVP. Please try again.";
+            if (err.status === 500) {
+                errorMessage = "Server error. Please try again later or contact us directly.";
+            } else if (err.status === 400) {
+                errorMessage = "Invalid RSVP data. Please check your information and try again.";
+            } else if (err.originalStatus === undefined) {
+                errorMessage = "Network error. Please check your connection and try again.";
+            }
+
+            toast.error(errorMessage, {
+                theme: "dark",
+                position: "top-right",
+                autoClose: 7000,
+            });
+
+            // Don't cleanup on error so user can retry
         }
     }
 

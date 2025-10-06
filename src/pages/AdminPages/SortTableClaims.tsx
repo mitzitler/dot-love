@@ -60,7 +60,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Icon',
-        width: 80,
+        width: 60,
         smallScreenWidth: 50,
     },
 
@@ -69,7 +69,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Item',
-        width: 80,
+        width: 120,
         smallScreenWidth: 50,
     },
     // col of the claimant's name, after join with users
@@ -78,7 +78,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Claimant',
-        width: 100,
+        width: 120,
         smallScreenWidth: 50,
     },
     {
@@ -86,7 +86,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Brand',
-        width: 80,
+        width: 100,
         smallScreenWidth: 50,
     },
     {
@@ -94,7 +94,7 @@ const headCells: readonly HeadCell[] = [
         numeric: true,
         disablePadding: false,
         label: 'Price',
-        width: 80,
+        width: 70,
         smallScreenWidth: 50,
     },
     {
@@ -102,7 +102,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Bucket',
-        width: 120,
+        width: 90,
         smallScreenWidth: 50,
     },
     {
@@ -110,7 +110,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Id',
-        width: 80,
+        width: 240,
         smallScreenWidth: 50,
     },
     {
@@ -118,22 +118,6 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Received',
-        width: 80,
-        smallScreenWidth: 50,
-    },
-    {
-        id: 'art_score',
-        numeric: true,
-        disablePadding: false,
-        label: 'Art',
-        width: 80,
-        smallScreenWidth: 50,
-    },
-    {
-        id: 'size_score',
-        numeric: true,
-        disablePadding: false,
-        label: 'Size',
         width: 80,
         smallScreenWidth: 50,
     },
@@ -240,13 +224,17 @@ export default function SortTableClaims({claimsData}: {claimsData: Data[]})
                         }}
                     >
                         
-                        {column.id === 'img_url' ? 
+                        {column.id === 'img_url' ?
                             <div className='w-10 h-10 m-auto' >
                                 <img className="gift image" src= {cdn_fronter + row[column.id]}>
                                 </img>
                             </div>
                             : column.id === 'claimant_id' ?
                                 row[column.id].split('_').join(' ')
+                            : column.id === 'received' ?
+                                row[column.id] ? 'Yes' : 'No'
+                            : column.id === 'price_cents' ?
+                                '$' + (row[column.id] / 100).toFixed(2)
                                 : row[column.id]
                         }
 

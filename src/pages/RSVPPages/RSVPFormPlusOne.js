@@ -32,13 +32,29 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
     }
 
     // API data
-    const { data, isLoading } = useGetUserByGuestLinkQuery(code);
+    const { data, isLoading, error } = useGetUserByGuestLinkQuery(code);
     const [, setGuestData] = useState(null);
     useEffect(() => {
       if (data) {
         setGuestData(data);
       }
-    }, [data]);
+      if (error) {
+        console.error("Failed to fetch guest link data:", error);
+        let errorMessage = "Failed to load guest information. Please check your link.";
+        if (error.status === 404) {
+            errorMessage = "Invalid or expired guest link. Please contact the hosts.";
+        } else if (error.status === 500) {
+            errorMessage = "Server error. Please try again later or contact the hosts.";
+        } else if (error.originalStatus === undefined) {
+            errorMessage = "Network error. Please check your connection and try again.";
+        }
+        toast.error(errorMessage, {
+            theme: "dark",
+            position: "top-right",
+            autoClose: 7000,
+        });
+      }
+    }, [data, error]);
 
 
     // handle return
@@ -46,12 +62,21 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
         console.log(isLoading)
         return (<p>Loading guest details...</p>);
     }
-    else {
+    if (error) {
+        return (
+            <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
+                pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
+                <h1>Oops! Unable to load guest information</h1>
+                <p>Please check your guest link or contact the hosts.</p>
+            </CardStackPage>
+        );
+    }
+    if (data) {
         console.log(isLoading)
 
         return (<><CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
         pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
-        <h1>Hello, guest of {data.body.user.first} {data.body.user.last}!</h1>
+        <h1>Hello, guest of {data.user.first} {data.user.last}!</h1>
 
 
         { notify("Guest link accepted! Please Scroll down")}
@@ -94,8 +119,10 @@ export function RSVPFormPlusOne({pageMainColor, pageSecondaryColor, pageTertiary
                     to={rsvpStatus !== 'undecided' ? '/rsvp/contact' : '/'}
                     end><marquee>Continue</marquee></NavLink>
                     {/* and there needs to be an error message too */}
-            </CardStackFooter> 
+            </CardStackFooter>
             </>
-               )}
+        );
+    }
 
+    return null;
 }

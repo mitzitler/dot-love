@@ -8,6 +8,7 @@ import { Registry } from '../pages/Registry';
 import { UpdateContact } from '../pages/UpdateContact';
 import { AboutUs } from '../pages/AboutUs';
 import { Admin } from '../pages/Admin';
+import { Survey } from '../pages/Survey';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
@@ -114,13 +115,31 @@ export function Router ({ setLoginHeader}) {
                 path="/admin"
                 element={
                     <Transitionizer>
-                        <Admin 
+                        <Admin
                             registryItems={registryItemsCat}
                             claimedItems={claimedItemsClaimed}
                             />
                     </Transitionizer>
                 }
             />
+            <Route
+                path="/survey"
+                element={
+                    <Transitionizer>
+                        <Survey />
+                    </Transitionizer>
+                }
+            />
+            {/* <Route
+                path="/tempregistry"
+                element={
+                    <Transitionizer>
+                        <RegistryTemp
+                            registryItems={registryItems}
+                            claimedItems={claimedItems} />
+                    </Transitionizer>
+                }
+            /> */}
         </Routes>
     )
 }
