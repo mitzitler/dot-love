@@ -10,14 +10,6 @@ from enum import Enum
 
 from aws_lambda_powertools.event_handler import Response
 
-# TODO: from aws_lambda_powertools.event_handler import Response
-# ex:
-# return Response(
-#     status_code=200,
-#     content_type="application/json",
-#     body={"code": 200, "message": "success"},
-# )
-
 import boto3
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.event_handler.api_gateway import (
@@ -232,6 +224,7 @@ class DotLoveMessageType(Enum):
     ITEM_CLAIMED_TEXT = 7
     ITEM_CLAIMED_TEXT_ADMINS = 8
     SURVEY_ALERT = 9
+    RAW_EMAIL = 10
 
     def __str__(self):
         return self.name
@@ -467,6 +460,17 @@ Mitzi & Matthew
             </html>
             """,
             },
+            DotLoveMessageType.RAW_EMAIL: {
+                "title": "{subject}",
+                "body": """
+            <html>
+                <head></head>
+                <body>
+                {raw}
+                </body>
+            </html>
+            """,
+            },
         }
         return templates[message_type]
 
@@ -518,6 +522,45 @@ Mitzi & Matthew
                 )
             except Exception as e:
                 log.exception("failed to send text to number=" + number)
+                continue
+
+    def email_blast(self, message_type, template_input, emails):
+        """
+        Send an email blast based on the message type and template input.
+
+        :param message_type: The type of message to send.
+        :param template_input: A dictionary with template variables for interpolation.
+        :param emails: List of email addresses.
+        :return: None
+        """
+        template = self._get_email_template(message_type)
+
+        template_input["contact_table"] = self.contact_table
+        body_html = template["body"].format(**template_input)
+
+        email_message = {
+            "Body": {
+                "Html": {
+                    "Charset": "utf-8",
+                    "Data": body_html,
+                },
+            },
+            "Subject": {
+                "Charset": "utf-8",
+                "Data": template["title"],
+            },
+        }
+
+        for email in emails:
+            try:
+                self.ses_client.send_email(
+                    Destination={"ToAddresses": [email]},
+                    Message=email_message,
+                    Source=self.sender_email,
+                    ConfigurationSetName=self.config_id,
+                )
+            except Exception as e:
+                log.exception("failed to send email to address=" + email)
                 continue
 
 
@@ -826,7 +869,9 @@ class User:
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
             guest_type=db_user.get("guest_type", {}).get("S"),
-            rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
+            rehearsal_dinner_invited=bool(
+                db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
+            ),
         )
 
     @staticmethod
@@ -870,7 +915,9 @@ class User:
                     date_link_requested=db_user["date_link_requested"]["BOOL"],
                 ),
                 guest_type=db_user.get("guest_type", {}).get("S"),
-                rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
+                rehearsal_dinner_invited=bool(
+                    db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
+                ),
             )
             user_list.append(user)
 
@@ -925,7 +972,9 @@ class User:
                 date_link_requested=db_user["date_link_requested"]["BOOL"],
             ),
             guest_type=db_user.get("guest_type", {}).get("S"),
-            rehearsal_dinner_invited=bool(db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)),
+            rehearsal_dinner_invited=bool(
+                db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
+            ),
         )
 
     @staticmethod
@@ -1706,12 +1755,13 @@ def submit_survey():
         survey_item = {
             "first_last": {"S": first_last},
             "responses": {"S": json.dumps(responses)},
-            "submitted_at": {"S": str(uuid.uuid4())},  # Using uuid as timestamp placeholder
+            "submitted_at": {
+                "S": str(uuid.uuid4())
+            },  # Using uuid as timestamp placeholder
         }
 
         CW_DYNAMO_CLIENT.client.put_item(
-            TableName=SURVEY_RESULTS_TABLE_NAME,
-            Item=survey_item
+            TableName=SURVEY_RESULTS_TABLE_NAME, Item=survey_item
         )
 
         log.info(f"Survey submitted successfully for {first_last}")
@@ -1746,8 +1796,7 @@ def get_survey():
             )
 
         result = CW_DYNAMO_CLIENT.client.get_item(
-            TableName=SURVEY_RESULTS_TABLE_NAME,
-            Key={"first_last": {"S": first_last}}
+            TableName=SURVEY_RESULTS_TABLE_NAME, Key={"first_last": {"S": first_last}}
         )
 
         if "Item" not in result:
@@ -1785,10 +1834,12 @@ def get_all_surveys():
 
         surveys = []
         for item in results:
-            surveys.append({
-                "first_last": item["first_last"]["S"],
-                "responses": json.loads(item["responses"]["S"]),
-            })
+            surveys.append(
+                {
+                    "first_last": item["first_last"]["S"],
+                    "responses": json.loads(item["responses"]["S"]),
+                }
+            )
 
         return Response(
             status_code=200,
@@ -1851,7 +1902,9 @@ def send_cohort_text():
             return Response(
                 status_code=400,
                 content_type="application/json",
-                body={"message": "Must provide either 'message' or both 'template_type' and 'template_details'"},
+                body={
+                    "message": "Must provide either 'message' or both 'template_type' and 'template_details'"
+                },
             )
 
         # Get all users
@@ -1888,9 +1941,9 @@ def send_cohort_text():
                 status_code=200,
                 content_type="application/json",
                 body={
-                    "message": f"No users matched filter {filter_field}={filter_value}",
+                    "message": f"no users matched filter {filter_field}={filter_value}",
                     "matched_count": 0,
-                    "users_checked": len(all_users)
+                    "users_checked": len(all_users),
                 },
             )
 
@@ -1902,9 +1955,9 @@ def send_cohort_text():
                 status_code=200,
                 content_type="application/json",
                 body={
-                    "message": "No valid phone numbers found for matched users",
+                    "message": "no valid phone numbers found for matched users",
                     "matched_count": len(filtered_users),
-                    "phone_numbers_found": 0
+                    "phone_numbers_found": 0,
                 },
             )
 
@@ -1918,12 +1971,12 @@ def send_cohort_text():
             status_code=200,
             content_type="application/json",
             body={
-                "message": f"Cohort text sent successfully to {len(numbers)} users",
+                "message": f"cohort text sent successfully to {len(numbers)} users",
                 "filter_field": filter_field,
                 "filter_value": filter_value,
                 "matched_count": len(filtered_users),
                 "texts_sent": len(numbers),
-                "data": res
+                "data": res,
             },
         )
 
@@ -1933,6 +1986,143 @@ def send_cohort_text():
             status_code=500,
             content_type="application/json",
             body={"message": "Failed to send cohort text", "error": str(e)},
+        )
+
+
+@app.post("/gizmo/email/cohort")
+@validate_internal_route
+def send_cohort_email():
+    """
+    Send email to a cohort of users based on field filtering.
+
+    Supports simple message:
+    {
+        "filter_field": "rsvp_status",
+        "filter_value": "ATTENDING",
+        "message": "Your HTML message here",
+        "subject": "Email subject"
+    }
+
+    OR use template directly:
+    {
+        "filter_field": "rsvp_status",
+        "filter_value": "ATTENDING",
+        "template_type": "RAW_EMAIL",
+        "template_details": {"raw": "Your HTML message", "subject": "Email subject"}
+    }
+    """
+    try:
+        payload = app.current_event.json_body
+        filter_field = payload.get("filter_field")
+        filter_value = payload.get("filter_value")
+
+        # Support simple "message" and "subject" fields OR template_type/template_details
+        simple_message = payload.get("message")
+        simple_subject = payload.get("subject")
+        template_type = payload.get("template_type")
+        template_details = payload.get("template_details")
+
+        if not filter_field or not filter_value:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={"message": "Missing required fields: filter_field, filter_value"},
+            )
+
+        # If simple message is provided, use RAW_EMAIL template
+        if simple_message:
+            template_type = "RAW_EMAIL"
+            template_details = {
+                "raw": simple_message,
+                "subject": simple_subject or "Update from Mitzi & Matthew"
+            }
+        elif not template_type or not template_details:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body={
+                    "message": "Must provide either 'message' and 'subject' or both 'template_type' and 'template_details'"
+                },
+            )
+
+        # Get all users
+        all_users = User.list_db(CW_DYNAMO_CLIENT)
+        if not all_users:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body={"message": "No users found in database"},
+            )
+
+        # Filter users based on the field and value
+        filtered_users = []
+        for user in all_users:
+            user_map = user.as_map()
+
+            # Navigate nested fields (e.g., "diet.meat" -> check user_map["diet"]["meat"])
+            field_parts = filter_field.split(".")
+            current_value = user_map
+
+            try:
+                for part in field_parts:
+                    current_value = current_value[part]
+
+                # Convert both to strings for comparison
+                if str(current_value).lower() == str(filter_value).lower():
+                    filtered_users.append(user)
+            except (KeyError, TypeError):
+                # Field doesn't exist or can't navigate - skip this user
+                continue
+
+        if not filtered_users:
+            return Response(
+                status_code=200,
+                content_type="application/json",
+                body={
+                    "message": f"no users matched filter {filter_field}={filter_value}",
+                    "matched_count": 0,
+                    "users_checked": len(all_users),
+                },
+            )
+
+        # Send emails to filtered users
+        emails = [user.email for user in filtered_users if user.email]
+
+        if not emails:
+            return Response(
+                status_code=200,
+                content_type="application/json",
+                body={
+                    "message": "no valid emails found for matched users",
+                    "matched_count": len(filtered_users),
+                    "emails_found": 0,
+                },
+            )
+
+        res = DOT_LOVE_MESSAGE_CLIENT.email_blast(
+            message_type=template_type,
+            template_input=template_details,
+            emails=emails,
+        )
+
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body={
+                "message": f"cohort email sent successfully to {len(emails)} users",
+                "filter_field": filter_field,
+                "filter_value": filter_value,
+                "matched_count": len(filtered_users),
+                "emails_sent": len(emails),
+            },
+        )
+
+    except Exception as e:
+        log.exception("Failed to send cohort email")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body={"message": "Failed to send cohort email", "error": str(e)},
         )
 
 

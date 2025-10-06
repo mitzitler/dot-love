@@ -597,6 +597,13 @@ class DotLoveCoreStack(Stack):
             integration=gizmo_service_integration,
         )
         #
+        # Email a cohort of users based on filter
+        dot_love_api_gw.add_routes(
+            path="/gizmo/email/cohort",
+            methods=[apigw.HttpMethod.POST],
+            integration=gizmo_service_integration,
+        )
+        #
         # Submit survey
         dot_love_api_gw.add_routes(
             path="/gizmo/survey",
