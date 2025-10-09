@@ -115,6 +115,8 @@ class DotLoveCoreStack(Stack):
         self.dot_love_registry_claim_table = self.create_dot_love_registry_claim_table()
         # Create Survey Results database
         self.dot_love_survey_results_table = self.create_dot_love_survey_results_table()
+        # Create Scoreboard database
+        self.dot_love_scoreboard_table = self.create_dot_love_scoreboard_table()
 
         ###################################################
         # DOT LOVE API GATEWAY 🖥
@@ -162,6 +164,19 @@ class DotLoveCoreStack(Stack):
             spectaculo_lambda=self.dot_love_spectaculo_lambda["function"],
         )
 
+        ###################################################
+        # DAPHNE GAME SERVICE 🎮
+        ###################################################
+        # Create Daphne Service Lambda and associate w/ API Gateway
+        self.dot_love_daphne_lambda = self.create_dot_love_daphne_lambda(
+            scoreboard_table=self.dot_love_scoreboard_table,
+        )
+        # Tie Daphne Lambda to API Gateway
+        self.add_daphne_routes_to_api_gw(
+            dot_love_api_gw=self.dot_love_api_gw,
+            daphne_lambda=self.dot_love_daphne_lambda["function"],
+        )
+
         # Set Stripe environment variables for the Spectaculo Lambda
         # TODO: Replace empty strings with actual values:
         # 1. Create Stripe account and get API key
@@ -179,6 +194,8 @@ class DotLoveCoreStack(Stack):
         )
         # Create s3 bucket to store registry item images
         self.create_dot_love_registry_item_img_s3()
+        # Create s3 bucket to store game assets
+        self.dot_love_game_assets_s3 = self.create_dot_love_game_assets_s3()
 
         ###################################################
         # DOT LOVE EMAIL HANDLING (SES, SNS, S3, Lambda) 📧
@@ -203,6 +220,7 @@ class DotLoveCoreStack(Stack):
         self.create_dot_love_cdn(
             self.dot_love_website_media_s3,
             self.dot_love_website_react_s3,
+            self.dot_love_game_assets_s3,
             self.cdn_domain_cert,
         )
 
@@ -302,6 +320,22 @@ class DotLoveCoreStack(Stack):
         )
 
         return survey_results_table
+
+    def create_dot_love_scoreboard_table(self):
+        scoreboard_table = dynamodb.Table(
+            scope=self,
+            id=f"{self.stack_env}-scoreboard",
+            # PK: composite first_last
+            partition_key=dynamodb.Attribute(
+                name="first_last",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            encryption=dynamodb.TableEncryption.AWS_MANAGED,
+        )
+
+        return scoreboard_table
 
     ###################################################
     # DOT LOVE SERVICES
@@ -429,6 +463,48 @@ class DotLoveCoreStack(Stack):
         )
 
         return {"function": spectaculo_lambda, "role": spectaculo_lambda_role}
+
+    def create_dot_love_daphne_lambda(self, scoreboard_table):
+        daphne_lambda_role = iam.Role(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-daphne-service-role",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+            description="Lambda Role with access to User table for scoreboard",
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AWSLambdaBasicExecutionRole"
+                )
+            ],
+        )
+
+        # Grant db access to user table
+        self.dot_love_user_table.grant_read_write_data(daphne_lambda_role)
+
+        daphne_lambda = lambdaFx.Function(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-daphne-service",
+            runtime=lambdaFx.Runtime.PYTHON_3_11,
+            handler="index.handler",
+            role=daphne_lambda_role,
+            code=lambdaFx.Code.from_asset("infra/lambda/daphne/"),
+            description="DotLove Daphne Service, to handle the game scoreboard",
+            environment={
+                # For getting scoreboard data from user table
+                "user_table_name": self.dot_love_user_table.table_name,
+                # Lambda Powertools
+                "POWERTOOLS_SERVICE_NAME": "daphne",
+                "POWERTOOLS_LOG_LEVEL": "INFO",
+                "TZ": "US/Eastern",
+                # For calling gizmo
+                "internal_api_key": self.internal_api_key,
+                "api_base_url": "https://api.mitzimatthew.love",
+            },
+            layers=[self.global_lambda_layer],
+            memory_size=512,
+            timeout=Duration.seconds(15),
+        )
+
+        return {"function": daphne_lambda, "role": daphne_lambda_role}
 
     def create_dot_love_ses_lambda(self, dot_love_ses_s3, ses_sns_arn):
         # Create lambda Role
@@ -701,6 +777,32 @@ class DotLoveCoreStack(Stack):
 
         return
 
+    def add_daphne_routes_to_api_gw(self, dot_love_api_gw, daphne_lambda):
+        # Create DotLove Daphne Service lambda association
+        daphne_service_integration = HttpLambdaIntegration(
+            f"{self.stack_env}-dot-love-daphne-service", daphne_lambda
+        )
+
+        # Create Daphne API routes
+        #
+        # GET /scoreboard
+        # Get top 5 scores
+        dot_love_api_gw.add_routes(
+            path="/daphne/scoreboard",
+            methods=[apigw.HttpMethod.GET],
+            integration=daphne_service_integration,
+        )
+        #
+        # POST /score
+        # Submit a new score
+        dot_love_api_gw.add_routes(
+            path="/daphne/score",
+            methods=[apigw.HttpMethod.POST],
+            integration=daphne_service_integration,
+        )
+
+        return
+
     ###################################################
     # SES Config
     ###################################################
@@ -812,7 +914,29 @@ class DotLoveCoreStack(Stack):
 
         return {"bucket": website_react_bucket}
 
-    def create_dot_love_cdn(self, website_media_s3, website_react_s3, dot_love_cert):
+    def create_dot_love_game_assets_s3(self):
+        game_assets_bucket = s3.Bucket(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-game-assets-s3",
+            auto_delete_objects=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[
+                        s3.HttpMethods.GET,
+                    ],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                )
+            ],
+            enforce_ssl=True,
+        )
+
+        return {"bucket": game_assets_bucket}
+
+    def create_dot_love_cdn(self, website_media_s3, website_react_s3, game_assets_s3, dot_love_cert):
         # Origin Access Identity (OAI) config
         media_oai = cloudfront.OriginAccessIdentity(
             self,
@@ -820,6 +944,14 @@ class DotLoveCoreStack(Stack):
             comment=f"OAI for {self.stack_env}-dot-love-media-cdn",
         )
         website_media_s3["bucket"].grant_read(media_oai)
+
+        game_assets_oai = cloudfront.OriginAccessIdentity(
+            self,
+            f"{self.stack_env}-dot-love-game-assets-origin-access-identity",
+            comment=f"OAI for {self.stack_env}-dot-love-game-assets",
+        )
+        game_assets_s3["bucket"].grant_read(game_assets_oai)
+
         react_oai = cloudfront.OriginAccessIdentity(
             self,
             f"{self.stack_env}-dot-love-react-origin-access-identity",
@@ -827,7 +959,7 @@ class DotLoveCoreStack(Stack):
         )
         website_react_s3["bucket"].grant_read(react_oai)
 
-        # Distribution for cdn.mitzimatthew.love (Media Bucket)
+        # Distribution for cdn.mitzimatthew.love (Media Bucket + Game Assets)
         media_distribution = cloudfront.Distribution(
             self,
             f"{self.stack_env}-dot-love-media-cdn",
@@ -838,6 +970,16 @@ class DotLoveCoreStack(Stack):
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,
             ),
+            additional_behaviors={
+                "/game/*": cloudfront.BehaviorOptions(
+                    origin=origins.S3Origin(
+                        game_assets_s3["bucket"], origin_access_identity=game_assets_oai
+                    ),
+                    viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                    allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+                    cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                )
+            },
             domain_names=["cdn.mitzimatthew.love"],
             certificate=dot_love_cert,
         )

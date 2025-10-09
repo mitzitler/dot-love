@@ -713,6 +713,7 @@ class User:
         guest_details=None,
         guest_type=None,
         rehearsal_dinner_invited=False,
+        high_score=0,
     ):
         self.first = first
         self.last = last
@@ -725,6 +726,7 @@ class User:
         self.guest_details = guest_details
         self.guest_type = guest_type
         self.rehearsal_dinner_invited = rehearsal_dinner_invited
+        self.high_score = high_score
 
     def as_map(self):
         return {
@@ -741,6 +743,7 @@ class User:
             ),
             "guest_type": self.guest_type,
             "rehearsal_dinner_invited": self.rehearsal_dinner_invited,
+            "high_score": self.high_score,
         }
 
     def __str__(self):
@@ -872,6 +875,7 @@ class User:
             rehearsal_dinner_invited=bool(
                 db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
             ),
+            high_score=int(db_user.get("high_score", {}).get("N", 0)),
         )
 
     @staticmethod
@@ -918,6 +922,7 @@ class User:
                 rehearsal_dinner_invited=bool(
                     db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
                 ),
+                high_score=int(db_user.get("high_score", {}).get("N", 0)),
             )
             user_list.append(user)
 
