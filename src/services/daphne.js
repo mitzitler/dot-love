@@ -5,13 +5,13 @@ export const daphneApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'https://api.mitzimatthew.love/daphne' }),
   tagTypes: ['Scoreboard'],
   endpoints: (builder) => ({
-    // Get scoreboard
+    // Get scoreboard - requires game parameter
     getScoreboard: builder.query({
-      query: () => ({
-        url: '/scoreboard',
+      query: (game) => ({
+        url: `/scoreboard?game=${game}`,
         method: 'GET',
       }),
-      providesTags: ['Scoreboard'],
+      providesTags: (result, error, game) => [{ type: 'Scoreboard', id: game }],
     }),
 
     // Submit score - only invalidates if it was a high score
@@ -22,10 +22,10 @@ export const daphneApi = createApi({
         body: scoreData,
         headers: headers,
       }),
-      // Conditionally invalidate tags based on response
+      // Conditionally invalidate tags based on response and game
       invalidatesTags: (result, error, arg) => {
         // Only invalidate scoreboard if it was actually a high score
-        return result?.isHighScore ? ['Scoreboard'] : [];
+        return result?.isHighScore ? [{ type: 'Scoreboard', id: arg.scoreData.game }] : [];
       },
     }),
   }),

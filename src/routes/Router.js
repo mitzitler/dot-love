@@ -7,7 +7,8 @@ import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
 import { Admin } from '../pages/Admin';
-import { Survey } from '../pages/Survey';
+import { Survey } from '../pages/games/militsa';
+import { Pritham } from '../pages/games/pritham';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
@@ -114,10 +115,18 @@ export function Router ({ setLoginHeader}) {
                 }
             />
             <Route
-                path="/survey"
+                path="/games/militsa"
                 element={
                     <Transitionizer>
                         <Survey />
+                    </Transitionizer>
+                }
+            />
+            <Route
+                path="/games/pritham"
+                element={
+                    <Transitionizer>
+                        <Pritham />
                     </Transitionizer>
                 }
             />

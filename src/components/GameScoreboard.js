@@ -25,8 +25,9 @@ function GameScoreboard({ topScores }) {
 
   return (
     <div style={{
-      width: '280px',
-      padding: '20px',
+      width: '320px',
+      maxWidth: '100%',
+      padding: '15px',
       backgroundColor: '#1a1a1a',
       borderRadius: '10px',
       position: 'relative',

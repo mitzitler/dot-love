@@ -1,7 +1,12 @@
-export const GAME_CONFIG = {
-  width: 400,
-  height: 600,
+export const MILITSA_GAME_CONFIG = {
+  width: 320,
+  height: 480,
   backgroundColor: '#2d2d2d',
+  backgroundImage: {
+    key: 'militsa-background',
+    //url: 'https://cdn.mitzimatthew.love/game/militsa_background.jpg'
+    url: 'https://cdn.mitzimatthew.love/allclad_square_griddle.png'
+  },
   gravity: 400,
   ballRadius: 50,
   ballColor: 0xff6600,
@@ -17,7 +22,7 @@ export const GAME_CONFIG = {
   horizontalVelocityRange: { min: -200, max: 200 }
 };
 
-export const TEXT_STYLES = {
+export const MILITSA_TEXT_STYLES = {
   score: {
     fontSize: '28px',
     color: '#ffffff'

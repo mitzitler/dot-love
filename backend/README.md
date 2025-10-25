@@ -54,3 +54,27 @@ cdk synth
 Now you can deploy with `cdk deploy` (you'll need some AWS credentials though), AND you will need to login to the AWS console and manually upload the `function.zip` file from `lambda/auth/zip` to the Auth lambda.
 
 At the moment, when running the frontend development server, you'll need to log into the AWS console, pull up your newly created API Gateway, and find and replace it's ID string into the URLs in the `CW_API_ENDPOINTS` variable in `frontend/src/AppConstants.tsx` for the frontend to be pointed at the new deployment.
+
+### Testing
+
+Lambda functions include test suites in their respective `tests/` directories (e.g., `infra/lambda/daphne/tests/`).
+
+**Running tests for a lambda function:**
+
+Using pytest (recommended):
+```bash
+cd infra/lambda/<lambda-name>
+python -m pytest tests/index_test.py -v
+```
+
+Using unittest:
+```bash
+cd infra/lambda/<lambda-name>
+python -m unittest tests.index_test -v
+```
+
+**Test structure:**
+- Helper function tests - Pure function unit tests
+- API endpoint tests - Route handler and integration tests
+- All external dependencies (boto3/DynamoDB, HTTP requests) are mocked
+- Tests run completely offline without AWS credentials or external services
