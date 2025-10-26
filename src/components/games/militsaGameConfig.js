@@ -4,8 +4,7 @@ export const MILITSA_GAME_CONFIG = {
   backgroundColor: '#2d2d2d',
   backgroundImage: {
     key: 'militsa-background',
-    //url: 'https://cdn.mitzimatthew.love/game/militsa_background.jpg'
-    url: 'https://cdn.mitzimatthew.love/allclad_square_griddle.png'
+    url: 'https://cdn.mitzimatthew.love/game/militsa_background.jpg'
   },
   gravity: 400,
   ballRadius: 50,
@@ -29,11 +28,11 @@ export const MILITSA_TEXT_STYLES = {
   },
   instructions: {
     fontSize: '16px',
-    color: '#aaaaaa'
+    color: '#ffffff'
   },
   gameOver: {
     fontSize: '42px',
-    color: '#ff0000'
+    color: '#ffffff'
   },
   finalScore: {
     fontSize: '28px',
@@ -41,6 +40,6 @@ export const MILITSA_TEXT_STYLES = {
   },
   restart: {
     fontSize: '20px',
-    color: '#aaaaaa'
+    color: '#ffffff'
   }
 };

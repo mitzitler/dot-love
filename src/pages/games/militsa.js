@@ -90,7 +90,11 @@ export function Survey() {
                     padding: '15px 20px 150px 40px',
                     overflow: 'hidden'
                 }}>
-                    <h1 style={{ marginBottom: '15px', marginTop: '5px', fontSize: '28px' }}>Don't Drop Militsa!</h1>
+                    <img
+                        src="https://cdn.mitzimatthew.love/game/ddm_title.png"
+                        alt="Don't Drop Militsa"
+                        style={{ marginBottom: '0px', marginTop: '5px', width: '80%', maxWidth: '250px', height: 'auto' }}
+                    />
                     <Suspense fallback={<div style={{color: '#ffffff', textAlign: 'center', padding: '40px'}}>Loading game...</div>}>
                         <div style={{
                             display: 'flex',
