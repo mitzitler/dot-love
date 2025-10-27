@@ -24,13 +24,13 @@ export function CardStackFooter({pageMainColor, pageSection, children, pageSecon
 
     return(
         <>
-            <section class={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${mainColor} ${mainBorder} border-2 backdrop-blur-md`}>
-                <span class='button-container'>
+            <section className={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${mainColor} ${mainBorder} border-2 backdrop-blur-md`}>
+                <span className='button-container'>
                     {children}
                 </span>
             </section>
-            <section class={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${secondaryColor} ${secondaryBorder} border-2 backdrop-blur-md`}/>
-            <section class={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${tertiaryColor} ${tertiaryBorder} border-2 backdrop-blur-md`}/>
+            <section className={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${secondaryColor} ${secondaryBorder} border-2 backdrop-blur-md`}/>
+            <section className={`${pageSectionClass} ${pageSectionSwipe} flex-grow ${tertiaryColor} ${tertiaryBorder} border-2 backdrop-blur-md`}/>
         </>
     )
 }

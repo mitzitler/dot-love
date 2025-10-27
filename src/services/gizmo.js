@@ -76,6 +76,32 @@ export const gizmoApi = createApi({
         headers: headers,
       }),
     }),
+
+    // Submit survey
+    submitSurvey: builder.mutation({
+      query: ({ headers, responses }) => ({
+        url: '/survey',
+        method: 'POST',
+        body: { responses },
+        headers: headers,
+      }),
+    }),
+
+    // Get survey for logged-in user
+    getSurvey: builder.query({
+      query: (headers) => ({
+        url: '/survey',
+        headers: headers,
+      }),
+    }),
+
+    // Get all surveys (admin)
+    getAllSurveys: builder.query({
+      query: (apiKey) => ({
+        url: '/survey/all',
+        headers: { 'Internal-Api-Key': apiKey },
+      }),
+    }),
   }),
 });
 
@@ -87,5 +113,8 @@ export const {
   useGetUserByGuestLinkQuery,
   useLazyGetAllUsersQuery,
   useEmailUserMutation,
+  useSubmitSurveyMutation,
+  useGetSurveyQuery,
+  useLazyGetAllSurveysQuery,
   useTextUserMutation,
 } = gizmoApi;

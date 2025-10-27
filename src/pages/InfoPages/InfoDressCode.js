@@ -46,10 +46,10 @@ export function InfoDressCode(guestDressCode) {
             <h1>Info</h1>
             {/* <h2>Saucedo-Zitler Wedding, November 7th 2025 at Diety Events</h2> */}
             <div >
-            <NavLink 
-            to='/info' end>
+            <NavLink
+            to='/games/militsa' end>
                 <div class="px-4 py-2 m-auto w-40 text-center border-dashed border-4 bg-slate-200 border-red-300 font-mono">
-                    Go up to the main page!
+                    Go to Games!
                 </div>
             </NavLink>
             </div>

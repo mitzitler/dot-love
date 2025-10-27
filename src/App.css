@@ -384,6 +384,10 @@ header {
   width: 90%
 }
 
+.swipe-card.game-card {
+  height: 1100px;
+}
+
 .swipe-card top {
   z-index: 4
 }

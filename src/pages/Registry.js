@@ -21,9 +21,9 @@ export function Registry({ registryItems,  claimedItems }) {
 
         <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
             pageTertiaryColor={pageTertiaryColor} >
-            <NavLink className='btn-23' 
-                to='/about'
-                end><marquee>ABOUT US → </marquee></NavLink>
+            <NavLink className='btn-23'
+                to='/games/militsa'
+                end><marquee>GAMES → </marquee></NavLink>
         </CardStackFooter>
         <CardStackPage pageMainColor={pageMainColor} 
             pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 

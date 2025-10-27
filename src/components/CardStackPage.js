@@ -1,10 +1,10 @@
 import '../App.css';
 
-export function CardStackPage({pageMainColor, pageSection, children, pageSecondaryColor, pageTertiaryColor, opacity}) {
+export function CardStackPage({pageMainColor, pageSection, children, pageSecondaryColor, pageTertiaryColor, opacity, customClass}) {
 
     const mainColor = 'bg-' + pageMainColor + '-400/75'
     const mainBorder = 'border-' + pageMainColor + '-500/50'
-    
+
     const secondaryColor = 'bg-' + pageSecondaryColor + '-400/75'
     const secondaryBorder = 'border-' + pageSecondaryColor + '-500/50'
 
@@ -20,6 +20,10 @@ export function CardStackPage({pageMainColor, pageSection, children, pageSeconda
     } else {
         pageSectionClass = 'section-content'
         pageSectionSwipe = 'swipe-card'
+    }
+
+    if (customClass) {
+        pageSectionSwipe += ' ' + customClass
     }
     // look into: https://stackoverflow.com/questions/72889068/template-literal-not-working-correctly-with-tailwind-css
 

@@ -3,9 +3,11 @@ import { useSelector } from 'react-redux';
 import { CardStackFooter } from '../components/CardStackFooter';
 import { CardStackPage } from '../components/CardStackPage';
 import SortTableRSVPs from "./AdminPages/SortTableRSVPs";
+import SortTableClaims from "./AdminPages/SortTableClaims";
 import { useLazyGetAllUsersQuery } from "../services/gizmo";
 import { useLazyGetAllClaimsQuery } from "../services/spectaculo";
 import { NavLink } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function processUsersData(usersArray) {
     if (!Array.isArray(usersArray)) return [];
@@ -41,16 +43,20 @@ function processUsersData(usersArray) {
 
 function processClaimsData(claimsArray, registryData) {
     if (!Array.isArray(claimsArray)) return [];
-  
-    return claimsArray.map(claim => {
-      return {
-        ...claim,
-        name: registryData.find(function(item) {return item.item_id === claim.item_id}).name,
-        img_url: registryData.find(function(item) {return item.item_id === claim.item_id}).img_url,
-        price_cents: registryData.find(function(item) {return item.item_id === claim.item_id}).price_cents,
-        received: registryData.find(function(item) {return item.item_id === claim.item_id}).received
-      };
-    });
+
+    // Filter out unclaimed items - only show CLAIMED or PURCHASED
+    return claimsArray
+      .filter(claim => claim.claim_state === "CLAIMED" || claim.claim_state === "PURCHASED")
+      .map(claim => {
+        const registryItem = registryData.find(function(item) {return item.item_id === claim.item_id});
+        return {
+          ...claim,
+          name: registryItem?.name || 'Unknown',
+          img_url: registryItem?.img_url || '',
+          price_cents: registryItem?.price_cents || 0,
+          received: registryItem?.received || false
+        };
+      });
   }
 
 export function Admin({ registryItems }) {
@@ -82,41 +88,79 @@ export function Admin({ registryItems }) {
         try {
             console.log('attempting to get all users, for: ', loginHeaderState)
             console.log('attempting to get claims list as well')
-            const resultUsers = await triggerGetAllUsers(password).unwrap();
-            const resultClaimsWrapped = await triggerGetAllClaims(password);
-            const resultClaims = await triggerGetAllClaims(password).unwrap();
-            console.log("made getAllUsers call to Gizmo, result:", resultUsers);
-            console.log("made getAllClaims call to Spectaculo, result:", resultClaims)
-            
-            if (resultUsers.isError && resultClaims.isError) {
-                
-                console.log("Something went wrong with Gizmo!", resultUsers);
-                console.log("Something went wrong with Spectaculo!", resultClaims);
-                return;
 
-            } else if (resultClaims.isError) {
-                console.log("The Gizmo worked:", resultUsers);
-                console.log("Something went wrong with Spectaculo!", resultClaims);
-                console.log("Something went wrong with Spectaculo, this is the result before its unwrapped,", resultClaimsWrapped)
-                setUsersData(processUsersData(resultUsers.body.users))
+            let resultUsers = null;
+            let resultClaims = null;
+            let usersError = null;
+            let claimsError = null;
+
+            // Try to fetch users
+            try {
+                resultUsers = await triggerGetAllUsers(password).unwrap();
+                console.log("made getAllUsers call to Gizmo, result:", resultUsers);
+            } catch (err) {
+                usersError = err;
+                console.error("Failed to fetch users:", err);
+            }
+
+            // Try to fetch claims
+            try {
+                resultClaims = await triggerGetAllClaims(password).unwrap();
+                console.log("made getAllClaims call to Spectaculo, result:", resultClaims);
+            } catch (err) {
+                claimsError = err;
+                console.error("Failed to fetch claims:", err);
+            }
+
+            // Handle results
+            if (usersError && claimsError) {
+                console.log("Both API calls failed");
+                toast.error("Failed to load admin data. Please check your password and try again.", {
+                    theme: "dark",
+                    position: "top-right",
+                    autoClose: 5000,
+                });
+                return;
+            } else if (claimsError) {
+                console.log("The Gizmo worked, but Spectaculo failed");
+                toast.warning("Loaded users data, but failed to load claims data.", {
+                    theme: "dark",
+                    position: "top-right",
+                    autoClose: 5000,
+                });
+                setUsersData(processUsersData(resultUsers.users))
                 setShowTableCards(true)
                 return;
-            } else if (resultUsers.isError) {
-                console.log("The Spectaculo worked:", resultClaims);
-                console.log("Something went wrong with Gizmo!", resultUsers);
+            } else if (usersError) {
+                console.log("The Spectaculo worked, but Gizmo failed");
+                toast.warning("Loaded claims data, but failed to load users data.", {
+                    theme: "dark",
+                    position: "top-right",
+                    autoClose: 5000,
+                });
                 setClaimsData(processClaimsData(resultClaims.claims, registryItems))
                 setShowTableCards(true)
                 return;
             } else {
                 console.log("Got all users from the Gizmo, and all claims from the Spectaculo");
-                setUsersData(processUsersData(resultUsers.body.users))
+                toast.success("Admin data loaded successfully!", {
+                    theme: "dark",
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+                setUsersData(processUsersData(resultUsers.users))
                 setClaimsData(processClaimsData(resultClaims.claims, registryItems))
                 console.log("claims data format,", claimsData)
                 setShowTableCards(true)
                 return;
             }
         } catch (err) {
-            console.error("Get users API call failed:", err);
+            console.error("Unexpected error in admin data fetch:", err);
+            toast.error("An unexpected error occurred. Please try again.", {
+                theme: "dark",
+                position: "top-right",
+                autoClose: 5000,
+            });
         }
 
     }
@@ -134,7 +178,7 @@ export function Admin({ registryItems }) {
                         <button type="submit">Submit</button>
                     </form>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/info' end>INFO</NavLink>
-                <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/about' end>ABOUT</NavLink>
+                <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/games/militsa' end>GAMES</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/registry' end>REGISTRY</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/rsvp' end>RSVP</NavLink>
             </CardStackFooter>
@@ -156,24 +200,29 @@ export function Admin({ registryItems }) {
 
                     <CardStackPage class="card-stack" pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} pageSection={pageSection}>
                         <div>
-                            <h1>Claims info</h1>
+                            <h1 class="my-4">Registry claims. Total claimed items: {claimsData?.length || 0}</h1>
 
                             <div class="flex-col">
 
                                 <div class="m-auto h-[600px] w-[900px]">
-                                    {/* <SortTableClaims
-                                        // claimsData={claimedItemsClaimed} 
-                                        claimsData={registryItemsClaimed}
-                                    /> */}
+                                    {claimsData && claimsData.length > 0 ? (
+                                        <SortTableClaims
+                                            claimsData={claimsData}
+                                        />
+                                    ) : (
+                                        <p>No claims data available.</p>
+                                    )}
                                 </div>
 
+                                {/* TODO: Future feature - mark items as received
                                 <div class="my-4">
-                                    {/* <form class="" onSubmit={handleReceivedClaim}>
+                                    <form class="" onSubmit={handleReceivedClaim}>
                                         <label for="received">submit item id to mark as received: </label>
                                         <input id="received" type="text" name="receivedClaim" value="item id" style={{width: "300px"}} class="w-48 px-2 mx-2"/>
                                         <button type="submit">Submit</button>
-                                    </form> */}
+                                    </form>
                                 </div>
+                                */}
 
                             </div>
 
