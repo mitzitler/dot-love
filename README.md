@@ -1,7 +1,6 @@
 <h1 align="center">MitziMatthew.Love
     <p align="center">
         <img alt="Static Badge - Made by" src="https://img.shields.io/badge/made%20by-mitzizitler-blue?style=plastic&logo=github">
-        <img alt="Static Badge - Stripe" src="https://img.shields.io/badge/payments-stripe-green?logo=stripe&style=plastic">
         <img alt="Static Badge - CDK" src="https://img.shields.io/badge/cdk-2.65.0-orange?style=plastic&logo=amazon">
         <img alt="Static Badge - Python" src="https://img.shields.io/badge/python-3.7-lightblue?style=plastic&logo=python">
         <img alt="Static Badge - React" src="https://img.shields.io/badge/react-18.2.0-red?style=plastic&logo=react">
