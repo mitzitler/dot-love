@@ -325,9 +325,15 @@ class DotLoveCoreStack(Stack):
         scoreboard_table = dynamodb.Table(
             scope=self,
             id=f"{self.stack_env}-scoreboard",
-            # PK: composite first_last
+            # PK: game name (e.g., "militsa", "pritham")
             partition_key=dynamodb.Attribute(
-                name="first_last",
+                name="game",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            # SK: date#score#first_last for efficient querying by date and score
+            # Format: "2025-10-27#00450#fake_name" (zero-padded score for lexicographic sorting)
+            sort_key=dynamodb.Attribute(
+                name="date_score_user",
                 type=dynamodb.AttributeType.STRING,
             ),
             removal_policy=RemovalPolicy.DESTROY,
@@ -477,8 +483,9 @@ class DotLoveCoreStack(Stack):
             ],
         )
 
-        # Grant db access to user table
+        # Grant db access to user table and scoreboard table
         self.dot_love_user_table.grant_read_write_data(daphne_lambda_role)
+        scoreboard_table.grant_read_write_data(daphne_lambda_role)
 
         daphne_lambda = lambdaFx.Function(
             scope=self,
@@ -491,6 +498,8 @@ class DotLoveCoreStack(Stack):
             environment={
                 # For getting scoreboard data from user table
                 "user_table_name": self.dot_love_user_table.table_name,
+                # For scoreboard data with daily/global leaderboards
+                "scoreboard_table_name": scoreboard_table.table_name,
                 # Lambda Powertools
                 "POWERTOOLS_SERVICE_NAME": "daphne",
                 "POWERTOOLS_LOG_LEVEL": "INFO",
@@ -785,8 +794,16 @@ class DotLoveCoreStack(Stack):
 
         # Create Daphne API routes
         #
+        # GET /scoreboard/daily
+        # Get top 5 scores for a specific date
+        dot_love_api_gw.add_routes(
+            path="/daphne/scoreboard/daily",
+            methods=[apigw.HttpMethod.GET],
+            integration=daphne_service_integration,
+        )
+        #
         # GET /scoreboard
-        # Get top 5 scores
+        # Get top 5 all-time high scores
         dot_love_api_gw.add_routes(
             path="/daphne/scoreboard",
             methods=[apigw.HttpMethod.GET],

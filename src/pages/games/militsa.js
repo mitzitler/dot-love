@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from 'react';
 import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../../components/CardStackPage';
 import { CardStackFooter } from '../../components/CardStackFooter';
-import { useGetScoreboardQuery, useSubmitScoreMutation } from '../../services/daphne';
+import { useSubmitScoreMutation } from '../../services/daphne';
 import { useGetUserQuery } from '../../services/gizmo';
 import '../../App.css';
 
@@ -18,14 +19,7 @@ export function Survey() {
         skip: !loginHeaderState,
     });
 
-    // Fetch scoreboard data from API for militsa game
-    const { data: scoreboardData, isLoading: isLoadingScoreboard, error: scoreboardError } = useGetScoreboardQuery('militsa');
     const [submitScore] = useSubmitScoreMutation();
-
-    // Debug logging
-    console.log('Scoreboard data:', scoreboardData);
-    console.log('Scoreboard loading:', isLoadingScoreboard);
-    console.log('Scoreboard error:', scoreboardError);
 
     const firstName = userData?.user?.first || '';
     const lastName = userData?.user?.last || '';
@@ -37,30 +31,14 @@ export function Survey() {
     const pageSection = "info";
 
     const handleGameOver = async (score, first, last) => {
-        console.log(`Game Over! User: ${first} ${last}, Score: ${score}, Current High Score: ${currentHighScore}`);
-        console.log('Submitting with data:', { score, first, last, loginHeaderState });
-
-        // Only submit score to API if it's a new high score
-        if (score > currentHighScore) {
-            console.log('New high score! Submitting to API...');
-            try {
-                const result = await submitScore({
-                    headers: { 'X-First-Last': loginHeaderState },
-                    scoreData: { score, first, last, game: 'militsa' }
-                }).unwrap();
-
-                console.log('Score submitted successfully:', result);
-
-                // Only refetch scoreboard if submission was successful and it was a high score
-                if (result.isHighScore) {
-                    console.log('Refreshing scoreboard...');
-                    // The RTK Query cache invalidation will automatically refetch
-                }
-            } catch (error) {
-                console.error('Failed to submit score:', error);
-            }
-        } else {
-            console.log(`Score ${score} is not higher than current high score ${currentHighScore}. Not submitting.`);
+        // Submit ALL scores (backend will handle high score logic and scoreboard updates)
+        try {
+            await submitScore({
+                headers: { 'X-First-Last': loginHeaderState },
+                scoreData: { score, first, last, game: 'militsa' }
+            }).unwrap();
+        } catch (error) {
+            console.error('Failed to submit score:', error);
         }
     };
 
@@ -78,7 +56,7 @@ export function Survey() {
         <>
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor}>
-                <a href="/" className="btn-23"><marquee>Home</marquee></a>
+                <NavLink to="/" className="btn-23"><marquee>INFO → </marquee></NavLink>
             </CardStackFooter>
             <CardStackPage pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} pageSection={pageSection} customClass="game-card">
@@ -110,9 +88,7 @@ export function Survey() {
                                 firstName={firstName}
                                 lastName={lastName}
                             />
-                            {!isLoadingScoreboard && scoreboardData && (
-                                <GameScoreboard topScores={scoreboardData} />
-                            )}
+                            <GameScoreboard game="militsa" />
                         </div>
                     </Suspense>
                 </div>

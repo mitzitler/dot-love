@@ -178,7 +178,7 @@ export function Admin({ registryItems }) {
                         <button type="submit">Submit</button>
                     </form>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/info' end>INFO</NavLink>
-                <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/about' end>ABOUT</NavLink>
+                <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/games/militsa' end>GAMES</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/registry' end>REGISTRY</NavLink>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/rsvp' end>RSVP</NavLink>
             </CardStackFooter>

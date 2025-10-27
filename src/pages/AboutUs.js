@@ -16,9 +16,9 @@ export function AboutUs() {
         <>
             <CardStackFooter pageMainColor={pageMainColor} pageSecondaryColor={pageSecondaryColor}
                 pageTertiaryColor={pageTertiaryColor} >
-                <NavLink className='btn-23' 
-                    to='/info'
-                    end><marquee>INFO → </marquee></NavLink>
+                <NavLink className='btn-23'
+                    to='/registry'
+                    end><marquee>REGISTRY → </marquee></NavLink>
             </CardStackFooter>
             <CardStackPage class="card-stack" pageMainColor={pageMainColor} 
                 pageSecondaryColor={pageSecondaryColor} pageTertiaryColor={pageTertiaryColor} 

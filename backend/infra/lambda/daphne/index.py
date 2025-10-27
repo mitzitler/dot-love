@@ -17,6 +17,7 @@ from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 
 # Environment Variables
 USER_TABLE_NAME = os.environ["user_table_name"]
+SCOREBOARD_TABLE_NAME = os.environ["scoreboard_table_name"]
 API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
 INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
 
@@ -218,6 +219,92 @@ def notify_bumped_users(
                 send_text_notification(user_fl, message)
 
 
+def write_score_to_scoreboard(game, score, first_last, first, last, date_str):
+    """
+    Write a score entry to the scoreboard table.
+
+    :param game: Game name (e.g., "militsa")
+    :param score: Score value
+    :param first_last: User ID in format "first_last"
+    :param first: User's first name
+    :param last: User's last name
+    :param date_str: Date string in YYYY-MM-DD format
+    """
+    # Create sort key: date#score#first_last with zero-padded 5-digit score
+    # Format example: "2025-10-27#00450#jane_doe"
+    # We invert the score (99999 - score) so higher scores come first lexicographically
+    inverted_score = 99999 - score
+    date_score_user = f"{date_str}#{inverted_score:05d}#{first_last}"
+
+    item = {
+        "game": {"S": game},
+        "date_score_user": {"S": date_score_user},
+        "score": {"N": str(score)},
+        "first_last": {"S": first_last},
+        "first": {"S": first},
+        "last": {"S": last},
+        "date": {"S": date_str},
+        "timestamp": {"S": datetime.utcnow().isoformat()},
+    }
+
+    CW_DYNAMO_CLIENT.put(SCOREBOARD_TABLE_NAME, item)
+    log.info(f"Wrote score to scoreboard: {game} - {first} {last} - {score} on {date_str}")
+
+
+def get_daily_top_scores(game, date_str, limit=5):
+    """
+    Get top scores for a specific game and date from scoreboard table.
+
+    :param game: Game name
+    :param date_str: Date in YYYY-MM-DD format
+    :param limit: Number of unique users to return
+    :return: List of top scores for the day
+    """
+    # Query for all scores on this date for this game
+    # The sort key starts with date, so we can use begins_with
+    # Don't set a limit here since we need to deduplicate users
+    key_condition = "game = :game AND begins_with(date_score_user, :date_prefix)"
+    expression_values = {
+        ":game": {"S": game},
+        ":date_prefix": {"S": f"{date_str}#"},
+    }
+
+    items = CW_DYNAMO_CLIENT.query(
+        SCOREBOARD_TABLE_NAME,
+        key_condition,
+        expression_values,
+        scan_index_forward=True,  # Ascending order (but scores are inverted, so highest first)
+    )
+
+    # Deserialize and format the results
+    top_scores = []
+    seen_users = set()  # Track users to only show their best score of the day
+
+    for item in items:
+        score_item = deserialize_user(item)
+        user_id = score_item.get("first_last")
+
+        # Only include each user once (their highest score)
+        if user_id not in seen_users:
+            seen_users.add(user_id)
+            first = score_item.get("first", "").title()
+            last = score_item.get("last", "").title()
+            score = int(score_item.get("score", 0))
+
+            top_scores.append({
+                "userName": f"{first} {last}",
+                "score": score,
+                "first": first,
+                "last": last,
+            })
+
+            # Stop once we have enough unique users
+            if len(top_scores) >= limit:
+                break
+
+    return top_scores
+
+
 ########################################################
 # CWDynamo Client
 ########################################################
@@ -263,10 +350,81 @@ class CWDynamoClient:
             ExpressionAttributeValues=expression_attribute_values,
         )
 
+    def put(self, table_name, item):
+        """Put an item into DynamoDB."""
+        self.client.put_item(TableName=table_name, Item=item)
+
+    def query(self, table_name, key_condition_expression, expression_attribute_values, scan_index_forward=True, limit=None):
+        """Query items from DynamoDB."""
+        params = {
+            "TableName": table_name,
+            "KeyConditionExpression": key_condition_expression,
+            "ExpressionAttributeValues": expression_attribute_values,
+            "ScanIndexForward": scan_index_forward,
+        }
+        if limit:
+            params["Limit"] = limit
+
+        res = self.client.query(**params)
+        return res.get("Items", [])
+
 
 ########################################################
 # API Routes
 ########################################################
+# More specific routes must come first
+@app.get("/daphne/scoreboard/daily")
+def get_daily_scoreboard():
+    """
+    Get top 5 scores for a specific date from the scoreboard table.
+    Query params: game (required), date (optional, defaults to today in YYYY-MM-DD format)
+    Returns: List of top 5 scores for that day sorted by score descending
+    """
+    try:
+        game = app.current_event.get_query_string_value("game", "")
+        date_param = app.current_event.get_query_string_value("date", "")
+
+        # Validate game parameter
+        if not game:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"error": "Missing required query parameter: game"}),
+            )
+
+        if game not in GAME_NAMES:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"error": f"Invalid game. Must be one of: {', '.join(GAME_NAMES.keys())}"}),
+            )
+
+        # Default to today if no date provided
+        if not date_param:
+            date_param = datetime.now().strftime("%Y-%m-%d")
+
+        log.info(f"Fetching daily scoreboard for game: {game}, date: {date_param}")
+
+        # Get daily top scores from scoreboard table
+        top_scores = get_daily_top_scores(game, date_param, limit=5)
+
+        log.info(f"Returning {len(top_scores)} daily scores for game: {game} on {date_param}")
+
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=json.dumps({"date": date_param, "scores": top_scores}),
+        )
+
+    except Exception as e:
+        log.exception(f"Error fetching daily scoreboard: {str(e)}")
+        return Response(
+            status_code=500,
+            content_type="application/json",
+            body=json.dumps({"error": "Failed to fetch daily scoreboard"}),
+        )
+
+
 @app.get("/daphne/scoreboard")
 def get_scoreboard():
     """
@@ -375,8 +533,12 @@ def submit_score():
         first_last = f"{first.lower()}_{last.lower()}"
         game_name = GAME_NAMES[game]
         score_field = f"high_score_{game}"
+        today_date = datetime.now().strftime("%Y-%m-%d")
 
         log.info(f"Checking score for {first} {last} in {game}: {score}")
+
+        # Write ALL scores to scoreboard table (not just high scores)
+        write_score_to_scoreboard(game, score, first_last, first, last, today_date)
 
         # Get existing user
         key_expression = {"first_last": {"S": first_last}}
