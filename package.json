@@ -39,7 +39,6 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "three": "^0.167.1",
-    "three.js": "^0.77.1",
     "victory": "^37.0.2",
     "web-vitals": "^2.1.4",
     "webkit": "^0.0.0",

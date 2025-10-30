@@ -10,6 +10,7 @@ import { Admin } from '../pages/Admin';
 import { Survey } from '../pages/games/militsa';
 import { Pritham } from '../pages/games/pritham';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
+import { JulesCraft } from '../pages/games/julescraft';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
 
@@ -127,6 +128,14 @@ export function Router ({ setLoginHeader}) {
                 element={
                     <Transitionizer>
                         <Pritham />
+                    </Transitionizer>
+                }
+            />
+            <Route
+                path="/games/jules-craft"
+                element={
+                    <Transitionizer>
+                        <JulesCraft />
                     </Transitionizer>
                 }
             />
