@@ -93,6 +93,33 @@ class DotLoveCoreStack(Stack):
                 secret_name="/dot-love/guests/contact/address"
             ),
         }
+        self.wedding_details = {
+            "date": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/wedding/date"
+            ),
+            "time": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/wedding/time"
+            ),
+            "venue_name": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/wedding/venue-name"
+            ),
+            "venue_address": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/wedding/venue-address"
+            ),
+            "contact_name_1": "Mitzi",
+            "contact_name_2": "Matthew",
+            "contact_email_1": self.contact_info["mitzi"]["email"],
+            "contact_email_2": self.contact_info["matthew"]["email"],
+            "contact_phone_1": self.contact_info["mitzi"]["phone"],
+            "contact_phone_2": self.contact_info["matthew"]["phone"],
+            "website_url": "www.mitzimatthew.love",
+        }
+        self.apple_wallet_pass_type_id = self.obtain_ssm_client_secret(
+            secret_name="/dot-love/apple-wallet/pass-type-id"
+        )
+        self.apple_wallet_team_identifier = self.obtain_ssm_client_secret(
+            secret_name="/dot-love/apple-wallet/team-identifier"
+        )
 
         ##################################################
         # DOMAIN SETUP
@@ -175,6 +202,19 @@ class DotLoveCoreStack(Stack):
         self.add_daphne_routes_to_api_gw(
             dot_love_api_gw=self.dot_love_api_gw,
             daphne_lambda=self.dot_love_daphne_lambda["function"],
+        )
+
+        ###################################################
+        # WALLET PASS SERVICE 🎫
+        ###################################################
+        self.dot_love_wallet_passes_s3 = self.create_dot_love_wallet_passes_s3()
+        self.dot_love_wallet_lambda = self.create_dot_love_wallet_lambda(
+            user_table=self.dot_love_user_table,
+            passes_s3_bucket=self.dot_love_wallet_passes_s3["bucket"],
+        )
+        self.add_wallet_routes_to_api_gw(
+            dot_love_api_gw=self.dot_love_api_gw,
+            wallet_lambda=self.dot_love_wallet_lambda["function"],
         )
 
         # Set Stripe environment variables for the Spectaculo Lambda
@@ -515,6 +555,47 @@ class DotLoveCoreStack(Stack):
 
         return {"function": daphne_lambda, "role": daphne_lambda_role}
 
+    def create_dot_love_wallet_lambda(self, user_table, passes_s3_bucket):
+        wallet_lambda_role = iam.Role(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-wallet-service-role",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+            description="Lambda Role for Apple Wallet pass generation",
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AWSLambdaBasicExecutionRole"
+                )
+            ],
+        )
+
+        user_table.grant_read_data(wallet_lambda_role)
+        passes_s3_bucket.grant_read_write(wallet_lambda_role)
+
+        wallet_lambda = lambdaFx.Function(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-wallet-service",
+            runtime=lambdaFx.Runtime.PYTHON_3_11,
+            handler="index.handler",
+            role=wallet_lambda_role,
+            code=lambdaFx.Code.from_asset("infra/lambda/wallet/"),
+            description="DotLove Wallet Service, to generate Apple Wallet passes",
+            environment={
+                "POWERTOOLS_SERVICE_NAME": "wallet",
+                "POWERTOOLS_LOG_LEVEL": "INFO",
+                "TZ": "US/Eastern",
+                "user_table_name": user_table.table_name,
+                "internal_api_key": self.internal_api_key,
+                "pass_type_id": self.apple_wallet_pass_type_id,
+                "team_identifier": self.apple_wallet_team_identifier,
+                "wedding_details": json.dumps(self.wedding_details),
+            },
+            layers=[self.global_lambda_layer],
+            memory_size=512,
+            timeout=Duration.seconds(30),
+        )
+
+        return {"function": wallet_lambda, "role": wallet_lambda_role}
+
     def create_dot_love_ses_lambda(self, dot_love_ses_s3, ses_sns_arn):
         # Create lambda Role
         ses_lambda_role = iam.Role(
@@ -820,6 +901,25 @@ class DotLoveCoreStack(Stack):
 
         return
 
+    def add_wallet_routes_to_api_gw(self, dot_love_api_gw, wallet_lambda):
+        wallet_service_integration = HttpLambdaIntegration(
+            f"{self.stack_env}-dot-love-wallet-service", wallet_lambda
+        )
+
+        dot_love_api_gw.add_routes(
+            path="/wallet/pass/generate",
+            methods=[apigw.HttpMethod.POST],
+            integration=wallet_service_integration,
+        )
+
+        dot_love_api_gw.add_routes(
+            path="/wallet/ping",
+            methods=[apigw.HttpMethod.GET],
+            integration=wallet_service_integration,
+        )
+
+        return
+
     ###################################################
     # SES Config
     ###################################################
@@ -952,6 +1052,25 @@ class DotLoveCoreStack(Stack):
         )
 
         return {"bucket": game_assets_bucket}
+
+    def create_dot_love_wallet_passes_s3(self):
+        wallet_passes_bucket = s3.Bucket(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-wallet-passes-s3",
+            auto_delete_objects=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            lifecycle_rules=[
+                s3.LifecycleRule(
+                    id=f"{self.stack_env}-wallet-pass-expiry",
+                    expiration=Duration.days(14),
+                )
+            ],
+            enforce_ssl=True,
+        )
+
+        return {"bucket": wallet_passes_bucket}
 
     def create_dot_love_cdn(self, website_media_s3, website_react_s3, game_assets_s3, dot_love_cert):
         # Origin Access Identity (OAI) config
