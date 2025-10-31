@@ -16,6 +16,8 @@ export function Info() {
     const pageTertiaryColor = "amber" 
     const pageSection = "info"
 
+    const rehearsal = {}
+
     const deity = {
         name: 'Diety Events',
         coordinates: [40.68725385467351, -73.98617663587743], 
@@ -50,11 +52,16 @@ export function Info() {
                     <InfoBox id="time" class="schedule" collapsable={false}>
                         <h4>Schedule</h4>
                         <ul>
+                            <li class="text-sm text-left pl-5"><em><strong>Thursday, November 6th</strong></em></li>
+                            {rehearsal ? <li class="text-sm text-left pl-1"> 6.30pm - Rehearsal Dinner at Juliette</li> : <></>}
+                            <li class="text-sm text-left pl-1"> 10.00pm - Welcome Drink Night at 33 Spritzenhaus</li>
                             <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
-                            <li class="text-sm text-left pl-1"> 6.30pm - Ceremony at Deity Events</li>
-                            <li class="text-sm text-left pl-1.5"> 7.00pm - Drinks</li>
-                            <li class="text-sm text-left pl-1.5"> 8.00pm - Dinner</li>
-                            <li class="text-sm text-left pl-1.5"> 9.00pm - Dancing</li>
+                            <li class="text-sm text-left pl-1"> 6.30pm - Champaign Flutes at Deity</li>
+                            <li class="text-sm text-left pl-1"> 7.00pm - Ceremony </li>
+                            <li class="text-sm text-left pl-1.5"> 7.30pm - Cocktail Hour</li>
+                            <li class="text-sm text-left pl-1.5"> 8.30pm - Dinner</li>
+                            <li class="text-sm text-left pl-1.5"> 10.00pm - Dancing</li>
+                            <li class="text-sm text-left pl-1.5"> 12.00am - Afters at Someday Bar</li>
                             <li class="text-sm text-left">12.00am - Afters</li>
                         </ul>
                     </InfoBox>
