@@ -3,11 +3,9 @@ import { NavLink } from "react-router-dom";
 import { CardStackPage } from "../../components/CardStackPage";
 import { CardStackFooter } from "../../components/CardStackFooter";
 
-const JulesCraftThree = lazy(() =>
-  import("../../components/games/JulesCraftThree")
-);
+const JulesCraftThree = lazy(() => import("../../components/games/JulesCraftThree"));
 
-export function JulesCraft() {
+export function JulesGame() {
   const pageMainColor = "plum";
   const pageSecondaryColor = "cyan";
   const pageTertiaryColor = "terracotta";
@@ -41,7 +39,7 @@ export function JulesCraft() {
             overflow: "hidden",
           }}
         >
-          <h2 style={{ color: "#fff", marginBottom: 8 }}>JulesCraft</h2>
+          <h2 style={{ color: "#fff", marginBottom: 8 }}>Jules Game</h2>
           <p style={{ color: "#ddd", marginBottom: 16, textAlign: "center" }}>
             Click in the scene to lock the mouse. Use WASD or arrows to move.
             Look around with the mouse.
@@ -67,4 +65,4 @@ export function JulesCraft() {
   );
 }
 
-export default JulesCraft;
+export default JulesGame;

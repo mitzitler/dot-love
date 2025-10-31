@@ -11987,22 +11987,10 @@
   dependencies:
     "any-promise" "^1.0.0"
 
-"three.js@^0.77.1":
-  "integrity" "sha512-lVMYlBXhhHlZtsF+cQdev6WCm2fSWs3I+A6Z63j6TBmkVXOYgdo9AUCRemfsw5mllqWx23VubJ5Qt8/uWKQpJA=="
-  "resolved" "https://registry.npmjs.org/three.js/-/three.js-0.77.1.tgz"
-  "version" "0.77.1"
-  dependencies:
-    "three" "0.77.0"
-
 "three@^0.167.1":
   "integrity" "sha512-gYTLJA/UQip6J/tJvl91YYqlZF47+D/kxiWrbTon35ZHlXEN0VOo+Qke2walF1/x92v55H6enomymg4Dak52kw=="
   "resolved" "https://registry.npmjs.org/three/-/three-0.167.1.tgz"
   "version" "0.167.1"
-
-"three@0.77.0":
-  "integrity" "sha512-YWEp8ahs2l+6fAFVbanLVQoSBwVq5jDct3nZdBSHHXb5I/w5oy/LCMAzIOAguKWclRqcjR4W1BeP5QBnftGbpA=="
-  "resolved" "https://registry.npmjs.org/three/-/three-0.77.0.tgz"
-  "version" "0.77.0"
 
 "throat@^5.0.0":
   "integrity" "sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA=="

@@ -5,6 +5,14 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 
+// Format seconds to M:SS
+function formatTime(sec) {
+  const s = Math.max(0, Math.floor(sec || 0));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${String(r).padStart(2, '0')}`;
+}
+
 // Simple seeded PRNG (Mulberry32)
 function mulberry32(seed) {
   let t = seed >>> 0;
@@ -102,13 +110,18 @@ export default function JulesCraftThree() {
   const swordSwingActiveRef = useRef(false);
   const [score, setScore] = useState(0);
   const scoreRef = useRef(0);
+  const [timeSurvived, setTimeSurvived] = useState(0);
+  const timeSecRef = useRef(0);
   const [hitFlash, setHitFlash] = useState(false);
-  const activeZombiesRef = useRef(0);
+  const hitFlashTimeoutRef = useRef(null);
+  const [resetKey, setResetKey] = useState(0);
+  const activeSlimesRef = useRef(0);
   const spawnTimerRef = useRef(0);
   const spawnIntervalRef = useRef(3.0);
   const spawnBatchRef = useRef(1);
   const elapsedRef = useRef(0);
   const spawnEnemyRef = useRef(null);
+  const performAttackRef = useRef(null);
 
   useEffect(() => {
     const mountEl = mountRef.current;
@@ -123,6 +136,7 @@ export default function JulesCraftThree() {
     scene.background = new THREE.Color(0x87ceeb); // sky blue
 
     const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
+    camera.rotation.order = 'YXZ';
     camera.position.set(0, 2, 5);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -130,6 +144,26 @@ export default function JulesCraftThree() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountEl.appendChild(renderer.domElement);
     rendererRef.current = renderer;
+
+    // Audio: sword swoosh
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+    const audioLoader = new THREE.AudioLoader();
+    const swingSfx = new THREE.Audio(listener);
+    audioLoader.load('/audio/jules/sword-swoosh.wav', (buffer) => {
+      swingSfx.setBuffer(buffer);
+      swingSfx.setVolume(0.65);
+    });
+    // Audio: slime pop (voice pool for overlap)
+    const popVoices = [];
+    audioLoader.load('/audio/jules/pop.wav', (buffer) => {
+      for (let i = 0; i < 4; i++) {
+        const v = new THREE.Audio(listener);
+        v.setBuffer(buffer);
+        v.setVolume(0.6);
+        popVoices.push(v);
+      }
+    });
     // Postprocessing composer with OutlinePass (keeps colors, adds edges)
     const composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
@@ -156,6 +190,9 @@ export default function JulesCraftThree() {
     // Voxel terrain (blocky, cube-based)
     const { fbm } = createPerlin2D(1337);
     const cellSize = 2; // cube size
+    const enemySize = cellSize; // same as cube
+    const enemyRadius = enemySize * 0.5; // use circle on XZ for collision
+    const playerRadius = cellSize * 0.55; // player collision radius
     const gridCount = 64; // per axis (64x64 blocks)
     const worldSize = gridCount * cellSize;
     const half = worldSize / 2;
@@ -233,21 +270,31 @@ export default function JulesCraftThree() {
 
     // Tree textures
     const trunkSideTex = makeCanvasTexture((ctx, s) => {
-      ctx.fillStyle = '#8b5a2b';
+      // base bark color with vertical gradient
+      const grd = ctx.createLinearGradient(0, 0, s, 0);
+      grd.addColorStop(0, '#6f4a23');
+      grd.addColorStop(0.5, '#8b5a2b');
+      grd.addColorStop(1, '#5e3d1c');
+      ctx.fillStyle = grd;
       ctx.fillRect(0, 0, s, s);
-      // bark vertical streaks
-      ctx.strokeStyle = '#6e451f';
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 8; i++) {
-        const x = Math.floor((i + 0.5 + Math.random() * 0.3) * (s / 8));
+
+      // darker vertical ridges of varying thickness
+      ctx.strokeStyle = '#4e351a';
+      for (let i = 0; i < 14; i++) {
+        const x = Math.floor((i + Math.random() * 0.5) * (s / 14));
+        ctx.lineWidth = 1 + Math.random() * 2.0;
+        ctx.globalAlpha = 0.55 + Math.random() * 0.2;
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, s);
         ctx.stroke();
       }
-      // subtle highlights
+      ctx.globalAlpha = 1;
+
+      // subtle lighter highlights to suggest sheen
       ctx.strokeStyle = '#a8713a';
       ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.35;
       for (let i = 0; i < 10; i++) {
         const x = Math.floor(Math.random() * s);
         ctx.beginPath();
@@ -255,21 +302,43 @@ export default function JulesCraftThree() {
         ctx.lineTo(x, s);
         ctx.stroke();
       }
+      ctx.globalAlpha = 1;
+
+      // scattered knots
+      const knots = 3 + Math.floor(Math.random() * 3);
+      for (let k = 0; k < knots; k++) {
+        const x = Math.random() * s;
+        const y = Math.random() * s;
+        ctx.fillStyle = '#4a2f16';
+        ctx.beginPath();
+        ctx.ellipse(x, y, 2 + Math.random() * 2, 1 + Math.random() * 1.5, Math.random() * Math.PI, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#2f1e0f';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 3 + Math.random() * 2, 2 + Math.random() * 2, Math.random() * Math.PI, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
     });
     const trunkTopTex = makeCanvasTexture((ctx, s) => {
-      // growth rings
+      // wood end with growth rings and subtle radial shading
       ctx.fillStyle = '#9c6b3b';
       ctx.fillRect(0, 0, s, s);
+      const cx = s / 2, cy = s / 2;
       ctx.strokeStyle = '#7a512d';
-      for (let r = s * 0.45; r > 6; r -= 6) {
+      ctx.globalAlpha = 0.9;
+      for (let r = s * 0.45; r > 4; r -= 4 + Math.random() * 2) {
         ctx.beginPath();
-        ctx.arc(s / 2, s / 2, r + (Math.random() * 1.5 - 0.75), 0, Math.PI * 2);
+        ctx.arc(cx, cy, r + (Math.random() * 1.2 - 0.6), 0, Math.PI * 2);
         ctx.stroke();
       }
-      // center darker knot
+      ctx.globalAlpha = 1;
+      // darker core
       ctx.fillStyle = '#6e451f';
       ctx.beginPath();
-      ctx.arc(s / 2, s / 2, 4, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 4 + Math.random() * 2, 0, Math.PI * 2);
       ctx.fill();
     });
     const leavesTex = makeCanvasTexture((ctx, s) => {
@@ -290,7 +359,7 @@ export default function JulesCraftThree() {
       }
       ctx.globalAlpha = 1;
     });
-    const zombieTex = makeCanvasTexture((ctx, s) => {
+    const slimeTex = makeCanvasTexture((ctx, s) => {
       // green skin base
       ctx.fillStyle = '#8dcf5f';
       ctx.fillRect(0, 0, s, s);
@@ -463,7 +532,7 @@ export default function JulesCraftThree() {
       trunkMatSide  // -z
     ];
     const leavesMat = new THREE.MeshStandardMaterial({ map: leavesTex });
-    const zombieMat = new THREE.MeshStandardMaterial({ map: zombieTex });
+    const slimeMat = new THREE.MeshStandardMaterial({ map: slimeTex });
     const trunkMesh = makeInstanced(trunkMaterials, trunkPositions);
     const leavesMesh = makeInstanced(leavesMat, leavesPositions);
     scene.add(grassMesh);
@@ -471,6 +540,18 @@ export default function JulesCraftThree() {
     scene.add(waterMesh);
     scene.add(trunkMesh);
     scene.add(leavesMesh);
+
+    // Build a spatial set of trunk columns for simple collision checks (XZ plane)
+    const trunkCellSet = new Set();
+    const cellIndex = (v) => Math.floor((v + half) / cellSize);
+    const trunkKeyStr = (ix, iz) => `${ix},${iz}`;
+    for (let i = 0; i < trunkPositions.length; i += 3) {
+      const tx = trunkPositions[i + 0];
+      const tz = trunkPositions[i + 2];
+      const ix = cellIndex(tx);
+      const iz = cellIndex(tz);
+      trunkCellSet.add(trunkKeyStr(ix, iz));
+    }
     // Sword (first-person view model)
     const swordGroup = new THREE.Group();
     const bladeGeo = new THREE.BoxGeometry(0.08, 0.9, 0.06);
@@ -493,12 +574,12 @@ export default function JulesCraftThree() {
     camera.add(swordGroup);
     scene.add(camera);
     swordRef.current = { group: swordGroup, basePos: swordGroup.position.clone(), baseRot: swordGroup.rotation.clone() };
-    // Enemies (zombies) instanced with capacity and timed spawns
-    const maxZombies = 200;
-    const initialZombies = 10;
-    const zombieMesh = new THREE.InstancedMesh(cubeGeo, zombieMat, maxZombies);
-    for (let i = 0; i < maxZombies; i++) {
-      zombieMesh.setColorAt(i, new THREE.Color(0xffffff));
+    // Enemies (slimes) instanced with capacity and timed spawns
+    const maxSlimes = 200;
+    const initialSlimes = 10;
+    const slimeMesh = new THREE.InstancedMesh(cubeGeo, slimeMat, maxSlimes);
+    for (let i = 0; i < maxSlimes; i++) {
+      slimeMesh.setColorAt(i, new THREE.Color(0xffffff));
     }
     const zMat = new THREE.Matrix4();
     const enemies = [];
@@ -517,11 +598,11 @@ export default function JulesCraftThree() {
       return null;
     }
     // Initialize pool as inactive
-    for (let i = 0; i < maxZombies; i++) {
+    for (let i = 0; i < maxSlimes; i++) {
       const e = { x: 0, y: -9999, z: 0, hp: 0, alive: false, cooldown: 0, hitTint: 0, bouncePhase: Math.random() * Math.PI * 2 };
       enemies.push(e);
       zMat.makeTranslation(e.x, e.y, e.z);
-      zombieMesh.setMatrixAt(i, zMat);
+      slimeMesh.setMatrixAt(i, zMat);
     }
     function spawnEnemy() {
       const pos = randomGrassTop();
@@ -532,23 +613,94 @@ export default function JulesCraftThree() {
           en.x = pos.x; en.y = pos.y; en.z = pos.z;
           en.hp = 3; en.alive = true; en.hitTint = 0; en.cooldown = 0; en.bouncePhase = Math.random() * Math.PI * 2;
           zMat.makeTranslation(en.x, en.y, en.z);
-          zombieMesh.setMatrixAt(i, zMat);
-          zombieMesh.setColorAt(i, new THREE.Color(0xffffff));
-          zombieMesh.instanceMatrix.needsUpdate = true;
-          zombieMesh.instanceColor.needsUpdate = true;
-          activeZombiesRef.current++;
+          slimeMesh.setMatrixAt(i, zMat);
+          slimeMesh.setColorAt(i, new THREE.Color(0xffffff));
+          slimeMesh.instanceMatrix.needsUpdate = true;
+          slimeMesh.instanceColor.needsUpdate = true;
+          activeSlimesRef.current++;
           return true;
         }
       }
       return false;
     }
     spawnEnemyRef.current = spawnEnemy;
-    for (let i = 0; i < initialZombies; i++) spawnEnemy();
-    scene.add(zombieMesh);
-    enemiesRef.current = { list: enemies, mesh: zombieMesh };
+    for (let i = 0; i < initialSlimes; i++) spawnEnemy();
+    scene.add(slimeMesh);
+    enemiesRef.current = { list: enemies, mesh: slimeMesh };
+
+    // Particle system (encapsulated): small red cubes that burst on slime death
+    const particlesSys = (() => {
+      const maxParticles = 1000;
+      const geo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xff5555, transparent: true, opacity: 0.95, depthWrite: false });
+      const mesh = new THREE.InstancedMesh(geo, mat, maxParticles);
+      const mtx = new THREE.Matrix4();
+      const store = new Array(maxParticles).fill(null).map(() => ({ active: false, x: 0, y: -9999, z: 0, vx: 0, vy: 0, vz: 0, life: 0, ttl: 0 }));
+      for (let i = 0; i < maxParticles; i++) { mtx.makeTranslation(0, -9999, 0); mesh.setMatrixAt(i, mtx); }
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+
+      function spawn(x, y, z, count = 18) {
+        for (let c = 0; c < count; c++) {
+          const idx = store.findIndex(p => !p.active);
+          if (idx === -1) break;
+          const p = store[idx];
+          p.active = true;
+          p.x = x; p.y = y; p.z = z;
+          const speed = 3 + Math.random() * 2.5;
+          const theta = Math.random() * Math.PI * 2;
+          const up = 2 + Math.random() * 3;
+          p.vx = Math.cos(theta) * speed;
+          p.vz = Math.sin(theta) * speed;
+          p.vy = up;
+          p.ttl = 0.8 + Math.random() * 0.6;
+          p.life = p.ttl;
+          const tmpPos = new THREE.Vector3(p.x, p.y, p.z);
+          const tmpQuat = new THREE.Quaternion();
+          const tmpScale = new THREE.Vector3(1, 1, 1);
+          mtx.compose(tmpPos, tmpQuat, tmpScale);
+          mesh.setMatrixAt(idx, mtx);
+          mesh.instanceMatrix.needsUpdate = true;
+        }
+      }
+
+      function update(dt) {
+        let changed = false;
+        for (let i = 0; i < store.length; i++) {
+          const p = store[i];
+          if (!p.active) continue;
+          p.life -= dt;
+          if (p.life <= 0) {
+            p.active = false;
+            mtx.makeTranslation(0, -9999, 0);
+            mesh.setMatrixAt(i, mtx);
+            changed = true;
+            continue;
+          }
+          p.vy -= 9.8 * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.z += p.vz * dt;
+          const s = Math.max(0.05, p.life / p.ttl);
+          const tmpPos2 = new THREE.Vector3(p.x, p.y, p.z);
+          const tmpQuat2 = new THREE.Quaternion();
+          const tmpScale2 = new THREE.Vector3(s, s, s);
+          mtx.compose(tmpPos2, tmpQuat2, tmpScale2);
+          mesh.setMatrixAt(i, mtx);
+          changed = true;
+        }
+        if (changed) mesh.instanceMatrix.needsUpdate = true;
+      }
+
+      function dispose() {
+        try { mesh.dispose(); geo.dispose(); mat.dispose(); } catch (e) {}
+      }
+      return { spawn, update, dispose };
+    })();
     // Configure outline pass to highlight world meshes
     try {
-      outlinePass.selectedObjects = [grassMesh, rockMesh, trunkMesh, leavesMesh, zombieMesh];
+      outlinePass.selectedObjects = [grassMesh, rockMesh, trunkMesh, leavesMesh, slimeMesh];
     } catch (e) {}
 
     // Grid helper for orientation
@@ -565,56 +717,132 @@ export default function JulesCraftThree() {
     const sprintMultiplier = 1.8;
 
     // Key handlers and listeners are defined once below (with jump support)
+    // Reusable helpers (reduce allocations)
+    const tmpColor = new THREE.Color();
 
     // Click to lock pointer
+    const el = renderer.domElement;
+    const canPointerLock = !!(el.requestPointerLock || el.webkitRequestPointerLock || el.mozRequestPointerLock || el.msRequestPointerLock);
     const requestPointerLock = () => {
+      if (!canPointerLock) return; // mobile or unsupported – no-op
       if (!controls.isLocked) controls.lock();
     };
-    const onMouseDown = (e) => {
-      // Left click swings sword
-      if (e.button === 0 && controls.isLocked && !gameOverRef.current) {
-        if (swingCooldownRef.current <= 0) {
-          swingCooldownRef.current = 0.25;
-          swordSwingTRef.current = 0;
-          swordSwingActiveRef.current = true;
-        }
-        // Perform hit detection once per click
-        const enemies = enemiesRef.current.list;
-        const forward = new THREE.Vector3();
-        camera.getWorldDirection(forward);
-        forward.y = 0; forward.normalize();
-        const camPos = controls.getObject().position;
-        const cosArc = Math.cos(Math.PI / 3); // 60deg swing arc
-        const range = 5.0; // larger reach
-        let hitAny = false;
-        enemies.forEach((en) => {
-          if (!en.alive) return;
-          const dx = en.x - camPos.x;
-          const dz = en.z - camPos.z;
-          const dist = Math.hypot(dx, dz);
-          if (dist > range) return;
-          const dir = new THREE.Vector3(dx, 0, dz).normalize();
-          if (dir.dot(forward) >= cosArc) {
-            en.hp -= 1;
-            en.hitTint = 0.15;
-            hitAny = true;
-            if (en.hp <= 0) {
-              en.alive = false;
-              en.y = -9999; // hide
-              scoreRef.current += 10;
-              setScore(scoreRef.current);
+    // Shared attack routine for mouse and touch buttons
+    const performAttack = ({ ignoreLock = false } = {}) => {
+      try { listener?.context?.resume?.(); } catch (e) {}
+      if ((!ignoreLock && !controls.isLocked) || gameOverRef.current) return;
+      // Gate attacks strictly by cooldown so damage cannot be spammed
+      if (swingCooldownRef.current > 0) return;
+      swingCooldownRef.current = 0.10; // 100ms between attacks
+      swordSwingTRef.current = 0;
+      swordSwingActiveRef.current = true;
+      const enemies = enemiesRef.current.list;
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0; forward.normalize();
+      const camPos = controls.getObject().position;
+      const cosArc = Math.cos(Math.PI / 3);
+      const range = 5.0;
+      let hitAny = false;
+      enemies.forEach((en) => {
+        if (!en.alive) return;
+        const dx = en.x - camPos.x;
+        const dz = en.z - camPos.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist > range) return;
+        const dir = new THREE.Vector3(dx, 0, dz).normalize();
+        if (dir.dot(forward) >= cosArc) {
+          en.hp -= 1;
+          en.hitTint = 0.15;
+          hitAny = true;
+          if (en.hp <= 0) {
+            en.alive = false;
+            particlesSys.spawn(en.x, en.y, en.z, 20);
+            en.y = -9999;
+            scoreRef.current += 10;
+            setScore(scoreRef.current);
+            // Play slime pop with slight random pitch; use an available voice
+            if (popVoices && popVoices.length) {
+              const voice = popVoices.find((a) => !a.isPlaying) || popVoices[0];
+              if (voice && voice.buffer) {
+                try { if (voice.isPlaying) voice.stop(); } catch (e) {}
+                const rate = 0.9 + Math.random() * 0.25; // 0.90–1.15
+                voice.setPlaybackRate(rate);
+                try { voice.play(); } catch (e) {}
+              }
             }
           }
-        });
-        if (hitAny) {
-          enemiesRef.current.mesh.instanceMatrix.needsUpdate = true;
-          enemiesRef.current.mesh.instanceColor.needsUpdate = true;
         }
+      });
+      if (hitAny) {
+        enemiesRef.current.mesh.instanceMatrix.needsUpdate = true;
+        enemiesRef.current.mesh.instanceColor.needsUpdate = true;
+      }
+      // Play sword swoosh with slight random pitch
+      if (swingSfx && swingSfx.buffer) {
+        try { if (swingSfx.isPlaying) swingSfx.stop(); } catch (e) {}
+        const rate = 0.92 + Math.random() * 0.18; // 0.92–1.10
+        swingSfx.setPlaybackRate(rate);
+        try { swingSfx.play(); } catch (e) {}
       }
     };
-    renderer.domElement.style.cursor = 'crosshair';
-    renderer.domElement.addEventListener('click', requestPointerLock);
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
+    performAttackRef.current = (ignoreLock = false) => performAttack({ ignoreLock });
+
+    const onMouseDown = (e) => {
+      // Left click swings sword
+      if (e.button === 0) {
+        performAttack({ ignoreLock: false });
+      }
+    };
+    el.style.cursor = canPointerLock ? 'crosshair' : 'default';
+    if (canPointerLock) el.addEventListener('click', requestPointerLock);
+    el.addEventListener('mousedown', onMouseDown);
+
+    // Touch-look support for mobile (drag to rotate view; no translation)
+    const touchState = { active: false, id: -1, x: 0, y: 0 };
+    const lookSensitivity = 0.007; // radians per pixel (faster turning)
+    const clampPitch = (v) => Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, v));
+    function onTouchStart(e) {
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        const t = e.changedTouches[0];
+        touchState.active = true;
+        touchState.id = t.identifier;
+        touchState.x = t.clientX;
+        touchState.y = t.clientY;
+        try { listener?.context?.resume?.(); } catch (err) {}
+        e.preventDefault();
+      }
+    }
+    function onTouchMove(e) {
+      if (!touchState.active) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        if (t.identifier !== touchState.id) continue;
+        const dx = t.clientX - touchState.x;
+        const dy = t.clientY - touchState.y;
+        touchState.x = t.clientX;
+        touchState.y = t.clientY;
+        // Rotate view: yaw (world Y) and pitch (camera X), same as desktop pointer lock
+        controls.getObject().rotation.y -= dx * lookSensitivity;
+        camera.rotation.x = clampPitch(camera.rotation.x - dy * lookSensitivity);
+        e.preventDefault();
+        break;
+      }
+    }
+    function onTouchEnd(e) {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === touchState.id) {
+          touchState.active = false;
+          touchState.id = -1;
+          break;
+        }
+      }
+    }
+    // Register touch listeners (non-passive to allow preventDefault)
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: false });
+    el.addEventListener('touchcancel', onTouchEnd, { passive: false });
 
     // Handle resize
     const onResize = () => {
@@ -710,7 +938,8 @@ export default function JulesCraftThree() {
       const dt = Math.min(0.05, (now - prevT) / 1000); // clamp to avoid jumps
       prevT = now;
 
-      if (controls.isLocked) {
+      // On mobile where pointer lock is unavailable, always run gameplay updates
+      if (controls.isLocked || !canPointerLock) {
         // Camera basis vectors
         camera.getWorldDirection(tmpDir);
         tmpDir.y = 0;
@@ -735,10 +964,42 @@ export default function JulesCraftThree() {
         posObj.x = Math.max(-boundsHalf, Math.min(boundsHalf, posObj.x));
         posObj.z = Math.max(-boundsHalf, Math.min(boundsHalf, posObj.z));
 
+        // Resolve collisions against trunk AABBs (XZ only, cylinder vs square)
+        const halfBox = cellSize * 0.5;
+        const cix = cellIndex(posObj.x);
+        const ciz = cellIndex(posObj.z);
+        for (let oz = -1; oz <= 1; oz++) {
+          for (let ox = -1; ox <= 1; ox++) {
+            const ix = cix + ox;
+            const iz = ciz + oz;
+            if (!trunkCellSet.has(trunkKeyStr(ix, iz))) continue;
+            const centerX = -half + ix * cellSize + cellSize * 0.5;
+            const centerZ = -half + iz * cellSize + cellSize * 0.5;
+            const dx = posObj.x - centerX;
+            const dz = posObj.z - centerZ;
+            const clampedX = Math.max(-halfBox, Math.min(halfBox, dx));
+            const clampedZ = Math.max(-halfBox, Math.min(halfBox, dz));
+            const nearestX = centerX + clampedX;
+            const nearestZ = centerZ + clampedZ;
+            const ddx = posObj.x - nearestX;
+            const ddz = posObj.z - nearestZ;
+            const distSq = ddx * ddx + ddz * ddz;
+            const r = playerRadius;
+            if (distSq < r * r - 1e-6) {
+              const dist = Math.max(1e-6, Math.sqrt(distSq));
+              const nx = ddx / dist;
+              const nz = ddz / dist;
+              const push = r - dist;
+              posObj.x += nx * push;
+              posObj.z += nz * push;
+            }
+          }
+        }
+
         // Sword swing animation
         if (swingCooldownRef.current > 0) swingCooldownRef.current -= dt;
         if (swordSwingActiveRef.current && swordRef.current) {
-          const dur = 0.22; // slower, heavier swing
+          const dur = 0.35; // slower, heavier swing to match cooldown
           swordSwingTRef.current += dt / dur;
           let t = swordSwingTRef.current;
           if (t >= 1) { t = 1; swordSwingActiveRef.current = false; }
@@ -777,12 +1038,18 @@ export default function JulesCraftThree() {
         const enemies = enemiesRef.current.list;
         const zMesh = enemiesRef.current.mesh;
         const playerPos = controls.getObject().position;
-        const harmRange = 1.6;
+        const harmRange = playerRadius + enemyRadius + 0.15; // damage trigger when touching
         const enemySpeed = 2.2;
         const nowSec = now / 1000;
-        // Spawn more zombies over time
+        // Spawn more slimes over time
         spawnTimerRef.current += dt;
         elapsedRef.current += dt;
+        // update UI timer (only when whole seconds change)
+        const whole = Math.floor(elapsedRef.current);
+        if (whole !== timeSecRef.current) {
+          timeSecRef.current = whole;
+          setTimeSurvived(whole);
+        }
         if (spawnTimerRef.current >= spawnIntervalRef.current) {
           spawnTimerRef.current = 0;
           let batch = spawnBatchRef.current;
@@ -791,6 +1058,7 @@ export default function JulesCraftThree() {
           if (elapsedRef.current > 25) spawnBatchRef.current = 2;
           if (elapsedRef.current > 60) spawnBatchRef.current = 3;
         }
+        // First pass: steer toward player and update bounce
         for (let i = 0; i < enemies.length; i++) {
           const en = enemies[i];
           if (!en.alive) {
@@ -814,14 +1082,19 @@ export default function JulesCraftThree() {
             const bounce = Math.abs(Math.sin(nowSec * bounceSpeed + phase)) * bounceAmp;
             en.y = groundY + cellSize + bounce; // center of cube + bounce
           }
-          // hit flash tint
+          // hit flash tint (only write color when changed)
           if (en.hitTint > 0) {
             en.hitTint -= dt;
-            const c = new THREE.Color(1, Math.max(0, 1 - 4 * en.hitTint), Math.max(0, 1 - 4 * en.hitTint));
-            zMesh.setColorAt(i, c);
+            tmpColor.setRGB(1, Math.max(0, 1 - 4 * en.hitTint), Math.max(0, 1 - 4 * en.hitTint));
+            zMesh.setColorAt(i, tmpColor);
             zMesh.instanceColor.needsUpdate = true;
-          } else {
-            zMesh.setColorAt(i, new THREE.Color(0xffffff));
+            en._tinted = true;
+          } else if (en._tinted) {
+            // reset to white only once after tint fades
+            tmpColor.set(0xffffff);
+            zMesh.setColorAt(i, tmpColor);
+            zMesh.instanceColor.needsUpdate = true;
+            en._tinted = false;
           }
 
           // attack
@@ -830,6 +1103,10 @@ export default function JulesCraftThree() {
               lastHitRef.current = now;
               healthRef.current = Math.max(0, healthRef.current - 1);
               setHealth(healthRef.current);
+              // quick red flash on hit
+              try { if (hitFlashTimeoutRef.current) clearTimeout(hitFlashTimeoutRef.current); } catch (e) {}
+              setHitFlash(true);
+              hitFlashTimeoutRef.current = setTimeout(() => setHitFlash(false), 150);
               if (healthRef.current <= 0) {
                 gameOverRef.current = true;
                 setGameOver(true);
@@ -837,11 +1114,121 @@ export default function JulesCraftThree() {
               }
             }
           }
+        }
+        // Second pass: resolve collisions against player (push slimes out)
+        for (let i = 0; i < enemies.length; i++) {
+          const en = enemies[i];
+          if (!en.alive) continue;
+          const dxp = en.x - playerPos.x;
+          const dzp = en.z - playerPos.z;
+          const d = Math.hypot(dxp, dzp);
+          const minD = playerRadius + enemyRadius;
+          if (d > 0 && d < minD) {
+            const overlap = minD - d;
+            en.x += (dxp / d) * overlap;
+            en.z += (dzp / d) * overlap;
+          }
+        }
+        // Third pass: resolve slime–tree collisions (XZ circle vs trunk AABB)
+        for (let i = 0; i < enemies.length; i++) {
+          const en = enemies[i];
+          if (!en.alive) continue;
+          const ecix = cellIndex(en.x);
+          const eciz = cellIndex(en.z);
+          for (let oz = -1; oz <= 1; oz++) {
+            for (let ox = -1; ox <= 1; ox++) {
+              const ix = ecix + ox;
+              const iz = eciz + oz;
+              if (!trunkCellSet.has(trunkKeyStr(ix, iz))) continue;
+              const centerX = -half + ix * cellSize + cellSize * 0.5;
+              const centerZ = -half + iz * cellSize + cellSize * 0.5;
+              const halfBox = cellSize * 0.5;
+              const dx = en.x - centerX;
+              const dz = en.z - centerZ;
+              const clampedX = Math.max(-halfBox, Math.min(halfBox, dx));
+              const clampedZ = Math.max(-halfBox, Math.min(halfBox, dz));
+              const nearestX = centerX + clampedX;
+              const nearestZ = centerZ + clampedZ;
+              const ddx = en.x - nearestX;
+              const ddz = en.z - nearestZ;
+              const distSq = ddx * ddx + ddz * ddz;
+              const r = enemyRadius;
+              if (distSq < r * r - 1e-6) {
+                const dist = Math.max(1e-6, Math.sqrt(distSq));
+                const nx = ddx / dist;
+                const nz = ddz / dist;
+                const push = r - dist;
+                en.x += nx * push;
+                en.z += nz * push;
+              }
+            }
+          }
+        }
+
+        // Fourth pass: resolve slime–slime collisions using a spatial grid
+        const cell = enemyRadius * 2 + 0.25;
+        const grid = new Map();
+        function gridKey(ix, iz) { return (ix << 16) ^ iz; }
+        for (let i = 0; i < enemies.length; i++) {
+          const e = enemies[i];
+          if (!e.alive) continue;
+          const ix = Math.floor(e.x / cell);
+          const iz = Math.floor(e.z / cell);
+          const k = gridKey(ix, iz);
+          if (!grid.has(k)) grid.set(k, []);
+          grid.get(k).push(i);
+        }
+        const offsets = [
+          [-1,-1], [0,-1], [1,-1],
+          [-1, 0], [0, 0], [1, 0],
+          [-1, 1], [0, 1], [1, 1],
+        ];
+        const minD = enemyRadius * 2;
+        for (const [k, idxs] of grid) {
+          const ix0 = k >> 16; const iz0 = k & 0xffff;
+          for (let oi = 0; oi < offsets.length; oi++) {
+            const nx = ix0 + offsets[oi][0];
+            const nz = iz0 + offsets[oi][1];
+            const nk = gridKey(nx, nz);
+            const other = grid.get(nk);
+            if (!other) continue;
+            for (let aIdx = 0; aIdx < idxs.length; aIdx++) {
+              const i = idxs[aIdx];
+              const a = enemies[i]; if (!a.alive) continue;
+              const start = (nk === k) ? aIdx + 1 : 0;
+              for (let bIdx = start; bIdx < other.length; bIdx++) {
+                const j = other[bIdx]; if (j === i) continue;
+                const b = enemies[j]; if (!b.alive) continue;
+                const dx = b.x - a.x; const dz = b.z - a.z;
+                const d = Math.hypot(dx, dz);
+                if (d > 0 && d < minD) {
+                  const overlap = (minD - d) * 0.5;
+                  const nxv = dx / d; const nzv = dz / d;
+                  a.x -= nxv * overlap; a.z -= nzv * overlap;
+                  b.x += nxv * overlap; b.z += nzv * overlap;
+                }
+              }
+            }
+          }
+        }
+        // After separation, update y and instance matrices
+        for (let i = 0; i < enemies.length; i++) {
+          const en = enemies[i];
+          if (!en.alive) continue;
+          const groundY = surfaceYAt(en.x, en.z);
+          const bounceAmp = 0.35 * cellSize;
+          const bounceSpeed = 6.0;
+          const phase = en.bouncePhase || 0;
+          const bounce = Math.abs(Math.sin(nowSec * bounceSpeed + phase)) * bounceAmp;
+          en.y = groundY + cellSize + bounce;
           zMat.makeTranslation(en.x, en.y, en.z);
           zMesh.setMatrixAt(i, zMat);
         }
         zMesh.instanceMatrix.needsUpdate = true;
       }
+
+      // Update particles
+      particlesSys.update(dt);
 
       try { composer.render(); } catch (e) { renderer.render(scene, camera); }
       animId = requestAnimationFrame(tick);
@@ -853,11 +1240,20 @@ export default function JulesCraftThree() {
       window.removeEventListener('resize', onResize);
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
-      renderer.domElement.removeEventListener('click', requestPointerLock);
+      if (canPointerLock) renderer.domElement.removeEventListener('click', requestPointerLock);
       try { renderer.domElement.removeEventListener('mousedown', onMouseDown); } catch (e) {}
+      try {
+        el.removeEventListener('touchstart', onTouchStart);
+        el.removeEventListener('touchmove', onTouchMove);
+        el.removeEventListener('touchend', onTouchEnd);
+        el.removeEventListener('touchcancel', onTouchEnd);
+      } catch (e) {}
       mountEl.removeChild(renderer.domElement);
       renderer.dispose();
       try { composer.dispose?.(); } catch (e) {}
+      try { swingSfx?.stop(); } catch (e) {}
+      try { popVoices?.forEach(v => { try { v.stop(); } catch (e) {} }); } catch (e) {}
+      try { particlesSys.dispose(); } catch (e) {}
       cubeGeo.dispose();
       grassMatTop.dispose();
       grassMatSide.dispose();
@@ -872,8 +1268,8 @@ export default function JulesCraftThree() {
       trunkMatTop.dispose();
       // trunkMatBottom is same as top
       leavesMat.dispose();
-      zombieMat.dispose();
-      zombieTex.dispose();
+      slimeMat.dispose();
+      slimeTex.dispose();
       trunkSideTex.dispose();
       trunkTopTex.dispose();
       leavesTex.dispose();
@@ -883,7 +1279,7 @@ export default function JulesCraftThree() {
         bladeMat.dispose(); hiltMat.dispose(); guardMat.dispose();
       } catch (e) {}
     };
-  }, []);
+  }, [resetKey]);
 
   return (
     <div
@@ -900,6 +1296,9 @@ export default function JulesCraftThree() {
       <div style={{ position: 'absolute', top: 8, right: 12, color: '#fff', fontWeight: 600, zIndex: 2 }}>
         Score: {score}
       </div>
+      <div style={{ position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontWeight: 600, zIndex: 2 }}>
+        Time: {formatTime(timeSurvived)}
+      </div>
       {hitFlash && (
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,0,0,0.22)', zIndex: 2, pointerEvents: 'none' }} />
       )}
@@ -907,40 +1306,33 @@ export default function JulesCraftThree() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 3 }}>
           <h2 style={{ marginBottom: 12 }}>Game Over</h2>
           <div style={{ marginBottom: 12 }}>Final Score: {score}</div>
+          <div style={{ marginBottom: 16 }}>Time Survived: {formatTime(timeSurvived)}</div>
           <button
             onClick={() => {
-              healthRef.current = 5; setHealth(5);
-              gameOverRef.current = false; setGameOver(false);
+              // Reset React UI state
+              setHealth(5); healthRef.current = 5;
+              setScore(0); scoreRef.current = 0;
+              setTimeSurvived(0); timeSecRef.current = 0; elapsedRef.current = 0;
+              setGameOver(false); gameOverRef.current = false;
               lastHitRef.current = 0;
-              scoreRef.current = 0; setScore(0);
-              // reset enemies
-              const { list, mesh } = enemiesRef.current;
-              const m = new THREE.Matrix4();
-              for (let i = 0; i < list.length; i++) {
-                const en = list[i];
-                en.alive = false; en.hp = 0; en.x = 0; en.y = -9999; en.z = 0; en.hitTint = 0;
-                m.makeTranslation(en.x, en.y, en.z);
-                mesh.setMatrixAt(i, m);
-                mesh.setColorAt(i, new THREE.Color(0xffffff));
-              }
-              mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
-              // reset spawn pacing
-              spawnTimerRef.current = 0; elapsedRef.current = 0; spawnBatchRef.current = 1; spawnIntervalRef.current = 3.0;
-              // spawn initial
-              if (spawnEnemyRef.current) {
-                for (let i = 0; i < 10; i++) spawnEnemyRef.current();
-              }
+              // Trigger full teardown + re-init of three.js scene
+              setResetKey((k) => k + 1);
             }}
             style={{ padding: '8px 14px', borderRadius: 6, background: '#39d353', color: '#000', border: 'none', cursor: 'pointer' }}
           >Restart</button>
         </div>
       )}
-      <MobileControls moveRef={moveRef} jumpRef={jumpRef} sprintRef={sprintRef} />
+      <MobileControls
+        moveRef={moveRef}
+        jumpRef={jumpRef}
+        sprintRef={sprintRef}
+        onAttack={() => performAttackRef.current?.(true)}
+      />
     </div>
   );
 }
 
-function MobileControls({ moveRef, jumpRef, sprintRef }) {
+function MobileControls({ moveRef, jumpRef, sprintRef, onAttack }) {
   const press = (dir, e) => {
     if (e && e.preventDefault) e.preventDefault();
     const m = moveRef.current;
@@ -1017,7 +1409,7 @@ function MobileControls({ moveRef, jumpRef, sprintRef }) {
           <button aria-label="Down" style={btnStyle} {...commonHandlers('down')}>↓</button>
         </div>
       </div>
-      {/* Jump and Sprint */}
+      {/* Jump, Sprint, Attack */}
       <div style={{ position: 'absolute', right: 16, bottom: 24, display: 'flex', gap: 12 }}>
         <button aria-label="Jump" style={{ ...btnStyle, width: 70, height: 70, fontSize: 16 }}
           onTouchStart={(e) => press('jump', e)}
@@ -1029,10 +1421,17 @@ function MobileControls({ moveRef, jumpRef, sprintRef }) {
           onMouseDown={(e) => press('sprint', e)}
           onMouseUp={(e) => release('sprint', e)}
         >Sprint</button>
+        {/* Attack button above Sprint */
+        }
+        <button aria-label="Attack"
+          style={{ ...btnStyle, position: 'absolute', right: 0, bottom: 70 + 12, width: 70, height: 70, fontSize: 16 }}
+          onTouchStart={(e) => { e.preventDefault(); onAttack?.(); }}
+          onMouseDown={(e) => { e.preventDefault(); onAttack?.(); }}
+        >Attack</button>
+        {/* Look buttons removed; touch-drag handles yaw/pitch */}
       </div>
     </>
   );
 }
-
 
 
