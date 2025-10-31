@@ -24,7 +24,8 @@ INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
 # Game name mapping
 GAME_NAMES = {
     "militsa": "Don't Drop Militsa",
-    "pritham": "Stop Pritham"
+    "pritham": "Stop Pritham",
+    "jules": "JulesCraft"
 }
 
 # Powertools logger

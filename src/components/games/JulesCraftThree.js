@@ -92,7 +92,7 @@ function createPerlin2D(seed = 12345) {
   return { noise, fbm };
 }
 
-export default function JulesCraftThree() {
+export default function JulesCraftThree({ onGameOver, firstName, lastName }) {
   const mountRef = useRef(null);
   const rendererRef = useRef(null);
   const moveRef = useRef({ forward: false, backward: false, left: false, right: false });
@@ -150,19 +150,38 @@ export default function JulesCraftThree() {
     camera.add(listener);
     const audioLoader = new THREE.AudioLoader();
     const swingSfx = new THREE.Audio(listener);
-    audioLoader.load('/audio/jules/sword-swoosh.wav', (buffer) => {
+    audioLoader.load('https://cdn.mitzimatthew.love/game/jules-sword-swoosh.mp3', (buffer) => {
       swingSfx.setBuffer(buffer);
       swingSfx.setVolume(0.65);
     });
     // Audio: slime pop (voice pool for overlap)
     const popVoices = [];
-    audioLoader.load('/audio/jules/pop.wav', (buffer) => {
+    audioLoader.load('https://cdn.mitzimatthew.love/game/jules-pop.mp3', (buffer) => {
       for (let i = 0; i < 4; i++) {
         const v = new THREE.Audio(listener);
         v.setBuffer(buffer);
         v.setVolume(0.6);
         popVoices.push(v);
       }
+    });
+    // Audio: player hurt
+    const hurtSfx = new THREE.Audio(listener);
+    audioLoader.load('https://cdn.mitzimatthew.love/game/jules-hurt.mp3', (buffer) => {
+      hurtSfx.setBuffer(buffer);
+      hurtSfx.setVolume(0.7);
+    });
+    // Audio: player death
+    const deathSfx = new THREE.Audio(listener);
+    audioLoader.load('https://cdn.mitzimatthew.love/game/jules-death.mp3', (buffer) => {
+      deathSfx.setBuffer(buffer);
+      deathSfx.setVolume(0.8);
+    });
+    // Audio: background music
+    const bgMusic = new THREE.Audio(listener);
+    audioLoader.load('https://cdn.mitzimatthew.love/game/jules-theme.mp3', (buffer) => {
+      bgMusic.setBuffer(buffer);
+      bgMusic.setVolume(0.35);
+      bgMusic.setLoop(true);
     });
     // Postprocessing composer with OutlinePass (keeps colors, adds edges)
     const composer = new EffectComposer(renderer);
@@ -359,25 +378,11 @@ export default function JulesCraftThree() {
       }
       ctx.globalAlpha = 1;
     });
-    const slimeTex = makeCanvasTexture((ctx, s) => {
-      // green skin base
-      ctx.fillStyle = '#8dcf5f';
-      ctx.fillRect(0, 0, s, s);
-      // noise
-      ctx.fillStyle = '#79b84f';
-      for (let i = 0; i < 140; i++) {
-        const x = Math.random() * s, y = Math.random() * s;
-        ctx.fillRect(x, y, 1, 1);
-      }
-      // simple face on top half
-      ctx.fillStyle = '#2b2b2b';
-      const eyeY = Math.floor(s * 0.3);
-      const eyeX1 = Math.floor(s * 0.3);
-      const eyeX2 = Math.floor(s * 0.7);
-      ctx.fillRect(eyeX1, eyeY, 4, 4);
-      ctx.fillRect(eyeX2 - 4, eyeY, 4, 4);
-      ctx.fillRect(Math.floor(s * 0.5) - 3, Math.floor(s * 0.5), 6, 2);
-    });
+    // Load slime texture from CDN
+    const slimeTex = new THREE.TextureLoader().load('https://cdn.mitzimatthew.love/game/jules-face.png');
+    slimeTex.magFilter = THREE.NearestFilter;
+    slimeTex.minFilter = THREE.NearestFilter;
+    slimeTex.anisotropy = 1;
 
     // Materials from textures
     const grassMatTop = new THREE.MeshStandardMaterial({ map: grassTopTex });
@@ -933,6 +938,10 @@ export default function JulesCraftThree() {
 
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
+
+    // Track if music has started
+    let musicStarted = false;
+
     const tick = () => {
       const now = performance.now();
       const dt = Math.min(0.05, (now - prevT) / 1000); // clamp to avoid jumps
@@ -940,6 +949,11 @@ export default function JulesCraftThree() {
 
       // On mobile where pointer lock is unavailable, always run gameplay updates
       if (controls.isLocked || !canPointerLock) {
+        // Start background music when gameplay begins
+        if (!musicStarted && bgMusic && bgMusic.buffer && !gameOverRef.current) {
+          try { bgMusic.play(); } catch (e) {}
+          musicStarted = true;
+        }
         // Camera basis vectors
         camera.getWorldDirection(tmpDir);
         tmpDir.y = 0;
@@ -1107,10 +1121,32 @@ export default function JulesCraftThree() {
               try { if (hitFlashTimeoutRef.current) clearTimeout(hitFlashTimeoutRef.current); } catch (e) {}
               setHitFlash(true);
               hitFlashTimeoutRef.current = setTimeout(() => setHitFlash(false), 150);
+
               if (healthRef.current <= 0) {
+                // Stop background music
+                if (bgMusic && bgMusic.isPlaying) {
+                  try { bgMusic.stop(); } catch (e) {}
+                }
+                // Play death sound
+                if (deathSfx && deathSfx.buffer) {
+                  try { if (deathSfx.isPlaying) deathSfx.stop(); } catch (e) {}
+                  try { deathSfx.play(); } catch (e) {}
+                }
                 gameOverRef.current = true;
                 setGameOver(true);
                 try { controls.unlock(); } catch (e) {}
+                // Submit score to API
+                if (onGameOver && firstName && lastName) {
+                  onGameOver(scoreRef.current, firstName, lastName);
+                }
+              } else {
+                // Play hurt sound with random pitch
+                if (hurtSfx && hurtSfx.buffer) {
+                  try { if (hurtSfx.isPlaying) hurtSfx.stop(); } catch (e) {}
+                  const rate = 0.9 + Math.random() * 0.2; // 0.9-1.1
+                  hurtSfx.setPlaybackRate(rate);
+                  try { hurtSfx.play(); } catch (e) {}
+                }
               }
             }
           }
@@ -1253,6 +1289,9 @@ export default function JulesCraftThree() {
       try { composer.dispose?.(); } catch (e) {}
       try { swingSfx?.stop(); } catch (e) {}
       try { popVoices?.forEach(v => { try { v.stop(); } catch (e) {} }); } catch (e) {}
+      try { hurtSfx?.stop(); } catch (e) {}
+      try { deathSfx?.stop(); } catch (e) {}
+      try { bgMusic?.stop(); } catch (e) {}
       try { particlesSys.dispose(); } catch (e) {}
       cubeGeo.dispose();
       grassMatTop.dispose();
@@ -1296,7 +1335,7 @@ export default function JulesCraftThree() {
       <div style={{ position: 'absolute', top: 8, right: 12, color: '#fff', fontWeight: 600, zIndex: 2 }}>
         Score: {score}
       </div>
-      <div style={{ position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontWeight: 600, zIndex: 2 }}>
+      <div style={{ position: 'absolute', top: 32, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontWeight: 600, zIndex: 2 }}>
         Time: {formatTime(timeSurvived)}
       </div>
       {hitFlash && (
@@ -1381,13 +1420,13 @@ function MobileControls({ moveRef, jumpRef, sprintRef, onAttack }) {
   });
 
   const btnStyle = {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 10,
     background: 'rgba(255,255,255,0.2)',
     border: '1px solid rgba(255,255,255,0.35)',
     color: '#fff',
-    fontSize: 18,
+    fontSize: 14,
     backdropFilter: 'blur(6px)',
     touchAction: 'none',
   };
@@ -1395,40 +1434,37 @@ function MobileControls({ moveRef, jumpRef, sprintRef, onAttack }) {
   return (
     <>
       {/* D-pad */}
-      <div style={{ position: 'absolute', left: 12, bottom: 12, width: 180, height: 180 }}>
-        <div style={{ position: 'absolute', left: 62, top: 0 }}>
+      <div style={{ position: 'absolute', left: 12, bottom: 12, width: 156, height: 156 }}>
+        <div style={{ position: 'absolute', left: 54, top: 0 }}>
           <button aria-label="Up" style={btnStyle} {...commonHandlers('up')}>↑</button>
         </div>
-        <div style={{ position: 'absolute', left: 0, top: 62 }}>
+        <div style={{ position: 'absolute', left: 0, top: 54 }}>
           <button aria-label="Left" style={btnStyle} {...commonHandlers('left')}>←</button>
         </div>
-        <div style={{ position: 'absolute', right: 0, top: 62 }}>
+        <div style={{ position: 'absolute', right: 0, top: 54 }}>
           <button aria-label="Right" style={btnStyle} {...commonHandlers('right')}>→</button>
         </div>
-        <div style={{ position: 'absolute', left: 62, bottom: 0 }}>
+        <div style={{ position: 'absolute', left: 54, bottom: 0 }}>
           <button aria-label="Down" style={btnStyle} {...commonHandlers('down')}>↓</button>
         </div>
       </div>
-      {/* Jump, Sprint, Attack */}
-      <div style={{ position: 'absolute', right: 16, bottom: 24, display: 'flex', gap: 12 }}>
-        <button aria-label="Jump" style={{ ...btnStyle, width: 70, height: 70, fontSize: 16 }}
-          onTouchStart={(e) => press('jump', e)}
-          onMouseDown={(e) => press('jump', e)}
-        >Jump</button>
-        <button aria-label="Sprint" style={{ ...btnStyle, width: 70, height: 70, fontSize: 16 }}
+      {/* Attack, Sprint, Jump - vertical column */}
+      <div style={{ position: 'absolute', right: 16, bottom: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <button aria-label="Attack"
+          style={{ ...btnStyle, width: 60, height: 60, fontSize: 14 }}
+          onTouchStart={(e) => { e.preventDefault(); onAttack?.(); }}
+          onMouseDown={(e) => { e.preventDefault(); onAttack?.(); }}
+        >Attack</button>
+        <button aria-label="Sprint" style={{ ...btnStyle, width: 60, height: 60, fontSize: 14 }}
           onTouchStart={(e) => press('sprint', e)}
           onTouchEnd={(e) => release('sprint', e)}
           onMouseDown={(e) => press('sprint', e)}
           onMouseUp={(e) => release('sprint', e)}
         >Sprint</button>
-        {/* Attack button above Sprint */
-        }
-        <button aria-label="Attack"
-          style={{ ...btnStyle, position: 'absolute', right: 0, bottom: 70 + 12, width: 70, height: 70, fontSize: 16 }}
-          onTouchStart={(e) => { e.preventDefault(); onAttack?.(); }}
-          onMouseDown={(e) => { e.preventDefault(); onAttack?.(); }}
-        >Attack</button>
-        {/* Look buttons removed; touch-drag handles yaw/pitch */}
+        <button aria-label="Jump" style={{ ...btnStyle, width: 60, height: 60, fontSize: 14 }}
+          onTouchStart={(e) => press('jump', e)}
+          onMouseDown={(e) => press('jump', e)}
+        >Jump</button>
       </div>
     </>
   );
