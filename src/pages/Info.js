@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { CardStackPage } from '../components/CardStackPage.js';
 import { CardStackFooter } from '../components/CardStackFooter.js';
@@ -10,13 +11,12 @@ import '../App.css';
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
+    const rehearsalDinnerInvited = useSelector((state) => state.user.rehearsalDinnerInvited)
 
-    const pageMainColor = "babyblue" 
-    const pageSecondaryColor = "lilac" 
-    const pageTertiaryColor = "amber" 
+    const pageMainColor = "babyblue"
+    const pageSecondaryColor = "lilac"
+    const pageTertiaryColor = "amber"
     const pageSection = "info"
-
-    const rehearsal = {}
 
     const deity = {
         name: 'Diety Events',
@@ -53,7 +53,7 @@ export function Info() {
                         <h4>Schedule</h4>
                         <ul>
                             <li class="text-sm text-left pl-5"><em><strong>Thursday, November 6th</strong></em></li>
-                            {rehearsal ? <li class="text-sm text-left pl-1"> 6.30pm - Rehearsal Dinner at Juliette</li> : <></>}
+                            {rehearsalDinnerInvited && <li class="text-sm text-left pl-1"> 6.30pm - Rehearsal Dinner at Juliette</li>}
                             <li class="text-sm text-left pl-1"> 10.00pm - Welcome Drink Night at 33 Spritzenhaus</li>
                             <li class="text-sm text-left pl-5"><em><strong>Friday, November 7th</strong></em></li>
                             <li class="text-sm text-left pl-1"> 6.30pm - Champaign Flutes at Deity</li>

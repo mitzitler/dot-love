@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GenericHeader } from '../components/GenericHeader';
 import { useGetUserQuery } from '../services/gizmo.js';
 import { setloginHeaderState } from '../features/guest/extrasSlice.js';
+import { rehearsalDinnerInvitedInput, guestTypeInput } from '../features/guest/userSlice.js';
 import { toast } from 'react-toastify'; // Toast (yum!)
 import { useLocation } from 'react-router-dom';
 import '../App.css';
@@ -48,6 +49,8 @@ export function HeaderHome({loginSuccess, setLoginSuccess, loginHeader, setLogin
             setLoginSuccess(true);
             // dispatch(setLoginSuccessState())
             dispatch(setloginHeaderState(loginHeader))
+            dispatch(rehearsalDinnerInvitedInput(data.user.rehearsal_dinner_invited))
+            dispatch(guestTypeInput(data.user.guest_type))
             console.log("Gizmo login success, result:", data);
             notify(`Welcome, ${data.user.first}! Please scroll down`)
         }

@@ -4,7 +4,9 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     fullNameCode: '',
-    loginSuccess: false
+    loginSuccess: false,
+    rehearsalDinnerInvited: false,
+    guestType: null
   },
   reducers: {
     fullNameCodeInput(state, action) {
@@ -12,10 +14,16 @@ const userSlice = createSlice({
     },
     loginSuccessInput(state, action) {
       state.loginSuccess = action.payload
+    },
+    rehearsalDinnerInvitedInput(state, action) {
+      state.rehearsalDinnerInvited = action.payload
+    },
+    guestTypeInput(state, action) {
+      state.guestType = action.payload
     }
   }
 })
 
-export const { fullNameCodeInput, loginSuccessInput } = userSlice.actions
+export const { fullNameCodeInput, loginSuccessInput, rehearsalDinnerInvitedInput, guestTypeInput } = userSlice.actions
   
 export default userSlice.reducer
