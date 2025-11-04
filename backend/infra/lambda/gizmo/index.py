@@ -1435,12 +1435,13 @@ def login():
             content_type="application/json",
             body={"message": err_msg},
         )
+    user_data = user.as_map()
     return Response(
         status_code=200,
         content_type="application/json",
         body={
             "message": "login success",
-            "user": user.as_map(),
+            "user": user_data,
         },
     )
 
