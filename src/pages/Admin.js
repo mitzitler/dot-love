@@ -174,7 +174,7 @@ export function Admin({ registryItems }) {
                 pageTertiaryColor={pageTertiaryColor} >
                     <form onSubmit={handlePassword}>
                         <label htmlFor="password">password</label>
-                        <input type="text" id="password" name="password" />
+                        <input type="password" id="password" name="password" />
                         <button type="submit">Submit</button>
                     </form>
                 <NavLink className='bg-warmGray-100 border-red-300 w-24 mx-6' to='/info' end>INFO</NavLink>

@@ -11,7 +11,7 @@ import '../App.css';
 export function Info() {
 
     const [expandedBox, setExpandedBox] = useState("")
-    const rehearsalDinnerInvited = useSelector((state) => state.user.rehearsalDinnerInvited)
+    const rehearsalDinnerInvited = false
 
     const pageMainColor = "babyblue"
     const pageSecondaryColor = "lilac"
