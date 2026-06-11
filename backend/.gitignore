@@ -10,6 +10,7 @@ infra/lambda/spectaculo/layer
 infra/lambda/nice_guy/layer
 infra/lambda/gizmo/layer
 infra/lambda/ses/layer
+infra/lambda/miatun/layer
 
 # CDK asset staging directory
 .cdk.staging

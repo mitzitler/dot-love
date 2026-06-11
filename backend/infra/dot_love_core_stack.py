@@ -177,6 +177,26 @@ class DotLoveCoreStack(Stack):
             daphne_lambda=self.dot_love_daphne_lambda["function"],
         )
 
+        ###################################################
+        # MIATUN THANK YOU CARD SERVICE 💌
+        ###################################################
+        # Create dependency layer (openpyxl is too heavy for the global layer)
+        self.create_miatun_dependency_layer()
+        # Create s3 bucket to hold generated thank-you-card exports
+        self.dot_love_thank_you_export_s3 = self.create_dot_love_thank_you_export_s3()
+        # Create Miatun Service Lambda and associate w/ API Gateway
+        self.dot_love_miatun_lambda = self.create_dot_love_miatun_lambda(
+            user_table=self.dot_love_user_table,
+            registry_item_table=self.dot_love_registry_item_table,
+            registry_claim_table=self.dot_love_registry_claim_table,
+            export_bucket=self.dot_love_thank_you_export_s3,
+        )
+        # Tie Miatun Lambda to API Gateway
+        self.add_miatun_routes_to_api_gw(
+            dot_love_api_gw=self.dot_love_api_gw,
+            miatun_lambda=self.dot_love_miatun_lambda["function"],
+        )
+
         # Set Stripe environment variables for the Spectaculo Lambda
         # TODO: Replace empty strings with actual values:
         # 1. Create Stripe account and get API key
@@ -515,6 +535,66 @@ class DotLoveCoreStack(Stack):
 
         return {"function": daphne_lambda, "role": daphne_lambda_role}
 
+    def create_dot_love_miatun_lambda(
+        self,
+        user_table,
+        registry_item_table,
+        registry_claim_table,
+        export_bucket,
+    ):
+        miatun_lambda_role = iam.Role(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-miatun-service-role",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
+            description="Lambda Role with read access to user/registry tables and the thank-you export bucket",
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AWSLambdaBasicExecutionRole"
+                )
+            ],
+        )
+
+        # Grant db access (read-only: miatun only exports)
+        user_table.grant_read_data(miatun_lambda_role)
+        registry_item_table.grant_read_data(miatun_lambda_role)
+        registry_claim_table.grant_read_data(miatun_lambda_role)
+        # Put for uploads, Get so the role-signed presigned URLs work
+        export_bucket["bucket"].grant_read_write(miatun_lambda_role)
+
+        miatun_lambda = lambdaFx.Function(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-miatun-service",
+            runtime=lambdaFx.Runtime.PYTHON_3_11,
+            handler="index.handler",
+            role=miatun_lambda_role,
+            # NOTE: exclude keeps the layer dir + tests out of the function zip
+            # (the layer is attached separately below)
+            code=lambdaFx.Code.from_asset(
+                "infra/lambda/miatun/",
+                exclude=["layer", "tests", "__pycache__"],
+            ),
+            description="DotLove Miatun Service, to generate thank-you-card spreadsheets",
+            environment={
+                # For joining gifts to guests
+                "user_table_name": user_table.table_name,
+                "registry_item_table_name": registry_item_table.table_name,
+                "registry_claim_table_name": registry_claim_table.table_name,
+                # Where generated xlsx exports land
+                "export_bucket_name": export_bucket["bucket"].bucket_name,
+                # Lambda Powertools
+                "POWERTOOLS_SERVICE_NAME": "miatun",
+                "POWERTOOLS_LOG_LEVEL": "INFO",
+                "TZ": "US/Eastern",
+                # Admin route auth
+                "internal_api_key": self.internal_api_key,
+            },
+            layers=[self.miatun_lambda_layer],
+            memory_size=512,
+            timeout=Duration.seconds(15),
+        )
+
+        return {"function": miatun_lambda, "role": miatun_lambda_role}
+
     def create_dot_love_ses_lambda(self, dot_love_ses_s3, ses_sns_arn):
         # Create lambda Role
         ses_lambda_role = iam.Role(
@@ -820,6 +900,33 @@ class DotLoveCoreStack(Stack):
 
         return
 
+    def add_miatun_routes_to_api_gw(self, dot_love_api_gw, miatun_lambda):
+        # Create DotLove Miatun Service lambda association
+        miatun_service_integration = HttpLambdaIntegration(
+            f"{self.stack_env}-dot-love-miatun-service", miatun_lambda
+        )
+
+        # Create Miatun API routes
+        #
+        # GET /ping
+        # Healthcheck
+        dot_love_api_gw.add_routes(
+            path="/miatun/ping",
+            methods=[apigw.HttpMethod.GET],
+            integration=miatun_service_integration,
+        )
+        #
+        # POST /export
+        # Generate the thank-you-card xlsx and return a presigned download URL
+        # (admin only, gated by Internal-Api-Key)
+        dot_love_api_gw.add_routes(
+            path="/miatun/export",
+            methods=[apigw.HttpMethod.POST],
+            integration=miatun_service_integration,
+        )
+
+        return
+
     ###################################################
     # SES Config
     ###################################################
@@ -874,6 +981,25 @@ class DotLoveCoreStack(Stack):
         )
 
         return {"bucket": ses_s3_bucket}
+
+    def create_dot_love_thank_you_export_s3(self):
+        # Exports are point-in-time snapshots; expire them after 30 days
+        lifecycle_rule = s3.LifecycleRule(
+            id=f"{self.stack_env}-thank-you-export-rule",
+            expiration=Duration.days(30),
+        )
+        thank_you_export_bucket = s3.Bucket(
+            scope=self,
+            id=f"{self.stack_env}-dot-love-thank-you-export-s3",
+            auto_delete_objects=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            enforce_ssl=True,
+            lifecycle_rules=[lifecycle_rule],
+        )
+
+        return {"bucket": thank_you_export_bucket}
 
     def create_dot_love_registry_item_img_s3(self):
         registry_item_img_bucket = s3.Bucket(
@@ -1063,5 +1189,16 @@ class DotLoveCoreStack(Stack):
             self,
             f"{self.stack_env}-global-layer",
             code=lambdaFx.AssetCode("infra/lambda/gizmo/layer/"),
+            compatible_runtimes=[lambdaFx.Runtime.PYTHON_3_11],
+        )
+
+    def create_miatun_dependency_layer(self):
+        # External Package(s) (AWS Powertools, openpyxl)
+        # NOTE: Built the same way as the global layer:
+        #   pip3 install -r ~/code/dot-love/backend/infra/lambda/miatun/requirements.txt --target ~/code/dot-love/backend/infra/lambda/miatun/layer/python/lib/python3.11/site-packages
+        self.miatun_lambda_layer = lambdaFx.LayerVersion(
+            self,
+            f"{self.stack_env}-miatun-layer",
+            code=lambdaFx.AssetCode("infra/lambda/miatun/layer/"),
             compatible_runtimes=[lambdaFx.Runtime.PYTHON_3_11],
         )
