@@ -1,3 +1,4 @@
+import hmac
 import json
 import os
 import random
@@ -164,7 +165,7 @@ def text_admins(message):
 def text_registration_success(user, inviter):
     if user.rsvp_status is RsvpStatus.NOTATTENDING:
         TWILIO_CLIENT.messages.create(
-            body=plus_one_text_body.strip(),
+            body=RSVP_NO_TEXT.strip(),
             from_=TWILIO_SENDER_NUMBER,
             to=user.address.phone,
         )
@@ -205,7 +206,7 @@ def text_registration_success(user, inviter):
             inviter_first=inviter.first, invitee_first=user.first
         )
         TWILIO_CLIENT.messages.create(
-            body=plus_one_text_body.strip(),
+            body=inviter_text_body.strip(),
             from_=TWILIO_SENDER_NUMBER,
             to=inviter.address.phone,
         )
@@ -306,10 +307,14 @@ class DotLoveMessageClient:
         """
         Retrieve the text template corresponding to the message type.
 
-        :param message_type: The type of message.
+        :param message_type: The type of message (DotLoveMessageType or its name as a string).
         :return: The text template as a string.
         """
-        message_type_enum = DotLoveMessageType[message_type]
+        message_type_enum = (
+            DotLoveMessageType[message_type]
+            if isinstance(message_type, str)
+            else message_type
+        )
         templates = {
             DotLoveMessageType.REGISTRATION_SUCCESS_TEXT: """
 🎉 RSVP Confirmed! 🎉
@@ -386,9 +391,15 @@ Mitzi & Matthew
         """
         Retrieve the email template corresponding to the message type.
 
-        :param message_type: The type of message.
+        :param message_type: The type of message (DotLoveMessageType or its name as a string).
         :return: The email template as a string.
         """
+        # Accept enum names from API payloads, like _get_text_template does
+        message_type_enum = (
+            DotLoveMessageType[message_type]
+            if isinstance(message_type, str)
+            else message_type
+        )
         templates = {
             DotLoveMessageType.REGISTRATION_SUCCESS_EMAIL_WITH_GUEST: {
                 "title": "The Wedding of Mitzi & Matthew: RSVP Confirmation",
@@ -472,7 +483,7 @@ Mitzi & Matthew
             """,
             },
         }
-        return templates[message_type]
+        return templates[message_type_enum]
 
     def text(self, message_type, template_input, recipient_phone):
         """
@@ -573,17 +584,6 @@ class UserAddress:
         self.country = country
         self.state_loc = state_loc
         self.phone = phone
-
-    def as_map(self):
-        return {
-            "street": self.street,
-            "second_line": self.second_line,
-            "city": self.city,
-            "zipcode": self.zipcode,
-            "country": self.country,
-            "state_loc": self.state_loc,
-            "phone": self.phone,
-        }
 
     def as_map(self):
         return {
@@ -814,7 +814,7 @@ class User:
                         formatted_key = k
                         if formatted_key == "pair_first_last":
                             formatted_key = "date"
-                        formatted_key.replace("_", " ").capitalize()
+                        formatted_key = formatted_key.replace("_", " ").capitalize()
 
                         # Format the line
                         formatted_line = f"{formatted_key}: {formatted_value}"
@@ -833,50 +833,62 @@ class User:
         return table_html
 
     @staticmethod
+    def _from_db_record(db_user):
+        """Build a User from a raw DynamoDB record, tolerating missing optional
+        fields instead of raising KeyError on incomplete records."""
+
+        def get_s(field, default=""):
+            return db_user.get(field, {}).get("S", default)
+
+        def get_bool(field, default=False):
+            return bool(db_user.get(field, {}).get("BOOL", default))
+
+        name_parts = get_s("first_last").split("_")
+        return User(
+            first=name_parts[0].lower(),
+            last=name_parts[1].lower() if len(name_parts) > 1 else "",
+            rsvp_code=get_s("rsvp_code"),
+            rsvp_status=RsvpStatus[get_s("rsvp_status", "UNDECIDED")],
+            pronouns=Pronouns[get_s("pronouns", "THEY_THEM")],
+            address=UserAddress(
+                street=get_s("street"),
+                second_line=get_s("second_line"),
+                city=get_s("city"),
+                zipcode=get_s("zipcode"),
+                country=get_s("country"),
+                state_loc=get_s("state_loc"),
+                phone=get_s("phone"),
+            ),
+            email=get_s("email"),
+            diet=UserDiet(
+                alcohol=get_bool("alcohol"),
+                meat=get_bool("meat"),
+                dairy=get_bool("dairy"),
+                fish=get_bool("fish"),
+                shellfish=get_bool("shellfish"),
+                eggs=get_bool("eggs"),
+                gluten=get_bool("gluten"),
+                peanuts=get_bool("peanuts"),
+                restrictions=get_s("restrictions"),
+            ),
+            guest_details=GuestDetails(
+                link=get_s("guest_link"),
+                pair_first_last=get_s("guest_pair_first_last"),
+                date_link_requested=get_bool("date_link_requested"),
+            ),
+            guest_type=db_user.get("guest_type", {}).get("S"),
+            rehearsal_dinner_invited=get_bool("rehearsal_dinner_invited"),
+            high_score=int(db_user.get("high_score", {}).get("N", 0)),
+        )
+
+    @staticmethod
     def from_first_last_db(first_last, dynamo_client):
         key_expression = {"first_last": {"S": first_last.lower()}}
         db_user = dynamo_client.get(USER_TABLE_NAME, key_expression)
         if not db_user:
             return None
 
-        return User(
-            first=first_last.split("_")[0].lower(),
-            last=first_last.split("_")[1].lower(),
-            rsvp_code=db_user["rsvp_code"]["S"],
-            rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
-            pronouns=Pronouns[db_user["pronouns"]["S"]],
-            address=UserAddress(
-                street=db_user["street"]["S"],
-                second_line=db_user["second_line"]["S"],
-                city=db_user["city"]["S"],
-                zipcode=db_user["zipcode"]["S"],
-                country=db_user["country"]["S"],
-                state_loc=db_user["state_loc"]["S"],
-                phone=db_user["phone"]["S"],
-            ),
-            email=db_user["email"]["S"],
-            diet=UserDiet(
-                alcohol=bool(db_user["alcohol"]["BOOL"]),
-                meat=bool(db_user["meat"]["BOOL"]),
-                dairy=bool(db_user["dairy"]["BOOL"]),
-                fish=bool(db_user["fish"]["BOOL"]),
-                shellfish=bool(db_user["shellfish"]["BOOL"]),
-                eggs=bool(db_user["eggs"]["BOOL"]),
-                gluten=bool(db_user["gluten"]["BOOL"]),
-                peanuts=bool(db_user["peanuts"]["BOOL"]),
-                restrictions=db_user["restrictions"]["S"],
-            ),
-            guest_details=GuestDetails(
-                link=db_user["guest_link"]["S"],
-                pair_first_last=db_user["guest_pair_first_last"]["S"],
-                date_link_requested=db_user["date_link_requested"]["BOOL"],
-            ),
-            guest_type=db_user.get("guest_type", {}).get("S"),
-            rehearsal_dinner_invited=bool(
-                db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
-            ),
-            high_score=int(db_user.get("high_score", {}).get("N", 0)),
-        )
+        return User._from_db_record(db_user)
 
     @staticmethod
     def list_db(dynamo_client):
@@ -886,45 +898,7 @@ class User:
 
         user_list = []
         for db_user in db_users:
-            user = User(
-                first=db_user["first_last"]["S"].split("_")[0].lower(),
-                last=db_user["first_last"]["S"].split("_")[1].lower(),
-                rsvp_code=db_user["rsvp_code"]["S"],
-                rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
-                pronouns=Pronouns[db_user["pronouns"]["S"]],
-                address=UserAddress(
-                    street=db_user["street"]["S"],
-                    second_line=db_user["second_line"]["S"],
-                    city=db_user["city"]["S"],
-                    zipcode=db_user["zipcode"]["S"],
-                    country=db_user["country"]["S"],
-                    state_loc=db_user["state_loc"]["S"],
-                    phone=db_user["phone"]["S"],
-                ),
-                email=db_user["email"]["S"],
-                diet=UserDiet(
-                    alcohol=bool(db_user["alcohol"]["BOOL"]),
-                    meat=bool(db_user["meat"]["BOOL"]),
-                    dairy=bool(db_user["dairy"]["BOOL"]),
-                    fish=bool(db_user["fish"]["BOOL"]),
-                    shellfish=bool(db_user["shellfish"]["BOOL"]),
-                    eggs=bool(db_user["eggs"]["BOOL"]),
-                    gluten=bool(db_user["gluten"]["BOOL"]),
-                    peanuts=bool(db_user["peanuts"]["BOOL"]),
-                    restrictions=db_user["restrictions"]["S"],
-                ),
-                guest_details=GuestDetails(
-                    link=db_user["guest_link"]["S"],
-                    pair_first_last=db_user["guest_pair_first_last"]["S"],
-                    date_link_requested=db_user["date_link_requested"]["BOOL"],
-                ),
-                guest_type=db_user.get("guest_type", {}).get("S"),
-                rehearsal_dinner_invited=bool(
-                    db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
-                ),
-                high_score=int(db_user.get("high_score", {}).get("N", 0)),
-            )
-            user_list.append(user)
+            user_list.append(User._from_db_record(db_user))
 
         return user_list
 
@@ -944,43 +918,7 @@ class User:
             return None
         db_user = db_user[0]
 
-        return User(
-            first=db_user["first_last"]["S"].split("_")[0],
-            last=db_user["first_last"]["S"].split("_")[1],
-            rsvp_code=db_user["rsvp_code"]["S"],
-            rsvp_status=RsvpStatus[db_user["rsvp_status"]["S"]],
-            pronouns=Pronouns[db_user["pronouns"]["S"]],
-            address=UserAddress(
-                street=db_user["street"]["S"],
-                second_line=db_user["second_line"]["S"],
-                city=db_user["city"]["S"],
-                zipcode=db_user["zipcode"]["S"],
-                country=db_user["country"]["S"],
-                state_loc=db_user["state_loc"]["S"],
-                phone=db_user["phone"]["S"],
-            ),
-            email=db_user["email"]["S"],
-            diet=UserDiet(
-                alcohol=bool(db_user["alcohol"]["BOOL"]),
-                meat=bool(db_user["meat"]["BOOL"]),
-                dairy=bool(db_user["dairy"]["BOOL"]),
-                fish=bool(db_user["fish"]["BOOL"]),
-                shellfish=bool(db_user["shellfish"]["BOOL"]),
-                eggs=bool(db_user["eggs"]["BOOL"]),
-                gluten=bool(db_user["gluten"]["BOOL"]),
-                peanuts=bool(db_user["peanuts"]["BOOL"]),
-                restrictions=db_user["restrictions"]["S"],
-            ),
-            guest_details=GuestDetails(
-                link=db_user["guest_link"]["S"],
-                pair_first_last=db_user["guest_pair_first_last"]["S"],
-                date_link_requested=db_user["date_link_requested"]["BOOL"],
-            ),
-            guest_type=db_user.get("guest_type", {}).get("S"),
-            rehearsal_dinner_invited=bool(
-                db_user.get("rehearsal_dinner_invited", {}).get("BOOL", False)
-            ),
-        )
+        return User._from_db_record(db_user)
 
     @staticmethod
     def extract_users_from_rsvps(rsvps):
@@ -1007,7 +945,7 @@ class User:
             .replace("+", "")
         )
         if not country_code.isdigit():
-            logger.info("how, literally how")
+            log.info("how, literally how")
             country_code = "1"
 
         phone = (
@@ -1391,7 +1329,7 @@ def validate_internal_route(func):
         if not api_key:
             api_key = event.headers.get("internal-api-key")
 
-        if not api_key or api_key != INTERNAL_API_KEY:
+        if not api_key or not hmac.compare_digest(api_key, INTERNAL_API_KEY):
             return Response(
                 status_code=401,
                 content_type="application/json",
@@ -2168,26 +2106,33 @@ def middleware_before(handler, event, context):
     if not first_last:
         log.error("First and last name not included in headers")
         return {
-            "code": 400,
-            "message": "First and last name not included in headers",
+            "statusCode": 400,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(
+                {"message": "First and last name not included in headers"}
+            ),
         }
     log.append_keys(first_last=first_last)
-    # TODO: DO NOT USE THIS - IT PERSISTS ACROSS INVOCATIONS
+    # NOTE: Powertools clears app.context after each resolve(), and this value is
+    # re-set from the request header on every invocation, so it cannot go stale.
     app.append_context(first_last=first_last)
 
     return handler(event, context)
 
 
-@log.inject_lambda_context(log_event=True)
+# NOTE: log_event stays False so request headers (incl. Internal-Api-Key) don't
+# land in CloudWatch
+@log.inject_lambda_context(log_event=False)
 @middleware_before
 def handler(event, context):
     try:
         return app.resolve(event, context)
-    except Exception as e:
+    except Exception:
         log.exception("unhandled server error encountered")
         return {
-            "code": 500,
-            "message": "Unhandled server error encountered",
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Unhandled server error encountered"}),
         }
 
 

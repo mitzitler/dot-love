@@ -848,10 +848,15 @@ class DotLoveCoreStack(Stack):
             integration=spectaculo_service_integration,
         )
         #
-        # /payment/create
+        # /payment + /payment/create (alias used by the frontend)
         # Create payment intent
         dot_love_api_gw.add_routes(
             path="/spectaculo/payment",
+            methods=[apigw.HttpMethod.POST],
+            integration=spectaculo_service_integration,
+        )
+        dot_love_api_gw.add_routes(
+            path="/spectaculo/payment/create",
             methods=[apigw.HttpMethod.POST],
             integration=spectaculo_service_integration,
         )

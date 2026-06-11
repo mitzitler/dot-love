@@ -429,11 +429,15 @@ class TestHelperFunctions(unittest.TestCase):
             index.Pronouns.HE_HIM,
             address, "john@example.com", diet, guest_details
         )
-        # text_registration_success has a bug: line 167 references plus_one_text_body
-        # which is not defined until later. This will cause a NameError.
-        # We'll test that the bug exists
-        with self.assertRaises(NameError):
-            index.text_registration_success(user, None)
+        mock_twilio = Mock()
+        index.TWILIO_CLIENT = mock_twilio
+        index.text_registration_success(user, None)
+
+        # User gets the "sorry you can't make it" text, admins get an alert
+        self.assertEqual(mock_twilio.messages.create.call_count, 4)
+        first_call_kwargs = mock_twilio.messages.create.call_args_list[0].kwargs
+        self.assertEqual(first_call_kwargs["body"], index.RSVP_NO_TEXT.strip())
+        self.assertEqual(first_call_kwargs["to"], "+15555551234")
 
 
 class TestAPIEndpoints(unittest.TestCase):
@@ -1071,12 +1075,12 @@ class TestAPIEndpoints(unittest.TestCase):
             mock_ses, "sender@example.com", "config_id"
         )
 
-        # This demonstrates a bug: send_cohort_email sets template_type to "RAW_EMAIL" string
-        # but _get_email_template expects an enum, causing a KeyError
         response = index.send_cohort_email()
-        self.assertEqual(response.status_code, 500)  # Bug causes error
+        self.assertEqual(response.status_code, 200)
         body = response.body
-        self.assertIn("Failed to send cohort email", body["message"])
+        self.assertEqual(body["matched_count"], 1)
+        self.assertEqual(body["emails_sent"], 1)
+        mock_ses.send_email.assert_called()
 
     def test_send_cohort_email_no_api_key(self):
         """Test send_cohort_email without API key."""

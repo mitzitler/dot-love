@@ -433,8 +433,9 @@ class TestPaymentProcessing(unittest.TestCase):
         with self.assertRaises(stripe_module.error.StripeError):
             index.create_payment_intent(amount=5000)
 
+    @patch.object(index, "send_text_notification")
     @patch("stripe.Webhook.construct_event")
-    def test_handle_stripe_webhook_with_signature(self, mock_construct):
+    def test_handle_stripe_webhook_with_signature(self, mock_construct, mock_notify):
         """Test handling webhook with signature verification."""
         mock_event = Mock()
         mock_event.type = "payment_intent.succeeded"
@@ -442,29 +443,27 @@ class TestPaymentProcessing(unittest.TestCase):
         mock_event.data.object.metadata = {"user_id": "john_doe"}
         mock_event.data.object.amount = 5000
         mock_construct.return_value = mock_event
-
-        # The actual code has a bug - it calls send_text_notification() without arguments
-        # which causes a TypeError, so this function will raise an exception
-        with self.assertRaises(TypeError):
-            index.handle_stripe_webhook(
-                event_data='{"type": "payment_intent.succeeded"}',
-                signature_header="test_sig",
-                webhook_secret="whsec_test",
-            )
-
-    @patch("stripe.Event.construct_from")
-    def test_handle_stripe_webhook_without_signature(self, mock_construct):
-        """Test handling webhook without signature verification."""
-        mock_event = Mock()
-        mock_event.type = "payment_intent.payment_failed"
-        mock_event.data.object.id = "pi_test_456"
-        mock_construct.return_value = mock_event
+        mock_notify.return_value = True
 
         result = index.handle_stripe_webhook(
-            event_data='{"type": "payment_intent.payment_failed"}',
+            event_data='{"type": "payment_intent.succeeded"}',
+            signature_header="test_sig",
+            webhook_secret="whsec_test",
         )
 
-        self.assertEqual(result.type, "payment_intent.payment_failed")
+        self.assertEqual(result.type, "payment_intent.succeeded")
+        mock_notify.assert_called_once()
+        notify_kwargs = mock_notify.call_args.kwargs
+        self.assertEqual(notify_kwargs["first_last"], "john_doe")
+        self.assertEqual(notify_kwargs["template_type"], "RAW_TEXT")
+        self.assertIn("$50.00", notify_kwargs["template_details"]["raw"])
+
+    def test_handle_stripe_webhook_without_signature_rejected(self):
+        """Unsigned webhooks are rejected — signature verification is mandatory."""
+        with self.assertRaises(ValueError):
+            index.handle_stripe_webhook(
+                event_data='{"type": "payment_intent.payment_failed"}',
+            )
 
 
 class TestGizmoServiceClient(unittest.TestCase):
@@ -686,11 +685,9 @@ class TestAPIEndpoints(unittest.TestCase):
 
         response = index.create_claim()
 
-        # The actual code has a bug - it returns 500 instead of 400
-        # when claimant_id is None because it calls .lower() on None
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         body = response.body
-        self.assertIn("Failed", body["message"])
+        self.assertIn("required", body["message"])
 
     def test_create_claim_item_not_found(self):
         """Test creating claim for non-existent item."""

@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 # Set required environment variables before importing index
 os.environ["user_table_name"] = "test_user_table"
+os.environ["scoreboard_table_name"] = "test_scoreboard_table"
 os.environ["api_base_url"] = "https://test.api.com"
 os.environ["internal_api_key"] = "test_key"
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
@@ -48,22 +49,22 @@ class TestHelperFunctions(unittest.TestCase):
                 "first_last": {"S": "john_doe"},
                 "first": {"S": "John"},
                 "last": {"S": "Doe"},
-                "high_score": {"N": "100"},
+                "high_score_militsa": {"N": "100"},
             },
             {
                 "first_last": {"S": "jane_smith"},
                 "first": {"S": "Jane"},
                 "last": {"S": "Smith"},
-                "high_score": {"N": "200"},
+                "high_score_militsa": {"N": "200"},
             },
             {
                 "first_last": {"S": "bob_jones"},
                 "first": {"S": "Bob"},
                 "last": {"S": "Jones"},
-                # No high_score - should be excluded
+                # No high_score_militsa - should be excluded
             },
         ]
-        result = index.get_user_scores_list(all_users)
+        result = index.get_user_scores_list(all_users, "militsa")
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]["first_last"], "john_doe")
         self.assertEqual(result[0]["score"], 100)
@@ -127,22 +128,29 @@ class TestHelperFunctions(unittest.TestCase):
 
     def test_get_bump_notification_message_dethroned(self):
         """Test notification message for being dethroned from #1."""
-        message = index.get_bump_notification_message(1, 2, "Jane", "Smith", 300)
+        message = index.get_bump_notification_message(
+            1, 2, "Jane", "Smith", 300, "Don't Drop Militsa"
+        )
         self.assertIn("throne", message.lower())
         self.assertIn("Jane Smith", message)
+        self.assertIn("Don't Drop Militsa", message)
         self.assertIn("#1", message)
         self.assertIn("#2", message)
 
     def test_get_bump_notification_message_out_of_top_5(self):
         """Test notification message for being bumped out of top 5."""
-        message = index.get_bump_notification_message(5, 6, "Jane", "Smith", 300)
+        message = index.get_bump_notification_message(
+            5, 6, "Jane", "Smith", 300, "Don't Drop Militsa"
+        )
         self.assertIn("top 5", message)
         self.assertIn("Jane Smith", message)
         self.assertIn("#6", message)
 
     def test_get_bump_notification_message_generic(self):
         """Test generic bump down notification message."""
-        message = index.get_bump_notification_message(3, 4, "Jane", "Smith", 300)
+        message = index.get_bump_notification_message(
+            3, 4, "Jane", "Smith", 300, "Don't Drop Militsa"
+        )
         self.assertIn("Jane Smith", message)
         self.assertIn("#3", message)
         self.assertIn("#4", message)
@@ -180,7 +188,7 @@ class TestAPIEndpoints(unittest.TestCase):
         call_args = mock_post.call_args
         self.assertEqual(call_args[1]["json"]["first_last"], "john_doe")
         self.assertEqual(
-            call_args[1]["json"]["template_details"]["raw_text"], "Test message"
+            call_args[1]["json"]["template_details"]["raw"], "Test message"
         )
 
     @patch("index.requests.post")
@@ -197,43 +205,47 @@ class TestAPIEndpoints(unittest.TestCase):
 
     def test_get_scoreboard_success(self):
         """Test get_scoreboard endpoint returns top 5 scores."""
+        mock_event = Mock()
+        mock_event.get_query_string_value.return_value = "militsa"
+        index.app.current_event = mock_event
+
         # Mock DynamoDB response
         self.mock_dynamo_client.get_all.return_value = [
             {
-                "first_last": {"S": "user1"},
+                "first_last": {"S": "user_one"},
                 "first": {"S": "User"},
                 "last": {"S": "One"},
-                "high_score": {"N": "500"},
+                "high_score_militsa": {"N": "500"},
             },
             {
-                "first_last": {"S": "user2"},
+                "first_last": {"S": "user_two"},
                 "first": {"S": "User"},
                 "last": {"S": "Two"},
-                "high_score": {"N": "400"},
+                "high_score_militsa": {"N": "400"},
             },
             {
-                "first_last": {"S": "user3"},
+                "first_last": {"S": "user_three"},
                 "first": {"S": "User"},
                 "last": {"S": "Three"},
-                "high_score": {"N": "300"},
+                "high_score_militsa": {"N": "300"},
             },
             {
-                "first_last": {"S": "user4"},
+                "first_last": {"S": "user_four"},
                 "first": {"S": "User"},
                 "last": {"S": "Four"},
-                "high_score": {"N": "200"},
+                "high_score_militsa": {"N": "200"},
             },
             {
-                "first_last": {"S": "user5"},
+                "first_last": {"S": "user_five"},
                 "first": {"S": "User"},
                 "last": {"S": "Five"},
-                "high_score": {"N": "100"},
+                "high_score_militsa": {"N": "100"},
             },
             {
-                "first_last": {"S": "user6"},
+                "first_last": {"S": "user_six"},
                 "first": {"S": "User"},
                 "last": {"S": "Six"},
-                "high_score": {"N": "50"},
+                "high_score_militsa": {"N": "50"},
             },
         ]
 
@@ -248,18 +260,22 @@ class TestAPIEndpoints(unittest.TestCase):
 
     def test_get_scoreboard_excludes_zero_scores(self):
         """Test get_scoreboard excludes users with score of 0."""
+        mock_event = Mock()
+        mock_event.get_query_string_value.return_value = "militsa"
+        index.app.current_event = mock_event
+
         self.mock_dynamo_client.get_all.return_value = [
             {
-                "first_last": {"S": "user1"},
+                "first_last": {"S": "user_one"},
                 "first": {"S": "User"},
                 "last": {"S": "One"},
-                "high_score": {"N": "100"},
+                "high_score_militsa": {"N": "100"},
             },
             {
-                "first_last": {"S": "user2"},
+                "first_last": {"S": "user_two"},
                 "first": {"S": "User"},
                 "last": {"S": "Two"},
-                "high_score": {"N": "0"},
+                "high_score_militsa": {"N": "0"},
             },
         ]
 
@@ -274,7 +290,12 @@ class TestAPIEndpoints(unittest.TestCase):
         """Test submitting a new high score."""
         # Mock current event
         mock_event = Mock()
-        mock_event.json_body = {"score": 150, "first": "John", "last": "Doe"}
+        mock_event.json_body = {
+            "score": 150,
+            "first": "John",
+            "last": "Doe",
+            "game": "militsa",
+        }
         index.app.current_event = mock_event
 
         # Mock get user
@@ -282,7 +303,7 @@ class TestAPIEndpoints(unittest.TestCase):
             "first_last": {"S": "john_doe"},
             "first": {"S": "John"},
             "last": {"S": "Doe"},
-            "high_score": {"N": "100"},
+            "high_score_militsa": {"N": "100"},
         }
 
         # Mock get_all for rankings
@@ -291,7 +312,7 @@ class TestAPIEndpoints(unittest.TestCase):
                 "first_last": {"S": "john_doe"},
                 "first": {"S": "John"},
                 "last": {"S": "Doe"},
-                "high_score": {"N": "100"},
+                "high_score_militsa": {"N": "100"},
             },
         ]
 
@@ -312,14 +333,19 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_submit_score_not_high_score(self):
         """Test submitting a score that's not a high score."""
         mock_event = Mock()
-        mock_event.json_body = {"score": 50, "first": "John", "last": "Doe"}
+        mock_event.json_body = {
+            "score": 50,
+            "first": "John",
+            "last": "Doe",
+            "game": "militsa",
+        }
         index.app.current_event = mock_event
 
         self.mock_dynamo_client.get.return_value = {
             "first_last": {"S": "john_doe"},
             "first": {"S": "John"},
             "last": {"S": "Doe"},
-            "high_score": {"N": "100"},
+            "high_score_militsa": {"N": "100"},
         }
 
         response = index.submit_score()
@@ -336,7 +362,12 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_submit_score_user_not_found(self):
         """Test submitting a score for non-existent user."""
         mock_event = Mock()
-        mock_event.json_body = {"score": 100, "first": "John", "last": "Doe"}
+        mock_event.json_body = {
+            "score": 100,
+            "first": "John",
+            "last": "Doe",
+            "game": "militsa",
+        }
         index.app.current_event = mock_event
 
         self.mock_dynamo_client.get.return_value = None
@@ -374,7 +405,8 @@ class TestAPIEndpoints(unittest.TestCase):
         }
 
         index.notify_bumped_users(
-            old_rankings, new_rankings, "user3", "User", "Three", 500
+            old_rankings, new_rankings, "user3", "User", "Three", 500,
+            "Don't Drop Militsa",
         )
 
         # Should send 2 notifications (user1 and user2 were bumped)
@@ -402,7 +434,8 @@ class TestNotifyBumpedUsersIntegration(unittest.TestCase):
         }
 
         index.notify_bumped_users(
-            old_rankings, new_rankings, "scorer", "New", "Scorer", 150
+            old_rankings, new_rankings, "scorer", "New", "Scorer", 150,
+            "Don't Drop Militsa",
         )
 
         mock_send_text.assert_called_once()

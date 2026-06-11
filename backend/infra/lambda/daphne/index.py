@@ -73,7 +73,7 @@ def send_text_notification(first_last, message_text):
         }
 
         log.info(f"Sending text notification to {first_last}")
-        response = requests.post(gizmo_endpoint, json=payload, headers=headers)
+        response = requests.post(gizmo_endpoint, json=payload, headers=headers, timeout=5)
 
         if response.status_code != 200:
             log.error(f"Failed to send text notification: {response.text}")
@@ -233,8 +233,13 @@ def write_score_to_scoreboard(game, score, first_last, first, last, date_str):
     """
     # Create sort key: date#score#first_last with zero-padded 5-digit score
     # Format example: "2025-10-27#00450#jane_doe"
-    # We invert the score (99999 - score) so higher scores come first lexicographically
-    inverted_score = 99999 - score
+    # We invert the score (99999 - score) so higher scores come first lexicographically.
+    # Scores above 99999 are clamped for the sort key (the real score is still
+    # stored in the "score" attribute) — a wider key would break ordering
+    # against existing 5-digit keys.
+    if score > 99999:
+        log.warning(f"score {score} exceeds sort-key max; clamping key to 99999")
+    inverted_score = 99999 - min(score, 99999)
     date_score_user = f"{date_str}#{inverted_score:05d}#{first_last}"
 
     item = {
@@ -678,16 +683,22 @@ def middleware_before(handler, event, context):
     return handler(event, context)
 
 
+# NOTE: log_event stays False so request headers (incl. Internal-Api-Key) don't
+# land in CloudWatch
 @log.inject_lambda_context(
-    correlation_id_path=correlation_paths.API_GATEWAY_HTTP, log_event=True
+    correlation_id_path=correlation_paths.API_GATEWAY_HTTP, log_event=False
 )
 @middleware_before
 def handler(event, context):
     try:
         return app.resolve(event, context)
-    except Exception as e:
+    except Exception:
         log.exception("unhandled server error encountered")
-        return {"code": 500, "message": "Unhandled server error encountered"}
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Unhandled server error encountered"}),
+        }
 
 
 # Initialize clients at top level so connections are preserved between lambda calls

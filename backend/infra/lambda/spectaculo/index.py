@@ -1,3 +1,4 @@
+import hmac
 import json
 import os
 import random
@@ -39,7 +40,9 @@ REGISTRY_ITEM_TABLE_NAME = os.environ["registry_item_table_name"]
 REGISTRY_CLAIM_TABLE_NAME = os.environ["registry_claim_table_name"]
 API_BASE_URL = os.environ.get("api_base_url", "https://api.mitzimatthew.love")
 MITZI_MATTHEW_ADDRESS = os.environ.get("mitzi_matthew_address")
-INTERNAL_ROUTE_LIST = ["list", "ping"]
+# NOTE: "webhook" skips the x-first-last check because Stripe can't send that
+# header; the webhook is protected by Stripe signature verification instead
+INTERNAL_ROUTE_LIST = ["list", "ping", "webhook"]
 
 # Powertools logger
 log = Logger(service="spectaculo")
@@ -81,7 +84,7 @@ def send_text_notification(first_last, template_type, template_details):
 
         # Send the request to Gizmo
         log.info(f"Sending text notification to {first_last}")
-        response = requests.post(gizmo_endpoint, json=payload, headers=headers)
+        response = requests.post(gizmo_endpoint, json=payload, headers=headers, timeout=5)
 
         if response.status_code != 200:
             log.error(f"Failed to send text notification to Gizmo: {response.text}")
@@ -1001,17 +1004,15 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
     :return: Processed event object
     """
     try:
-        # Verify webhook signature if provided
-        if signature_header and webhook_secret:
-            event = stripe.Webhook.construct_event(
-                payload=event_data, sig_header=signature_header, secret=webhook_secret
-            )
-        else:
-            log.warn("no webhook secret included")
-            event = stripe.Event.construct_from(
-                json.loads(event_data) if isinstance(event_data, str) else event_data,
-                stripe.api_key,
-            )
+        # Signature verification is mandatory: an unsigned event could be forged
+        # by anyone who can reach the public webhook URL
+        if not signature_header or not webhook_secret:
+            log.error("webhook rejected: missing signature header or webhook secret")
+            raise ValueError("Stripe webhook signature verification is required")
+
+        event = stripe.Webhook.construct_event(
+            payload=event_data, sig_header=signature_header, secret=webhook_secret
+        )
 
         log.info(f"Processing webhook event type: {event.type}")
 
@@ -1025,9 +1026,15 @@ def handle_stripe_webhook(event_data, signature_header=None, webhook_secret=None
             first_last = metadata.get("user_id", "guest")
             amount_dollars = payment_intent.amount / 100
 
-            # Send a text notification to the user and us
+            # Send a text notification to the user
             if first_last != "guest":
-                send_text_notification()
+                send_text_notification(
+                    first_last=first_last,
+                    template_type="RAW_TEXT",
+                    template_details={
+                        "raw": f"💸 Your payment of ${amount_dollars:.2f} was received! Thank you! 💖"
+                    },
+                )
 
         elif event.type == "payment_intent.payment_failed":
             payment_intent = event.data.object
@@ -1056,7 +1063,7 @@ def validate_internal_route(func):
         if not api_key:
             api_key = event.headers.get("internal-api-key")
 
-        if not api_key or api_key != INTERNAL_API_KEY:
+        if not api_key or not hmac.compare_digest(api_key, INTERNAL_API_KEY):
             return Response(
                 status_code=401,
                 content_type="application/json",
@@ -1128,7 +1135,7 @@ def add_registry_item():
             display=payload.get("display"),
             price_cents=payload.get("price_cents"),
             claim_state=ClaimState.UNCLAIMED,
-            received=payload.get("display", False),
+            received=payload.get("received", False),
         )
         item.update_db(CW_DYNAMO_CLIENT)
         return Response(
@@ -1140,11 +1147,11 @@ def add_registry_item():
             },
         )
     except Exception as e:
-        log.exception("Failed to create registry claim")
+        log.exception("Failed to create registry item")
         return Response(
             status_code=500,
             content_type="application/json",
-            body={"message": "Failed to create registry claim", "error": str(e)},
+            body={"message": "Failed to create registry item", "error": str(e)},
         )
 
 
@@ -1226,7 +1233,7 @@ def create_claim():
     try:
         payload = app.current_event.json_body
         item_id = payload.get("item_id")
-        claimant_id = payload.get("claimant_id").lower()
+        claimant_id = (payload.get("claimant_id") or "").lower()
 
         if not item_id or not claimant_id:
             return Response(
@@ -1246,6 +1253,11 @@ def create_claim():
             )
 
         # Check if the item is already claimed
+        # TODO: This check-then-act flow is not atomic — two simultaneous claims
+        # for the same item can both pass these checks and both "succeed"
+        # (last write wins). A proper fix needs a DynamoDB ConditionExpression
+        # on the item update (e.g. claim_state = UNCLAIMED). Left as-is since
+        # the registry is winding down post-wedding.
         if (
             item.claim_state is ClaimState.CLAIMED
             or item.claim_state is ClaimState.PURCHASED
@@ -1288,8 +1300,9 @@ def create_claim():
         item.claimant_id = claimant_id
         item.update_db(CW_DYNAMO_CLIENT)
 
-        # Send text notification to the claimant
-        send_text_notification(
+        # Send text notification to the claimant (best-effort: the claim has
+        # already been persisted, so a failed text should not fail the request)
+        notified = send_text_notification(
             first_last=claimant_id,
             template_type="ITEM_CLAIMED_TEXT",
             template_details={
@@ -1298,6 +1311,11 @@ def create_claim():
                 "mitzi_matthew_address": MITZI_MATTHEW_ADDRESS,
             },
         )
+        if not notified:
+            log.warning(
+                f"claim for item {item_id} by {claimant_id} succeeded but the "
+                "confirmation text failed to send"
+            )
 
         return Response(
             status_code=200,
@@ -1476,7 +1494,10 @@ def list_claims():
     )
 
 
+# NOTE: /payment/create is an alias — the frontend's createPayment mutation
+# calls it, while /payment is the original route
 @app.post("/spectaculo/payment")
+@app.post("/spectaculo/payment/create")
 def payment_create():
     """
     Create a payment intent using Stripe.
@@ -1625,26 +1646,38 @@ def middleware_before(handler, event, context):
     )
 
     # validate headers
-    first_last = event["headers"].get("x-first-last").lower()
+    first_last = (event["headers"].get("x-first-last") or "").lower()
     if not first_last:
         log.error("First and last name not included in headers")
-        return {"code": 400, "message": "First and last name not included in headers"}
+        return {
+            "statusCode": 400,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(
+                {"message": "First and last name not included in headers"}
+            ),
+        }
     log.append_keys(first_last=first_last)
     app.append_context(first_last=first_last)
 
     return handler(event, context)
 
 
+# NOTE: log_event stays False so request headers (incl. Internal-Api-Key) don't
+# land in CloudWatch
 @log.inject_lambda_context(
-    correlation_id_path=correlation_paths.API_GATEWAY_HTTP, log_event=True
+    correlation_id_path=correlation_paths.API_GATEWAY_HTTP, log_event=False
 )
 @middleware_before
 def handler(event, context):
     try:
         return app.resolve(event, context)
-    except Exception as e:
+    except Exception:
         log.exception("unhandled server error encountered")
-        return {"code": 500, "message": "Unhandled server error encountered"}
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Unhandled server error encountered"}),
+        }
 
 
 # NOTE: Doing this at the top level so the client connections are preserved b/t lambda calls
