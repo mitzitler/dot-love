@@ -61,6 +61,9 @@ class DotLoveCoreStack(Stack):
         self.twilio_auth_token = self.obtain_ssm_client_secret(
             secret_name="/dot-love/twilio/auth-token/dev"
         )
+        self.twilio_api_key_sid = self.obtain_ssm_client_secret(
+            secret_name="/dot-love/twilio/api-key-sid/dev"
+        )
         self.twilio_sender_number = self.obtain_ssm_client_secret(
             secret_name="/dot-love/twilio/sender-number"
         )
@@ -140,6 +143,7 @@ class DotLoveCoreStack(Stack):
             ses_admin_list=ses_admin_list,
             twilio_auth_token=self.twilio_auth_token,
             twilio_account_sid=self.twilio_account_sid,
+            twilio_api_key_sid=self.twilio_api_key_sid,
             twilio_sender_number=self.twilio_sender_number,
             contact_info=self.contact_info,
             internal_api_key=self.internal_api_key,
@@ -374,6 +378,7 @@ class DotLoveCoreStack(Stack):
         ses_admin_list,
         twilio_auth_token,
         twilio_account_sid,
+        twilio_api_key_sid,
         twilio_sender_number,
         contact_info,
         internal_api_key,
@@ -416,6 +421,7 @@ class DotLoveCoreStack(Stack):
                 # twilio config
                 "twilio_auth_token": twilio_auth_token,
                 "twilio_account_sid": twilio_account_sid,
+                "twilio_api_key_sid": twilio_api_key_sid,
                 "twilio_sender_number": twilio_sender_number,
                 # contact info
                 "mitzi_email": contact_info["mitzi"]["email"],

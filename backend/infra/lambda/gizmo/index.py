@@ -30,6 +30,7 @@ SES_CONFIG_ID = os.environ["ses_config_id"]
 SES_ADMIN_LIST = os.environ["ses_admin_list"]
 TWILIO_AUTH_TOKEN = os.environ["twilio_auth_token"]
 TWILIO_ACCOUNT_SID = os.environ["twilio_account_sid"]
+TWILIO_API_KEY_SID = os.environ["twilio_api_key_sid"]
 TWILIO_SENDER_NUMBER = os.environ["twilio_sender_number"]
 INTERNAL_ROUTE_LIST = ["ping", "list", "text", "email"]
 CONTACT_INFO = {
@@ -2139,7 +2140,7 @@ def handler(event, context):
 # NOTE: Doing this at the top level so the client connections are preserved b/t lambda calls
 # Initialize clients
 CW_DYNAMO_CLIENT = CWDynamoClient()
-TWILIO_CLIENT = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+TWILIO_CLIENT = Client(TWILIO_API_KEY_SID, TWILIO_AUTH_TOKEN, TWILIO_ACCOUNT_SID)
 SES_CLIENT = boto3.client("ses")
 DOT_LOVE_MESSAGE_CLIENT = DotLoveMessageClient(
     SES_CLIENT, SES_SENDER_EMAIL, SES_CONFIG_ID
