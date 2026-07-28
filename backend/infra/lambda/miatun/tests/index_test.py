@@ -1,4 +1,3 @@
-import io
 import json
 import os
 import sys
@@ -9,7 +8,8 @@ from unittest.mock import MagicMock, patch
 os.environ["user_table_name"] = "test_user_table"
 os.environ["registry_item_table_name"] = "test_registry_item_table"
 os.environ["registry_claim_table_name"] = "test_registry_claim_table"
-os.environ["export_bucket_name"] = "test_export_bucket"
+os.environ["letters_table_name"] = "test_letters_table"
+os.environ["letters_disjoined_pairs_table_name"] = "test_letters_disjoined_pairs_table"
 os.environ["internal_api_key"] = "test_internal_key"
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
@@ -20,9 +20,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 with patch("boto3.client"):
     import index
 
-from openpyxl import load_workbook
 
-
+########################################################
+# Deserialized-dict builders, for exercising build_letter_records() directly
+########################################################
 def make_item(item_id, item_name, claimant_id="", brand="", price_cents=None):
     item = {
         "id": item_id,
@@ -61,6 +62,137 @@ def make_user(first_last, pair="", **contact):
     return user
 
 
+########################################################
+# Raw DynamoDB-typed helpers, for seeding FakeDynamoDB tables
+########################################################
+def to_dynamo_value(value):
+    """Recursively convert a plain Python value into a raw DynamoDB-typed
+    value (the same shape TypeDeserializer/CWDynamoClient produce/consume),
+    including nested lists-of-maps like the `gifts` field."""
+    if value is None:
+        return {"NULL": True}
+    if isinstance(value, bool):
+        return {"BOOL": value}
+    if isinstance(value, (int, float)):
+        return {"N": str(value)}
+    if isinstance(value, dict):
+        return {"M": {k: to_dynamo_value(v) for k, v in value.items()}}
+    if isinstance(value, list):
+        return {"L": [to_dynamo_value(v) for v in value]}
+    return {"S": str(value)}
+
+
+def make_raw_item(item_id, item_name, claimant_id="", brand="", price_cents=None, received=True):
+    item = {
+        "id": {"S": item_id},
+        "item_name": {"S": item_name},
+        "brand": {"S": brand},
+        "claimant_id": {"S": claimant_id},
+        "received": {"BOOL": received},
+    }
+    if price_cents is not None:
+        item["price_cents"] = {"N": str(price_cents)}
+    return item
+
+
+def make_raw_claim(claim_id, item_id, claimant_id, claim_state="CLAIMED"):
+    return {
+        "id": {"S": claim_id},
+        "item_id": {"S": item_id},
+        "claimant_id": {"S": claimant_id},
+        "claim_state": {"S": claim_state},
+    }
+
+
+def make_raw_user(first_last, pair="", **contact):
+    fields = {
+        "phone": "+15555550100",
+        "street": "123 Main St",
+        "second_line": "Apt 4",
+        "city": "Brooklyn",
+        "state_loc": "NY",
+        "zipcode": "11201",
+        "country": "USA",
+    }
+    fields.update(contact)
+    raw = {"first_last": {"S": first_last}, "guest_pair_first_last": {"S": pair}}
+    for key, value in fields.items():
+        raw[key] = {"S": value}
+    return raw
+
+
+def make_raw_letter(letter_id, gifts=None, **fields):
+    raw = {"id": {"S": letter_id}}
+    defaults = {
+        "guest": "",
+        "partner": "",
+        "claimant_id": "",
+        "phone": "",
+        "street": "",
+        "second_line": "",
+        "city": "",
+        "state_loc": "",
+        "zipcode": "",
+        "country": "",
+        "letter_body": "",
+        "status": "DRAFT",
+        "source": "SYNC",
+    }
+    defaults.update(fields)
+    for key, value in defaults.items():
+        raw[key] = {"S": value}
+    raw["gifts"] = to_dynamo_value(gifts if gifts is not None else [])
+    return raw
+
+
+class FakeDynamoDB:
+    """Minimal in-memory double for CWDynamoClient — just enough behavior
+    (get/get_all/update/delete/batch_get_items) to exercise real upsert
+    semantics (e.g. sync never clobbering a written letter body) without
+    touching real AWS."""
+
+    def __init__(self):
+        self.tables = {}  # table_name -> {id: raw dynamo-typed item}
+
+    def _table(self, table_name):
+        return self.tables.setdefault(table_name, {})
+
+    @staticmethod
+    def _key_value(key_expression):
+        """Extract the single partition-key value regardless of its
+        attribute name ("id" for letters/disjoined-pairs, "first_last" for
+        users, etc.) — real DynamoDB Key dicts aren't hardcoded to "id"."""
+        ((_, value),) = key_expression.items()
+        return value["S"]
+
+    def get(self, table_name, key_expression):
+        return self._table(table_name).get(self._key_value(key_expression))
+
+    def get_all(self, table_name, filter_expression=None, expression_attribute_values=None):
+        return list(self._table(table_name).values())
+
+    def batch_get_items(self, table_name, keys, projection_expression=None):
+        table = self._table(table_name)
+        return [
+            table[key["first_last"]["S"]]
+            for key in keys
+            if key["first_last"]["S"] in table
+        ]
+
+    def update(self, table_name, key_expression, field_value_map, manual_expression_attribute_map=None):
+        table = self._table(table_name)
+        item_id = self._key_value(key_expression)
+        existing = table.get(item_id, dict(key_expression))
+        for field_name, field_value in field_value_map.items():
+            existing[field_name] = to_dynamo_value(field_value)
+        table[item_id] = existing
+        return {}
+
+    def delete(self, table_name, key_expression):
+        self._table(table_name).pop(self._key_value(key_expression), None)
+        return {}
+
+
 class TestHelpers(unittest.TestCase):
     """Test suite for formatting helpers."""
 
@@ -75,73 +207,141 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(index.title_case_first_last(""), "")
         self.assertEqual(index.title_case_first_last(None), "")
 
-    def test_format_price_cents(self):
-        self.assertEqual(index.format_price_cents(12999), "$129.99")
-        self.assertEqual(index.format_price_cents(0), "$0.00")
-        self.assertEqual(index.format_price_cents(None), "")
-        self.assertEqual(index.format_price_cents("garbage"), "")
 
+class TestBuildLetterRecords(unittest.TestCase):
+    """Test suite for the claims/items/users join + household-grouping logic."""
 
-class TestBuildThankYouRows(unittest.TestCase):
-    """Test suite for the claims/items/users join logic."""
-
-    def test_full_row_with_partner(self):
+    def test_full_record_with_partner(self):
         items = {"i1": make_item("i1", "Stand Mixer", brand="KitchenAid", price_cents=44999)}
         claims = [make_claim("i1", "john_smith")]
         users = {"john_smith": make_user("john_smith", pair="jane_smith")}
 
-        rows = index.build_thank_you_rows(items, claims, users)
+        letters = index.build_letter_records(items, claims, users)
 
-        self.assertEqual(len(rows), 1)
-        row = rows[0]
-        self.assertEqual(row.guest, "John Smith")
-        self.assertEqual(row.partner, "Jane Smith")
-        self.assertEqual(row.gift, "Stand Mixer")
-        self.assertEqual(row.brand, "KitchenAid")
-        self.assertEqual(row.price, "$449.99")
-        self.assertEqual(row.phone, "+15555550100")
-        self.assertEqual(row.street, "123 Main St")
-        self.assertEqual(row.city, "Brooklyn")
+        self.assertEqual(len(letters), 1)
+        letter = letters[0]
+        self.assertEqual(letter.id, "couple:jane_smith|john_smith")
+        self.assertEqual(letter.guest, "John Smith")
+        self.assertEqual(letter.partner, "Jane Smith")
+        self.assertEqual(len(letter.gifts), 1)
+        self.assertEqual(letter.gifts[0]["gift"], "Stand Mixer")
+        self.assertEqual(letter.gifts[0]["brand"], "KitchenAid")
+        self.assertEqual(letter.gifts[0]["price_cents"], 44999)
+        self.assertEqual(letter.phone, "+15555550100")
+        self.assertEqual(letter.street, "123 Main St")
+        self.assertEqual(letter.city, "Brooklyn")
+        self.assertEqual(letter.status, index.LetterStatus.DRAFT)
+        self.assertEqual(letter.letter_body, "")
+        self.assertEqual(letter.source, "SYNC")
+
+    def test_guest_with_multiple_gifts_merged_into_one_letter(self):
+        items = {
+            "i1": make_item("i1", "Toaster"),
+            "i2": make_item("i2", "Blender"),
+        }
+        claims = [
+            make_claim("i1", "john_smith"),
+            make_claim("i2", "john_smith"),
+        ]
+
+        letters = index.build_letter_records(items, claims, {})
+
+        self.assertEqual(len(letters), 1)
+        letter = letters[0]
+        self.assertEqual(letter.id, "guest:john_smith")
+        self.assertEqual(letter.guest, "John Smith")
+        self.assertEqual(len(letter.gifts), 2)
+        self.assertEqual(
+            sorted(g["gift"] for g in letter.gifts), ["Blender", "Toaster"]
+        )
+
+    def test_couple_each_claiming_a_gift_merged_into_one_letter(self):
+        items = {
+            "i1": make_item("i1", "Toaster"),
+            "i2": make_item("i2", "Blender"),
+        }
+        claims = [
+            make_claim("i1", "john_smith"),
+            make_claim("i2", "jane_smith"),
+        ]
+        users = {
+            "john_smith": make_user("john_smith", pair="jane_smith"),
+            "jane_smith": make_user("jane_smith", pair="john_smith"),
+        }
+
+        letters = index.build_letter_records(items, claims, users)
+
+        self.assertEqual(len(letters), 1)
+        letter = letters[0]
+        self.assertEqual(letter.id, "couple:jane_smith|john_smith")
+        # primary claimant is whichever id sorts first, alphabetically
+        self.assertEqual(letter.guest, "Jane Smith")
+        self.assertEqual(letter.partner, "John Smith")
+        self.assertEqual(len(letter.gifts), 2)
+        self.assertEqual(
+            sorted(g["gift"] for g in letter.gifts), ["Blender", "Toaster"]
+        )
+
+    def test_couple_grouping_is_order_independent(self):
+        """It shouldn't matter which partner's identity claimed a gift —
+        it still lands in the same household letter as the other partner's
+        gifts."""
+        items_a = {"i1": make_item("i1", "Toaster")}
+        claims_a = [make_claim("i1", "jane_smith")]
+        users_a = {"jane_smith": make_user("jane_smith", pair="john_smith")}
+        letters_a = index.build_letter_records(items_a, claims_a, users_a)
+
+        items_b = {"i1": make_item("i1", "Toaster")}
+        claims_b = [make_claim("i1", "john_smith")]
+        users_b = {"john_smith": make_user("john_smith", pair="jane_smith")}
+        letters_b = index.build_letter_records(items_b, claims_b, users_b)
+
+        self.assertEqual(letters_a[0].id, letters_b[0].id)
 
     def test_claim_for_non_received_item_excluded(self):
         items = {}  # nothing received
         claims = [make_claim("i1", "john_smith")]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
-        self.assertEqual(rows, [])
+        self.assertEqual(letters, [])
 
     def test_unclaimed_claim_state_excluded(self):
         items = {"i1": make_item("i1", "Vase")}
         claims = [make_claim("i1", "john_smith", claim_state="UNCLAIMED")]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
         # The UNCLAIMED claim is skipped, but the received item still appears
         # via the fallback (using the item's own claimant_id, blank here).
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0].guest, "")
+        # With no identifiable claimant, it gets its own letter keyed by
+        # the item's id rather than being grouped.
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(letters[0].guest, "")
+        self.assertEqual(letters[0].id, "item:i1")
 
     def test_purchased_claim_state_included(self):
         items = {"i1": make_item("i1", "Vase")}
         claims = [make_claim("i1", "john_smith", claim_state="PURCHASED")]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0].guest, "John Smith")
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(letters[0].guest, "John Smith")
+        self.assertEqual(letters[0].id, "guest:john_smith")
 
     def test_claimant_missing_from_users_table(self):
         items = {"i1": make_item("i1", "Blender")}
         claims = [make_claim("i1", "plus_one")]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0].guest, "Plus One")
-        self.assertEqual(rows[0].partner, "")
-        self.assertEqual(rows[0].phone, "")
-        self.assertEqual(rows[0].street, "")
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(letters[0].guest, "Plus One")
+        self.assertEqual(letters[0].partner, "")
+        self.assertEqual(letters[0].phone, "")
+        self.assertEqual(letters[0].street, "")
+        self.assertEqual(letters[0].id, "guest:plus_one")
 
     def test_duplicate_claims_deduped(self):
         items = {"i1": make_item("i1", "Toaster")}
@@ -150,21 +350,23 @@ class TestBuildThankYouRows(unittest.TestCase):
             make_claim("i1", "john_smith", claim_state="PURCHASED"),
         ]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
-        self.assertEqual(len(rows), 1)
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(len(letters[0].gifts), 1)
 
     def test_received_item_without_claim_falls_back_to_item_claimant(self):
         items = {"i1": make_item("i1", "Wok", claimant_id="amy_pond")}
         users = {"amy_pond": make_user("amy_pond")}
 
-        rows = index.build_thank_you_rows(items, [], users)
+        letters = index.build_letter_records(items, [], users)
 
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0].guest, "Amy Pond")
-        self.assertEqual(rows[0].phone, "+15555550100")
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(letters[0].guest, "Amy Pond")
+        self.assertEqual(letters[0].phone, "+15555550100")
+        self.assertEqual(letters[0].id, "guest:amy_pond")
 
-    def test_rows_sorted_by_guest_then_gift(self):
+    def test_records_sorted_by_guest(self):
         items = {
             "i1": make_item("i1", "Zester"),
             "i2": make_item("i2", "Apron"),
@@ -176,49 +378,118 @@ class TestBuildThankYouRows(unittest.TestCase):
             make_claim("i3", "amy_pond"),
         ]
 
-        rows = index.build_thank_you_rows(items, claims, {})
+        letters = index.build_letter_records(items, claims, {})
 
+        self.assertEqual([letter.guest for letter in letters], ["Amy Pond", "Zoe Washburne"])
+        amy_letter = letters[0]
+        self.assertEqual(len(amy_letter.gifts), 2)
         self.assertEqual(
-            [(r.guest, r.gift) for r in rows],
-            [("Amy Pond", "Apron"), ("Amy Pond", "Kettle"), ("Zoe Washburne", "Zester")],
+            sorted(g["gift"] for g in amy_letter.gifts), ["Apron", "Kettle"]
         )
 
+    def test_disjoined_pair_produces_two_guest_letters(self):
+        items = {
+            "i1": make_item("i1", "Toaster"),
+            "i2": make_item("i2", "Blender"),
+        }
+        claims = [
+            make_claim("i1", "john_smith"),
+            make_claim("i2", "jane_smith"),
+        ]
+        users = {
+            "john_smith": make_user("john_smith", pair="jane_smith"),
+            "jane_smith": make_user("jane_smith", pair="john_smith"),
+        }
 
-class TestBuildXlsx(unittest.TestCase):
-    """Test suite for xlsx generation."""
+        letters = index.build_letter_records(
+            items, claims, users,
+            disjoined_pair_keys={"jane_smith|john_smith"},
+        )
 
-    def test_workbook_round_trip(self):
+        self.assertEqual(len(letters), 2)
+        by_id = {letter.id: letter for letter in letters}
+        self.assertIn("guest:john_smith", by_id)
+        self.assertIn("guest:jane_smith", by_id)
+        self.assertEqual(by_id["guest:john_smith"].partner, "")
+        self.assertEqual(by_id["guest:jane_smith"].partner, "")
+        self.assertEqual([g["gift"] for g in by_id["guest:john_smith"].gifts], ["Toaster"])
+        self.assertEqual([g["gift"] for g in by_id["guest:jane_smith"].gifts], ["Blender"])
+
+    def test_disjoined_pair_keys_omitted_is_backward_compatible(self):
+        """Calling build_letter_records with no 4th argument (the pre-disjoin
+        signature) must behave exactly as before — couples still merge."""
         items = {"i1": make_item("i1", "Stand Mixer", brand="KitchenAid", price_cents=44999)}
         claims = [make_claim("i1", "john_smith")]
         users = {"john_smith": make_user("john_smith", pair="jane_smith")}
-        rows = index.build_thank_you_rows(items, claims, users)
 
-        xlsx_bytes = index.build_xlsx(rows)
-        workbook = load_workbook(io.BytesIO(xlsx_bytes))
-        sheet = workbook.active
+        letters = index.build_letter_records(items, claims, users)
 
-        self.assertEqual(sheet.title, "Thank You Cards")
-        self.assertEqual(sheet.freeze_panes, "A2")
-        header = tuple(cell.value for cell in sheet[1])
-        self.assertEqual(header, index.SHEET_HEADERS)
-        self.assertTrue(sheet[1][0].font.bold)
-        data_row = tuple(cell.value for cell in sheet[2])
-        self.assertEqual(data_row[0], "John Smith")
-        self.assertEqual(data_row[1], "Jane Smith")
-        self.assertEqual(data_row[2], "Stand Mixer")
-
-    def test_empty_rows_still_produces_header(self):
-        xlsx_bytes = index.build_xlsx([])
-        sheet = load_workbook(io.BytesIO(xlsx_bytes)).active
-        self.assertEqual(sheet.max_row, 1)
+        self.assertEqual(len(letters), 1)
+        self.assertEqual(letters[0].id, "couple:jane_smith|john_smith")
+        self.assertEqual(letters[0].partner, "Jane Smith")
 
 
-class TestExportEndpoint(unittest.TestCase):
+class TestSyncPreservesLetterBody(unittest.TestCase):
+    """The claims-sync upsert must never clobber a letter body/status that's
+    already been written, even after the source claims data is re-synced."""
+
+    def setUp(self):
+        self.fake_db = FakeDynamoDB()
+        self.fake_db.tables[index.REGISTRY_ITEM_TABLE_NAME] = {
+            "i1": make_raw_item("i1", "Stand Mixer", claimant_id="john_smith", brand="KitchenAid", price_cents=44999)
+        }
+        self.fake_db.tables[index.REGISTRY_CLAIM_TABLE_NAME] = {
+            "c1": make_raw_claim("c1", "i1", "john_smith", claim_state="PURCHASED")
+        }
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "john_smith": make_raw_user("john_smith", pair="jane_smith")
+        }
+
+    def run_sync(self):
+        received_items_by_id, claims, users_by_first_last, disjoined_pair_keys = (
+            index.fetch_sync_data(self.fake_db)
+        )
+        letters = index.build_letter_records(
+            received_items_by_id,
+            claims,
+            users_by_first_last,
+            disjoined_pair_keys=disjoined_pair_keys,
+        )
+        for letter in letters:
+            letter.sync_upsert_db(self.fake_db)
+        return letters
+
+    def test_second_sync_preserves_edited_body_and_status(self):
+        letters = self.run_sync()
+        self.assertEqual(len(letters), 1)
+        letter_id = letters[0].id
+        self.assertEqual(letter_id, "couple:jane_smith|john_smith")
+
+        # Admin opens the letter, writes the body, and marks it WRITTEN
+        letter = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+        letter.letter_body = "Dear John, thank you so much for the mixer!"
+        letter.status = index.LetterStatus.WRITTEN
+        letter.update_db(self.fake_db)
+
+        # Re-running sync (e.g. because a new gift was received) must not
+        # touch this letter's body/status
+        self.run_sync()
+
+        reloaded = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+        self.assertEqual(reloaded.letter_body, "Dear John, thank you so much for the mixer!")
+        self.assertEqual(reloaded.status, index.LetterStatus.WRITTEN)
+        # contact/gift fields still reflect the latest sync
+        self.assertEqual(reloaded.guest, "John Smith")
+        self.assertEqual(reloaded.source, "SYNC")
+        self.assertEqual(len(reloaded.gifts), 1)
+
+
+class TestAPIEndpoints(unittest.TestCase):
     """Test suite for the API routes through the full handler."""
 
     @staticmethod
-    def make_event(path, method="GET", headers=None):
-        return {
+    def make_event(path, method="GET", headers=None, body=None):
+        event = {
             "version": "2.0",
             "rawPath": path,
             "rawQueryString": "",
@@ -230,6 +501,9 @@ class TestExportEndpoint(unittest.TestCase):
             },
             "isBase64Encoded": False,
         }
+        if body is not None:
+            event["body"] = json.dumps(body)
+        return event
 
     @staticmethod
     def make_context():
@@ -242,102 +516,248 @@ class TestExportEndpoint(unittest.TestCase):
         ctx.aws_request_id = "test-aws-request-id"
         return ctx
 
+    def setUp(self):
+        self.fake_db = FakeDynamoDB()
+        self.auth_headers = {"Internal-Api-Key": "test_internal_key"}
+
     def test_ping_no_headers_required(self):
         response = index.handler(self.make_event("/miatun/ping"), self.make_context())
         self.assertEqual(response["statusCode"], 200)
 
-    def test_export_rejects_missing_api_key(self):
-        event = self.make_event("/miatun/export", method="POST")
+    def test_sync_rejects_missing_api_key(self):
+        event = self.make_event("/miatun/sync", method="POST")
         response = index.handler(event, self.make_context())
         self.assertEqual(response["statusCode"], 401)
 
-    def test_export_rejects_wrong_api_key(self):
+    def test_sync_rejects_wrong_api_key(self):
         event = self.make_event(
-            "/miatun/export", method="POST", headers={"internal-api-key": "wrong"}
+            "/miatun/sync", method="POST", headers={"internal-api-key": "wrong"}
         )
         response = index.handler(event, self.make_context())
         self.assertEqual(response["statusCode"], 401)
 
-    def test_export_success(self):
-        mock_dynamo = MagicMock()
-        mock_dynamo.get_all.side_effect = [
-            # received items scan
-            [
-                {
-                    "id": {"S": "i1"},
-                    "item_name": {"S": "Stand Mixer"},
-                    "brand": {"S": "KitchenAid"},
-                    "price_cents": {"N": "44999"},
-                    "received": {"BOOL": True},
-                    "claimant_id": {"S": "john_smith"},
-                }
-            ],
-            # claims scan
-            [
-                {
-                    "id": {"S": "c1"},
-                    "item_id": {"S": "i1"},
-                    "claimant_id": {"S": "john_smith"},
-                    "claim_state": {"S": "PURCHASED"},
-                }
-            ],
-        ]
-        mock_dynamo.batch_get_items.return_value = [
-            {
-                "first_last": {"S": "john_smith"},
-                "guest_pair_first_last": {"S": "jane_smith"},
-                "phone": {"S": "+15555550100"},
-                "street": {"S": "123 Main St"},
-                "second_line": {"S": ""},
-                "city": {"S": "Brooklyn"},
-                "state_loc": {"S": "NY"},
-                "zipcode": {"S": "11201"},
-                "country": {"S": "USA"},
-            }
-        ]
-        mock_s3 = MagicMock()
-        mock_s3.generate_presigned_url.return_value = "https://example.com/signed"
+    def test_sync_success(self):
+        self.fake_db.tables[index.REGISTRY_ITEM_TABLE_NAME] = {
+            "i1": make_raw_item("i1", "Stand Mixer", claimant_id="john_smith", brand="KitchenAid", price_cents=44999)
+        }
+        self.fake_db.tables[index.REGISTRY_CLAIM_TABLE_NAME] = {
+            "c1": make_raw_claim("c1", "i1", "john_smith", claim_state="PURCHASED")
+        }
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "john_smith": make_raw_user("john_smith", pair="jane_smith")
+        }
 
-        event = self.make_event(
-            "/miatun/export",
-            method="POST",
-            headers={"Internal-Api-Key": "test_internal_key"},
-        )
-
-        with patch.object(index, "DYNAMO_CLIENT", mock_dynamo), patch.object(
-            index, "S3_CLIENT", mock_s3
-        ):
+        event = self.make_event("/miatun/sync", method="POST", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
             response = index.handler(event, self.make_context())
 
         self.assertEqual(response["statusCode"], 200)
         body = json.loads(response["body"])
-        self.assertEqual(body["message"], "export success")
-        self.assertEqual(body["download_url"], "https://example.com/signed")
-        self.assertEqual(body["row_count"], 1)
+        self.assertEqual(body["message"], "sync success")
+        self.assertEqual(body["synced_count"], 1)
 
-        # The uploaded object is a real xlsx with our data in it
-        put_kwargs = mock_s3.put_object.call_args.kwargs
-        self.assertEqual(put_kwargs["Bucket"], "test_export_bucket")
-        self.assertTrue(put_kwargs["Key"].startswith("thank-you-cards/"))
-        self.assertTrue(put_kwargs["Key"].endswith(".xlsx"))
-        sheet = load_workbook(io.BytesIO(put_kwargs["Body"])).active
-        self.assertEqual(sheet[2][0].value, "John Smith")
-        self.assertEqual(sheet[2][2].value, "Stand Mixer")
+        letter = index.LetterRecord.from_letter_id_db("couple:jane_smith|john_smith", self.fake_db)
+        self.assertIsNotNone(letter)
+        self.assertEqual(letter.guest, "John Smith")
+        self.assertEqual(letter.status, index.LetterStatus.DRAFT)
+        self.assertEqual(letter.letter_body, "")
+        self.assertEqual(len(letter.gifts), 1)
 
-    def test_export_returns_500_on_dynamo_error(self):
+    def test_sync_merges_couple_and_multi_gift_guest_each_into_one_letter(self):
+        self.fake_db.tables[index.REGISTRY_ITEM_TABLE_NAME] = {
+            "i1": make_raw_item("i1", "Toaster"),
+            "i2": make_raw_item("i2", "Blender"),
+            "i3": make_raw_item("i3", "Kettle"),
+        }
+        self.fake_db.tables[index.REGISTRY_CLAIM_TABLE_NAME] = {
+            "c1": make_raw_claim("c1", "i1", "john_smith"),
+            "c2": make_raw_claim("c2", "i2", "jane_smith"),
+            "c3": make_raw_claim("c3", "i3", "amy_pond"),
+        }
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "john_smith": make_raw_user("john_smith", pair="jane_smith"),
+            "jane_smith": make_raw_user("jane_smith", pair="john_smith"),
+            "amy_pond": make_raw_user("amy_pond"),
+        }
+
+        event = self.make_event("/miatun/sync", method="POST", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        # one letter for the couple (2 gifts) + one for the solo guest (1 gift)
+        self.assertEqual(body["synced_count"], 2)
+
+        letters = index.LetterRecord.get_all_letters_db(self.fake_db)
+        by_id = {letter.id: letter for letter in letters}
+        self.assertEqual(len(letters), 2)
+        self.assertEqual(len(by_id["couple:jane_smith|john_smith"].gifts), 2)
+        self.assertEqual(len(by_id["guest:amy_pond"].gifts), 1)
+
+    def test_sync_prunes_stale_sync_letters_but_keeps_manual(self):
+        self.fake_db.tables[index.REGISTRY_ITEM_TABLE_NAME] = {
+            "i1": make_raw_item("i1", "Toaster", claimant_id="john_smith"),
+        }
+        self.fake_db.tables[index.REGISTRY_CLAIM_TABLE_NAME] = {
+            "c1": make_raw_claim("c1", "i1", "john_smith"),
+        }
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "john_smith": make_raw_user("john_smith"),
+        }
+        # Seed a stale SYNC letter (e.g. left over from before the household
+        # grouping change) and a MANUAL letter that must survive pruning.
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "stale-sync-id": make_raw_letter("stale-sync-id", source="SYNC", guest="Old Stale"),
+            "manual-id": make_raw_letter("manual-id", source="MANUAL", guest="Hand Entered"),
+        }
+
+        event = self.make_event("/miatun/sync", method="POST", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(body["pruned_count"], 1)
+
+        remaining_ids = set(self.fake_db.tables[index.LETTERS_TABLE_NAME].keys())
+        self.assertNotIn("stale-sync-id", remaining_ids)
+        self.assertIn("manual-id", remaining_ids)
+        self.assertIn("guest:john_smith", remaining_ids)
+
+    def test_sync_returns_500_on_dynamo_error(self):
         mock_dynamo = MagicMock()
         mock_dynamo.get_all.side_effect = Exception("dynamo exploded")
 
-        event = self.make_event(
-            "/miatun/export",
-            method="POST",
-            headers={"Internal-Api-Key": "test_internal_key"},
-        )
-
-        with patch.object(index, "DYNAMO_CLIENT", mock_dynamo):
+        event = self.make_event("/miatun/sync", method="POST", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", mock_dynamo):
             response = index.handler(event, self.make_context())
 
         self.assertEqual(response["statusCode"], 500)
+
+    def test_list_letters(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "l1": make_raw_letter("l1", guest="John Smith", gifts=[{"gift": "Stand Mixer", "brand": "", "price_cents": None}])
+        }
+
+        event = self.make_event("/miatun/letter", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(len(body["letters"]), 1)
+        self.assertEqual(body["letters"][0]["guest"], "John Smith")
+        self.assertEqual(body["letters"][0]["gifts"][0]["gift"], "Stand Mixer")
+
+    def test_list_letters_rejects_missing_api_key(self):
+        event = self.make_event("/miatun/letter")
+        response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 401)
+
+    def test_create_letter_manual(self):
+        payload = {
+            "guest": "Amy Pond",
+            "gifts": [{"gift": "Hand-knit Scarf", "brand": "", "price_cents": None}],
+            "letter_body": "",
+        }
+        event = self.make_event(
+            "/miatun/letter", method="POST", headers=self.auth_headers, body=payload
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(body["letter"]["guest"], "Amy Pond")
+        self.assertEqual(body["letter"]["gifts"][0]["gift"], "Hand-knit Scarf")
+        self.assertEqual(body["letter"]["status"], "DRAFT")
+        self.assertEqual(body["letter"]["source"], "MANUAL")
+        self.assertEqual(len(self.fake_db.tables[index.LETTERS_TABLE_NAME]), 1)
+
+    def test_patch_letter_updates_body_and_status(self):
+        letter_id = "l1"
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            letter_id: make_raw_letter(letter_id, guest="John Smith", gifts=[{"gift": "Stand Mixer", "brand": "", "price_cents": None}])
+        }
+        payload = {
+            "letter_id": letter_id,
+            "letter_body": "Dear John, thank you!",
+            "status": "WRITTEN",
+        }
+        event = self.make_event(
+            "/miatun/letter", method="PATCH", headers=self.auth_headers, body=payload
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(body["letter"]["letter_body"], "Dear John, thank you!")
+        self.assertEqual(body["letter"]["status"], "WRITTEN")
+        self.assertEqual(body["letter"]["guest"], "John Smith")
+        # gifts untouched by a body/status-only edit
+        self.assertEqual(body["letter"]["gifts"][0]["gift"], "Stand Mixer")
+
+    def test_patch_missing_letter_id(self):
+        event = self.make_event(
+            "/miatun/letter", method="PATCH", headers=self.auth_headers, body={}
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_patch_not_found(self):
+        event = self.make_event(
+            "/miatun/letter",
+            method="PATCH",
+            headers=self.auth_headers,
+            body={"letter_id": "nope", "letter_body": "x"},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 404)
+
+    def test_delete_letter_then_list_is_empty(self):
+        letter_id = "l1"
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            letter_id: make_raw_letter(letter_id, guest="John Smith", gifts=[{"gift": "Stand Mixer", "brand": "", "price_cents": None}])
+        }
+
+        delete_event = self.make_event(
+            "/miatun/letter",
+            method="DELETE",
+            headers=self.auth_headers,
+            body={"letter_id": letter_id},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            delete_response = index.handler(delete_event, self.make_context())
+        self.assertEqual(delete_response["statusCode"], 200)
+
+        list_event = self.make_event("/miatun/letter", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            list_response = index.handler(list_event, self.make_context())
+        list_body = json.loads(list_response["body"])
+        self.assertEqual(list_body["letters"], [])
+
+    def test_delete_missing_letter_id(self):
+        event = self.make_event(
+            "/miatun/letter", method="DELETE", headers=self.auth_headers, body={}
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_delete_not_found(self):
+        event = self.make_event(
+            "/miatun/letter",
+            method="DELETE",
+            headers=self.auth_headers,
+            body={"letter_id": "nope"},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 404)
 
     def test_unknown_route_404(self):
         event = self.make_event(
@@ -345,6 +765,234 @@ class TestExportEndpoint(unittest.TestCase):
         )
         response = index.handler(event, self.make_context())
         self.assertEqual(response["statusCode"], 404)
+
+
+class TestDisjoinLetterPair(unittest.TestCase):
+    """Test suite for POST /miatun/disjoin through the full handler."""
+
+    @staticmethod
+    def make_event(path, method="GET", headers=None, body=None):
+        event = {
+            "version": "2.0",
+            "rawPath": path,
+            "rawQueryString": "",
+            "headers": headers or {},
+            "requestContext": {
+                "http": {"method": method, "path": path, "sourceIp": "127.0.0.1"},
+                "requestId": "test-request-id",
+                "stage": "$default",
+            },
+            "isBase64Encoded": False,
+        }
+        if body is not None:
+            event["body"] = json.dumps(body)
+        return event
+
+    @staticmethod
+    def make_context():
+        ctx = MagicMock()
+        ctx.function_name = "miatun"
+        ctx.memory_limit_in_mb = 512
+        ctx.invoked_function_arn = (
+            "arn:aws:lambda:us-east-1:123456789012:function:miatun"
+        )
+        ctx.aws_request_id = "test-aws-request-id"
+        return ctx
+
+    def setUp(self):
+        self.fake_db = FakeDynamoDB()
+        self.auth_headers = {"Internal-Api-Key": "test_internal_key"}
+
+    def seed_couple(self, both_claim_a_gift=True):
+        """John and Jane are paired (guest_pair_first_last); Jane always
+        claims a gift, John optionally claims a separate one too."""
+        items = {
+            "i1": make_raw_item("i1", "Toaster", claimant_id="jane_smith"),
+        }
+        claims = {
+            "c1": make_raw_claim("c1", "i1", "jane_smith"),
+        }
+        if both_claim_a_gift:
+            items["i2"] = make_raw_item("i2", "Blender", claimant_id="john_smith")
+            claims["c2"] = make_raw_claim("c2", "i2", "john_smith")
+
+        self.fake_db.tables[index.REGISTRY_ITEM_TABLE_NAME] = items
+        self.fake_db.tables[index.REGISTRY_CLAIM_TABLE_NAME] = claims
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "jane_smith": make_raw_user("jane_smith", pair="john_smith"),
+            "john_smith": make_raw_user("john_smith", pair="jane_smith"),
+        }
+
+    def run_sync(self):
+        event = self.make_event("/miatun/sync", method="POST", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 200)
+
+    def disjoin(self, letter_id):
+        event = self.make_event(
+            "/miatun/disjoin",
+            method="POST",
+            headers=self.auth_headers,
+            body={"letter_id": letter_id},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            return index.handler(event, self.make_context())
+
+    def test_disjoin_rejects_missing_api_key(self):
+        event = self.make_event(
+            "/miatun/disjoin", method="POST", body={"letter_id": "x"}
+        )
+        response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 401)
+
+    def test_disjoin_rejects_wrong_api_key(self):
+        event = self.make_event(
+            "/miatun/disjoin",
+            method="POST",
+            headers={"internal-api-key": "wrong"},
+            body={"letter_id": "x"},
+        )
+        response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 401)
+
+    def test_disjoin_missing_letter_id(self):
+        event = self.make_event(
+            "/miatun/disjoin", method="POST", headers=self.auth_headers, body={}
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_disjoin_letter_not_found(self):
+        response = self.disjoin("nope")
+        self.assertEqual(response["statusCode"], 404)
+
+    def test_disjoin_rejects_manual_letter(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "manual-1": make_raw_letter(
+                "manual-1", source="MANUAL", guest="Jane Smith", partner="John Smith"
+            ),
+        }
+        response = self.disjoin("manual-1")
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_disjoin_rejects_letter_with_no_claimant(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "item:i1": make_raw_letter(
+                "item:i1", source="SYNC", guest="", claimant_id=""
+            ),
+        }
+        response = self.disjoin("item:i1")
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_disjoin_rejects_when_no_partner_on_file(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "guest:amy_pond": make_raw_letter(
+                "guest:amy_pond", source="SYNC", guest="Amy Pond", claimant_id="amy_pond"
+            ),
+        }
+        self.fake_db.tables[index.USER_TABLE_NAME] = {
+            "amy_pond": make_raw_user("amy_pond", pair=""),
+        }
+        response = self.disjoin("guest:amy_pond")
+        self.assertEqual(response["statusCode"], 400)
+
+    def test_disjoin_happy_path_splits_couple_with_correct_gift_attribution(self):
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+
+        response = self.disjoin("couple:jane_smith|john_smith")
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(len(body["letters"]), 2)
+
+        by_id = {letter.id: letter for letter in index.LetterRecord.get_all_letters_db(self.fake_db)}
+        self.assertIn("guest:jane_smith", by_id)
+        self.assertIn("guest:john_smith", by_id)
+        self.assertNotIn("couple:jane_smith|john_smith", by_id)
+        self.assertEqual(by_id["guest:jane_smith"].partner, "")
+        self.assertEqual(by_id["guest:john_smith"].partner, "")
+        self.assertEqual([g["gift"] for g in by_id["guest:jane_smith"].gifts], ["Toaster"])
+        self.assertEqual([g["gift"] for g in by_id["guest:john_smith"].gifts], ["Blender"])
+
+    def test_disjoin_is_durable_across_subsequent_sync(self):
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+        self.disjoin("couple:jane_smith|john_smith")
+
+        pair_table = self.fake_db.tables[index.LETTERS_DISJOINED_PAIRS_TABLE_NAME]
+        self.assertIn("jane_smith|john_smith", pair_table)
+
+        self.run_sync()
+
+        remaining_ids = set(self.fake_db.tables[index.LETTERS_TABLE_NAME].keys())
+        self.assertIn("guest:jane_smith", remaining_ids)
+        self.assertIn("guest:john_smith", remaining_ids)
+        self.assertNotIn("couple:jane_smith|john_smith", remaining_ids)
+
+    def test_disjoin_preserves_letter_body_and_status_for_original_claimant(self):
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+
+        letter = index.LetterRecord.from_letter_id_db(
+            "couple:jane_smith|john_smith", self.fake_db
+        )
+        self.assertEqual(letter.claimant_id, "jane_smith")  # sorts first alphabetically
+        letter.letter_body = "Dear Jane and John, thank you!"
+        letter.status = index.LetterStatus.WRITTEN
+        letter.update_db(self.fake_db)
+
+        self.disjoin("couple:jane_smith|john_smith")
+
+        by_id = {letter.id: letter for letter in index.LetterRecord.get_all_letters_db(self.fake_db)}
+        self.assertEqual(by_id["guest:jane_smith"].letter_body, "Dear Jane and John, thank you!")
+        self.assertEqual(by_id["guest:jane_smith"].status, index.LetterStatus.WRITTEN)
+        self.assertEqual(by_id["guest:john_smith"].letter_body, "")
+        self.assertEqual(by_id["guest:john_smith"].status, index.LetterStatus.DRAFT)
+
+    def test_disjoin_partner_with_no_claimed_gifts_yields_single_letter(self):
+        self.seed_couple(both_claim_a_gift=False)
+        self.run_sync()
+
+        response = self.disjoin("couple:jane_smith|john_smith")
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(len(body["letters"]), 1)
+        self.assertEqual(body["letters"][0]["id"], "guest:jane_smith")
+
+        remaining_ids = set(self.fake_db.tables[index.LETTERS_TABLE_NAME].keys())
+        self.assertNotIn("guest:john_smith", remaining_ids)
+
+    def test_redisjoin_after_prune_returns_404(self):
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+        first = self.disjoin("couple:jane_smith|john_smith")
+        self.assertEqual(first["statusCode"], 200)
+
+        second = self.disjoin("couple:jane_smith|john_smith")
+        self.assertEqual(second["statusCode"], 404)
+
+    def test_disjoin_returns_500_on_dynamo_error(self):
+        # from_letter_id_db/get_user_db swallow their own errors (return
+        # None/{}, surfacing as 404s elsewhere), so to exercise the 500 path
+        # a real letter+partner must resolve first — only the recompute
+        # step's get_all() call blows up.
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+
+        mock_dynamo = MagicMock(wraps=self.fake_db)
+        mock_dynamo.get_all.side_effect = Exception("dynamo exploded")
+
+        event = self.make_event(
+            "/miatun/disjoin",
+            method="POST",
+            headers=self.auth_headers,
+            body={"letter_id": "couple:jane_smith|john_smith"},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", mock_dynamo):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 500)
 
 
 if __name__ == "__main__":

@@ -120,6 +120,12 @@ class DotLoveCoreStack(Stack):
         self.dot_love_survey_results_table = self.create_dot_love_survey_results_table()
         # Create Scoreboard database
         self.dot_love_scoreboard_table = self.create_dot_love_scoreboard_table()
+        # Create Letters database
+        self.dot_love_letters_table = self.create_dot_love_letters_table()
+        # Create Letters Disjoined-Pairs database
+        self.dot_love_letters_disjoined_pairs_table = (
+            self.create_dot_love_letters_disjoined_pairs_table()
+        )
 
         ###################################################
         # DOT LOVE API GATEWAY 🖥
@@ -182,18 +188,15 @@ class DotLoveCoreStack(Stack):
         )
 
         ###################################################
-        # MIATUN THANK YOU CARD SERVICE 💌
+        # MIATUN THANK YOU LETTERS SERVICE 💌
         ###################################################
-        # Create dependency layer (openpyxl is too heavy for the global layer)
-        self.create_miatun_dependency_layer()
-        # Create s3 bucket to hold generated thank-you-card exports
-        self.dot_love_thank_you_export_s3 = self.create_dot_love_thank_you_export_s3()
         # Create Miatun Service Lambda and associate w/ API Gateway
         self.dot_love_miatun_lambda = self.create_dot_love_miatun_lambda(
             user_table=self.dot_love_user_table,
             registry_item_table=self.dot_love_registry_item_table,
             registry_claim_table=self.dot_love_registry_claim_table,
-            export_bucket=self.dot_love_thank_you_export_s3,
+            letters_table=self.dot_love_letters_table,
+            letters_disjoined_pairs_table=self.dot_love_letters_disjoined_pairs_table,
         )
         # Tie Miatun Lambda to API Gateway
         self.add_miatun_routes_to_api_gw(
@@ -366,6 +369,45 @@ class DotLoveCoreStack(Stack):
         )
 
         return scoreboard_table
+
+    def create_dot_love_letters_table(self):
+        letters_table = dynamodb.Table(
+            scope=self,
+            id=f"{self.stack_env}-letters",
+            # PK: id. For claims-sync rows this is the source registry_claims
+            # (or registry_items, for the no-claim fallback) row's own id, so
+            # re-syncing upserts in place instead of duplicating.
+            partition_key=dynamodb.Attribute(
+                name="id",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            encryption=dynamodb.TableEncryption.AWS_MANAGED,
+        )
+
+        return letters_table
+
+    def create_dot_love_letters_disjoined_pairs_table(self):
+        letters_disjoined_pairs_table = dynamodb.Table(
+            scope=self,
+            id=f"{self.stack_env}-letters_disjoined_pairs",
+            # PK: pair_key, canonical "sorted(first_last_a, first_last_b)"
+            # joined by "|". Presence of a row means: don't merge this
+            # claimant pair into one thank-you letter, even though
+            # guest_pair_first_last on the User table still pairs them (that
+            # field drives real RSVP date-pairing elsewhere and is
+            # intentionally left untouched by this feature).
+            partition_key=dynamodb.Attribute(
+                name="pair_key",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            encryption=dynamodb.TableEncryption.AWS_MANAGED,
+        )
+
+        return letters_disjoined_pairs_table
 
     ###################################################
     # DOT LOVE SERVICES
@@ -546,13 +588,14 @@ class DotLoveCoreStack(Stack):
         user_table,
         registry_item_table,
         registry_claim_table,
-        export_bucket,
+        letters_table,
+        letters_disjoined_pairs_table,
     ):
         miatun_lambda_role = iam.Role(
             scope=self,
             id=f"{self.stack_env}-dot-love-miatun-service-role",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Lambda Role with read access to user/registry tables and the thank-you export bucket",
+            description="Lambda Role with read access to user/registry tables and read/write access to the letters table",
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name(
                     "service-role/AWSLambdaBasicExecutionRole"
@@ -560,12 +603,12 @@ class DotLoveCoreStack(Stack):
             ],
         )
 
-        # Grant db access (read-only: miatun only exports)
+        # Grant db access
         user_table.grant_read_data(miatun_lambda_role)
         registry_item_table.grant_read_data(miatun_lambda_role)
         registry_claim_table.grant_read_data(miatun_lambda_role)
-        # Put for uploads, Get so the role-signed presigned URLs work
-        export_bucket["bucket"].grant_read_write(miatun_lambda_role)
+        letters_table.grant_read_write_data(miatun_lambda_role)
+        letters_disjoined_pairs_table.grant_read_write_data(miatun_lambda_role)
 
         miatun_lambda = lambdaFx.Function(
             scope=self,
@@ -573,20 +616,18 @@ class DotLoveCoreStack(Stack):
             runtime=lambdaFx.Runtime.PYTHON_3_11,
             handler="index.handler",
             role=miatun_lambda_role,
-            # NOTE: exclude keeps the layer dir + tests out of the function zip
-            # (the layer is attached separately below)
-            code=lambdaFx.Code.from_asset(
-                "infra/lambda/miatun/",
-                exclude=["layer", "tests", "__pycache__"],
-            ),
-            description="DotLove Miatun Service, to generate thank-you-card spreadsheets",
+            code=lambdaFx.Code.from_asset("infra/lambda/miatun/"),
+            description="DotLove Miatun Service, to manage thank-you letters",
             environment={
                 # For joining gifts to guests
                 "user_table_name": user_table.table_name,
                 "registry_item_table_name": registry_item_table.table_name,
                 "registry_claim_table_name": registry_claim_table.table_name,
-                # Where generated xlsx exports land
-                "export_bucket_name": export_bucket["bucket"].bucket_name,
+                # Where letter records are stored
+                "letters_table_name": letters_table.table_name,
+                # Pairs excluded from household grouping despite
+                # guest_pair_first_last (see POST /miatun/disjoin)
+                "letters_disjoined_pairs_table_name": letters_disjoined_pairs_table.table_name,
                 # Lambda Powertools
                 "POWERTOOLS_SERVICE_NAME": "miatun",
                 "POWERTOOLS_LOG_LEVEL": "INFO",
@@ -594,7 +635,7 @@ class DotLoveCoreStack(Stack):
                 # Admin route auth
                 "internal_api_key": self.internal_api_key,
             },
-            layers=[self.miatun_lambda_layer],
+            layers=[self.global_lambda_layer],
             memory_size=512,
             timeout=Duration.seconds(15),
         )
@@ -670,6 +711,7 @@ class DotLoveCoreStack(Stack):
                     apigw.CorsHttpMethod.OPTIONS,
                     apigw.CorsHttpMethod.POST,
                     apigw.CorsHttpMethod.PATCH,
+                    apigw.CorsHttpMethod.DELETE,
                 ],
                 # NOTE: Should be fine for the calls I make from Spectaculo to Gizmo, we'll see
                 allow_origins=["*"],
@@ -927,11 +969,33 @@ class DotLoveCoreStack(Stack):
             integration=miatun_service_integration,
         )
         #
-        # POST /export
-        # Generate the thank-you-card xlsx and return a presigned download URL
-        # (admin only, gated by Internal-Api-Key)
+        # POST /sync
+        # Re-gather delivered gifts from claims/items/users and upsert them
+        # into the letters table (admin only, gated by Internal-Api-Key)
         dot_love_api_gw.add_routes(
-            path="/miatun/export",
+            path="/miatun/sync",
+            methods=[apigw.HttpMethod.POST],
+            integration=miatun_service_integration,
+        )
+        #
+        # GET/POST/PATCH/DELETE /letter
+        # Letters CRUD (admin only, gated by Internal-Api-Key)
+        dot_love_api_gw.add_routes(
+            path="/miatun/letter",
+            methods=[
+                apigw.HttpMethod.GET,
+                apigw.HttpMethod.POST,
+                apigw.HttpMethod.PATCH,
+                apigw.HttpMethod.DELETE,
+            ],
+            integration=miatun_service_integration,
+        )
+        #
+        # POST /disjoin
+        # Split a two-person letter into two individual letters (admin only,
+        # gated by Internal-Api-Key)
+        dot_love_api_gw.add_routes(
+            path="/miatun/disjoin",
             methods=[apigw.HttpMethod.POST],
             integration=miatun_service_integration,
         )
@@ -992,25 +1056,6 @@ class DotLoveCoreStack(Stack):
         )
 
         return {"bucket": ses_s3_bucket}
-
-    def create_dot_love_thank_you_export_s3(self):
-        # Exports are point-in-time snapshots; expire them after 30 days
-        lifecycle_rule = s3.LifecycleRule(
-            id=f"{self.stack_env}-thank-you-export-rule",
-            expiration=Duration.days(30),
-        )
-        thank_you_export_bucket = s3.Bucket(
-            scope=self,
-            id=f"{self.stack_env}-dot-love-thank-you-export-s3",
-            auto_delete_objects=True,
-            removal_policy=RemovalPolicy.DESTROY,
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            encryption=s3.BucketEncryption.S3_MANAGED,
-            enforce_ssl=True,
-            lifecycle_rules=[lifecycle_rule],
-        )
-
-        return {"bucket": thank_you_export_bucket}
 
     def create_dot_love_registry_item_img_s3(self):
         registry_item_img_bucket = s3.Bucket(
@@ -1203,13 +1248,3 @@ class DotLoveCoreStack(Stack):
             compatible_runtimes=[lambdaFx.Runtime.PYTHON_3_11],
         )
 
-    def create_miatun_dependency_layer(self):
-        # External Package(s) (AWS Powertools, openpyxl)
-        # NOTE: Built the same way as the global layer:
-        #   pip3 install -r ~/code/dot-love/backend/infra/lambda/miatun/requirements.txt --target ~/code/dot-love/backend/infra/lambda/miatun/layer/python/lib/python3.11/site-packages
-        self.miatun_lambda_layer = lambdaFx.LayerVersion(
-            self,
-            f"{self.stack_env}-miatun-layer",
-            code=lambdaFx.AssetCode("infra/lambda/miatun/layer/"),
-            compatible_runtimes=[lambdaFx.Runtime.PYTHON_3_11],
-        )
