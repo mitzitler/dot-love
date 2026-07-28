@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import { Transitionizer } from '../components/Transitionizer';
@@ -6,13 +6,18 @@ import { Info } from '../pages/Info';
 import { RegistryTemp } from '../pages/RegistryTemp';
 import { Registry } from '../pages/Registry';
 import { AboutUs } from '../pages/AboutUs';
-import { Admin } from '../pages/Admin';
 import { Survey } from '../pages/games/militsa';
 import { Pritham } from '../pages/games/pritham';
 import { setloginHeaderState } from '../features/guest/extrasSlice';
 import { JulesGame } from '../pages/games/julescraft';
 import useRegistryItems from '../components/useRegistryItems';
 import useClaimedItems from '../components/useClaimedItems';
+
+// Admin pulls in MUI + react-virtuoso + admin-only queries that regular
+// guests never need, so it's code-split out of the main bundle.
+const Admin = React.lazy(() =>
+    import('../pages/Admin').then((module) => ({ default: module.Admin }))
+);
 
 export function Router ({ setLoginHeader}) {
 
@@ -108,10 +113,12 @@ export function Router ({ setLoginHeader}) {
                 path="/admin"
                 element={
                     <Transitionizer>
-                        <Admin
-                            registryItems={registryItemsCat}
-                            claimedItems={claimedItemsClaimed}
-                            />
+                        <Suspense fallback={<div className="p-10 text-center font-suse">Loading admin…</div>}>
+                            <Admin
+                                registryItems={registryItemsCat}
+                                claimedItems={claimedItemsClaimed}
+                                />
+                        </Suspense>
                     </Transitionizer>
                 }
             />

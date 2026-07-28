@@ -150,7 +150,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 };
 
 
-export default function SortTableClaims({claimsData}: {claimsData: Data[]}) 
+function SortTableClaims({claimsData}: {claimsData: Data[]})
     {
     
     const [order, setOrder] = React.useState<Order>('asc');
@@ -255,3 +255,5 @@ export default function SortTableClaims({claimsData}: {claimsData: Data[]})
         </Paper>
     );
 }
+
+export default React.memo(SortTableClaims);

@@ -11,23 +11,20 @@ import {
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 
-export interface Data {
-    first: string;
-    last: string;
-    first_last: string;
-    email: string;
-    phone: string;
-    pronouns: string;
-    rsvp_status: string;
-  
-    address_info: string,
-  
-    dietary: string,
-  
-    date_link_requested: boolean;
-    link: string;
-    pair_first_last: string;
-  }
+interface Gift {
+    gift: string;
+    brand: string;
+    price_cents: number | null;
+}
+
+interface Data {
+    id: string;
+    guest: string;
+    partner: string;
+    gifts: Gift[];
+    status: string;
+    updated_at: string;
+}
 
 interface HeadCell {
     disablePadding: boolean;
@@ -45,7 +42,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] > a[orderBy]) return 1;
     return 0;
 }
-  
+
 function getComparator<Key extends keyof any>(
     order: Order,
     orderBy: Key
@@ -55,67 +52,47 @@ function getComparator<Key extends keyof any>(
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const numCols = 7;
-const overallWidth = 850;
-
 const headCells: readonly HeadCell[] = [
     {
-        id: 'first',
+        id: 'guest',
         numeric: false,
         disablePadding: true,
-        label: 'First',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
+        label: 'Guest',
+        width: 140,
+        smallScreenWidth: 50,
     },
     {
-        id: 'last',
+        id: 'partner',
         numeric: false,
-        disablePadding: true,
-        label: 'Last',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
+        disablePadding: false,
+        label: 'Partner',
+        width: 140,
+        smallScreenWidth: 50,
     },
     {
-        id: 'phone',
+        id: 'gifts',
         numeric: false,
-        disablePadding: true,
-        label: 'Phone',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
+        disablePadding: false,
+        label: 'Gifts',
+        width: 220,
+        smallScreenWidth: 50,
     },
     {
-        id: 'pair_first_last',
+        id: 'status',
         numeric: false,
-        disablePadding: true,
-        label: 'Date Pair',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
+        disablePadding: false,
+        label: 'Status',
+        width: 90,
+        smallScreenWidth: 50,
     },
     {
-        id: 'address_info',
+        id: 'updated_at',
         numeric: false,
-        disablePadding: true,
-        label: 'Address',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
+        disablePadding: false,
+        label: 'Updated',
+        width: 160,
+        smallScreenWidth: 50,
     },
-    {
-        id: 'dietary',
-        numeric: false,
-        disablePadding: true,
-        label: 'Dietary Info',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
-    },
-    {
-        id: 'email',
-        numeric: false,
-        disablePadding: true,
-        label: 'Email',
-        width: overallWidth/numCols,
-        smallScreenWidth: 40,
-    },
-    // more fields also
 ];
 
 const VirtuosoTableComponents: TableComponents<Data> = {
@@ -124,14 +101,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
         component={Paper}
         ref={ref}
         {...props}
-        sx={{ backgroundColor: 'beige', width: 850 }}
+        sx={{ backgroundColor: 'beige', width: 750 }}
       />
     )),
     Table: (props) => (
       <Table
         {...props}
         size="small"
-        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 850 }}
+        sx={{ borderCollapse: 'separate', tableLayout: 'fixed', width: 750 }}
       />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
@@ -143,12 +120,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
     )),
 };
 
+function SortTableLetters(
+    { lettersData, selectedLetterId, onSelectLetter }:
+    { lettersData: Data[], selectedLetterId?: string, onSelectLetter: (row: Data) => void }
+) {
 
-function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
-    
     const [order, setOrder] = React.useState<Order>('asc');
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('last');
-  
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('guest');
+
     const handleSort = (property: keyof Data) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -156,10 +135,10 @@ function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
     };
 
     const sortedRows = React.useMemo(
-        () => [...(rsvpData || [])].sort(getComparator(order, orderBy)),
-        [rsvpData, order, orderBy]
-      );
-  
+        () => [...lettersData].sort(getComparator(order, orderBy)),
+        [lettersData, order, orderBy]
+    );
+
     const fixedHeaderContent = () => (
         <TableRow>
             {headCells.map((column) => (
@@ -189,19 +168,19 @@ function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
         )}
       </TableRow>
     );
-  
+
     const rowContent = (index: number, row: Data) => {
-        const notComing = row.rsvp_status != 'ATTENDING';
+        const isSelected = row.id === selectedLetterId;
         return (
             <TableRow
-                key={row.email}
+                key={row.id}
+                onClick={() => onSelectLetter(row)}
                 sx={{
-                    backgroundColor: 'khaki',
+                    backgroundColor: isSelected ? 'khaki' : 'inherit',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
                     width: "100%",
-                    display: "inline-table",
-                    opacity: notComing ? 0.5 : 1
+                    display: "inline-table"
                 }}
             >
                 {headCells.map((column) => (
@@ -212,21 +191,20 @@ function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
                             fontSize: '10px',
                             width: column.width,
                             maxWidth: column.width,
-                            minWidth: column.width,
-                            textDecoration: notComing ? 'line-through' : 'none'
+                            minWidth: column.width
                         }}
                     >
-
-                        {row[column.id]}
-
+                        {column.id === 'gifts'
+                            ? row.gifts.map((g) => g.gift).join(', ')
+                            : row[column.id]}
                     </TableCell>
                 ))}
             </TableRow>
         );
     };
-  
+
     return (
-        <Paper style={{ height: 600, width: 850, margin: '0 auto' }}>
+        <Paper style={{ height: 600, width: 750, margin: '0 auto' }}>
             <TableVirtuoso
                 data={sortedRows}
                 components={VirtuosoTableComponents}
@@ -237,4 +215,4 @@ function SortTableRSVPs({ rsvpData }: {rsvpData: Data[]})  {
     );
 }
 
-export default React.memo(SortTableRSVPs);
+export default React.memo(SortTableLetters);

@@ -8,6 +8,7 @@ import extrasReducer from './features/guest/extrasSlice';
 import { gizmoApi } from './services/gizmo';
 import { spectaculoApi } from './services/spectaculo';
 import { daphneApi } from './services/daphne';
+import { lettersApi } from './services/letters';
 
 const persistConfig = {
     key: 'root',
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
     [gizmoApi.reducerPath]: gizmoApi.reducer,
     [spectaculoApi.reducerPath]: spectaculoApi.reducer,
     [daphneApi.reducerPath]: daphneApi.reducer,
+    [lettersApi.reducerPath]: lettersApi.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -34,7 +36,7 @@ const store = configureStore({
             serializableCheck: {
                 ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
             },
-        }).concat(gizmoApi.middleware, spectaculoApi.middleware, daphneApi.middleware)
+        }).concat(gizmoApi.middleware, spectaculoApi.middleware, daphneApi.middleware, lettersApi.middleware)
 })
 
 const persistor = persistStore(store)
