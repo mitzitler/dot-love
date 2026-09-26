@@ -37,6 +37,13 @@ interface HeadCell {
 
 type Order = 'asc' | 'desc';
 
+const STATUS_ROW_COLOR: Record<string, string> = {
+    DRAFT: '#dbeafe',
+    WRITTEN: '#fed7aa',
+    READY_TO_SEND: '#bbf7d0',
+    SENT: '#e9d5ff',
+};
+
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) return -1;
     if (b[orderBy] > a[orderBy]) return 1;
@@ -176,7 +183,9 @@ function SortTableLetters(
                 key={row.id}
                 onClick={() => onSelectLetter(row)}
                 sx={{
-                    backgroundColor: isSelected ? 'khaki' : 'inherit',
+                    backgroundColor: STATUS_ROW_COLOR[row.status] || 'inherit',
+                    // Row color shows status, so mark selection with an outline
+                    boxShadow: isSelected ? 'inset 0 0 0 2px #902E6B' : 'none',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
                     width: "100%",
@@ -189,6 +198,7 @@ function SortTableLetters(
                         align={column.numeric ? 'right' : 'left'}
                         sx={{
                             fontSize: '10px',
+                            fontWeight: isSelected ? 'bold' : 'normal',
                             width: column.width,
                             maxWidth: column.width,
                             minWidth: column.width

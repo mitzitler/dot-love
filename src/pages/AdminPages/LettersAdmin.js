@@ -30,13 +30,19 @@ import {
     useDisjoinLetterPairMutation,
 } from "../../services/letters";
 
-const STATUS_OPTIONS = ["DRAFT", "WRITTEN", "SENT"];
+const STATUS_OPTIONS = ["DRAFT", "WRITTEN", "READY_TO_SEND", "SENT"];
 
 const STATUS_CHIP_COLOR = {
-    DRAFT: "default",
+    DRAFT: "info",
     WRITTEN: "warning",
-    SENT: "success",
+    READY_TO_SEND: "success",
+    SENT: "secondary",
 };
+
+// Max handwritten message length (greeting + body) Handwrytten fits on a
+// card; the envelope address and sign-off are separate. Mirrors
+// LETTER_BODY_MAX_CHARS in the miatun lambda.
+export const LETTER_BODY_MAX_CHARS = 500;
 
 const EMPTY_NEW_LETTER = {
     guest: "",
@@ -356,7 +362,10 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                             minRows={8}
                             label="Letter body"
                             value={bodyDraft}
-                            onChange={(e) => setBodyDraft(e.target.value)}
+                            onChange={(e) => setBodyDraft(e.target.value.slice(0, LETTER_BODY_MAX_CHARS))}
+                            inputProps={{ maxLength: LETTER_BODY_MAX_CHARS }}
+                            helperText={`${bodyDraft.length}/${LETTER_BODY_MAX_CHARS}`}
+                            FormHelperTextProps={{ sx: { textAlign: "right" } }}
                         />
 
                         {currentLetter.partner && currentLetter.source === "SYNC" && (

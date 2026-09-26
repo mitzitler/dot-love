@@ -1,6 +1,10 @@
 import hmac
+import json
 import os
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -23,7 +27,25 @@ LETTERS_TABLE_NAME = os.environ["letters_table_name"]
 LETTERS_DISJOINED_PAIRS_TABLE_NAME = os.environ["letters_disjoined_pairs_table_name"]
 INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
 
-INTERNAL_ROUTE_LIST = ["ping", "sync", "letter", "disjoin"]
+# Handwrytten (robot-handwritten card mailing) config. Read with .get() so the
+# lambda (and its tests) still import without them; the send routes refuse
+# to run if any are missing.
+HANDWRYTTEN_API_KEY = os.environ.get("handwrytten_api_key", "")
+HANDWRYTTEN_CARD_ID = os.environ.get("handwrytten_card_id", "")
+HANDWRYTTEN_FONT_LABEL = os.environ.get("handwrytten_font_label", "")
+# Fixed sign-off, sent as Handwrytten's separate "wishes" field (not part of
+# letter_body, so it doesn't count against LETTER_BODY_MAX_CHARS)
+HANDWRYTTEN_WISHES = os.environ.get("handwrytten_wishes", "")
+# JSON: {"first_name","last_name","address1","address2","city","state","zip"}
+HANDWRYTTEN_SENDER = os.environ.get("handwrytten_sender", "")
+HANDWRYTTEN_BASE_URL = "https://api.handwrytten.com/v2/"
+
+# Max chars of handwritten message (greeting + body). The envelope address
+# and the wishes sign-off are separate fields and don't count. Individual
+# card designs may allow fewer — /send checks the card's own capacity too.
+LETTER_BODY_MAX_CHARS = 500
+
+INTERNAL_ROUTE_LIST = ["ping", "sync", "letter", "disjoin", "send", "send-one"]
 
 # Powertools logger
 log = Logger(service="miatun")
@@ -462,7 +484,8 @@ class CWDynamoClient:
 class LetterStatus(Enum):
     DRAFT = 1
     WRITTEN = 2
-    SENT = 3
+    READY_TO_SEND = 3
+    SENT = 4
 
     def __str__(self):
         return self.name
@@ -490,6 +513,8 @@ class LetterRecord:
         status=None,
         source="MANUAL",
         updated_at=None,
+        handwrytten_order_id="",
+        sent_at="",
     ):
         """
         A thank-you letter for a household (a solo guest, or a guest+partner
@@ -504,9 +529,12 @@ class LetterRecord:
             instead of duplicating.
         :param gifts (list[dict]): each dict has "gift", "brand",
             "price_cents".
-        :param status (LetterStatus): DRAFT/WRITTEN/SENT.
+        :param status (LetterStatus): DRAFT/WRITTEN/READY_TO_SEND/SENT.
         :param source (STR): "SYNC" (populated by the claims sync) or
             "MANUAL" (hand-entered by an admin).
+        :param handwrytten_order_id (STR): set when mailed via
+            Handwrytten (see POST /miatun/send).
+        :param sent_at (STR): ISO timestamp of the Handwrytten send.
         """
         self.id = id
         self.guest = guest
@@ -524,6 +552,8 @@ class LetterRecord:
         self.status = status or LetterStatus.DRAFT
         self.source = source
         self.updated_at = updated_at or datetime.now().isoformat()
+        self.handwrytten_order_id = handwrytten_order_id
+        self.sent_at = sent_at
 
     def as_map(self):
         return {
@@ -543,6 +573,8 @@ class LetterRecord:
             "status": self.status.name if self.status else LetterStatus.DRAFT.name,
             "source": self.source,
             "updated_at": self.updated_at,
+            "handwrytten_order_id": self.handwrytten_order_id,
+            "sent_at": self.sent_at,
         }
 
     def __str__(self):
@@ -607,6 +639,8 @@ class LetterRecord:
                 status=status,
                 source=letter.get("source", "MANUAL"),
                 updated_at=letter.get("updated_at"),
+                handwrytten_order_id=letter.get("handwrytten_order_id", ""),
+                sent_at=letter.get("sent_at", ""),
             )
         except Exception as e:
             log.exception(f"Error creating LetterRecord from data: {e}")
@@ -679,6 +713,8 @@ class LetterRecord:
             "letter_body": self.letter_body,
             "status": self.status.name if self.status else LetterStatus.DRAFT.name,
             "source": self.source,
+            "handwrytten_order_id": self.handwrytten_order_id,
+            "sent_at": self.sent_at,
             "updated_at": datetime.now().isoformat(),
         }
 
@@ -944,6 +980,347 @@ def build_letter_records(
 
 
 ########################################################
+# Handwrytten (robot-handwritten card mailing)
+# API ref: https://www.handwrytten.com/api-redoc/ — request shapes mirror the
+# official SDK (github.com/handwrytten/handwrytten-python-sdk); called with
+# urllib so no new dependency lands in the layer.
+########################################################
+US_COUNTRY_ALIASES = {
+    "",
+    "US",
+    "USA",
+    "U.S.",
+    "U.S.A.",
+    "UNITED STATES",
+    "UNITED STATES OF AMERICA",
+}
+
+
+class HandwryttenError(Exception):
+    pass
+
+
+class HandwryttenClient:
+    def __init__(self, api_key, base_url=HANDWRYTTEN_BASE_URL, timeout=10):
+        self.api_key = api_key
+        self.base_url = base_url
+        self.timeout = timeout
+
+    def _request(self, method, path, params=None, body=None):
+        """Make a single (never retried — a retried POST could double-order)
+        request and return the parsed JSON body."""
+        url = self.base_url + path
+        if params:
+            url += "?" + urllib.parse.urlencode(params)
+        data = json.dumps(body).encode("utf-8") if body is not None else None
+        req = urllib.request.Request(
+            url,
+            data=data,
+            method=method,
+            headers={
+                # Handwrytten takes the raw key, no "Bearer " prefix
+                "Authorization": self.api_key,
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as res:
+                raw = res.read()
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", errors="replace")[:500]
+            raise HandwryttenError(
+                f"{method} {path} failed with HTTP {e.code}: {detail}"
+            ) from e
+        except urllib.error.URLError as e:
+            raise HandwryttenError(f"{method} {path} failed: {e.reason}") from e
+
+        parsed = json.loads(raw) if raw else {}
+        # Some Handwrytten errors come back as HTTP 200 with status=error
+        if isinstance(parsed, dict) and parsed.get("status") == "error":
+            raise HandwryttenError(
+                f"{method} {path} returned an error: {parsed.get('message') or parsed}"
+            )
+        return parsed
+
+    def get_card(self, card_id):
+        data = self._request("GET", "cards/view", params={"card_id": card_id})
+        card = data.get("card") if isinstance(data, dict) else None
+        if not isinstance(card, dict) or str(card.get("id")) != str(card_id):
+            raise HandwryttenError(f"No Handwrytten card found with id {card_id}")
+        return card
+
+    def basket_count(self):
+        data = self._request("GET", "basket/count")
+        return int(data.get("count", 0)) if isinstance(data, dict) else 0
+
+    def place_basket(self, card_id, font_label, addresses):
+        """Add one order to the basket covering every address row. Each row
+        carries its own to_*/from_* fields plus message/wishes."""
+        return self._request(
+            "POST",
+            "orders/placeBasket",
+            body={
+                "card_id": int(card_id),
+                "font": font_label,
+                "addresses": addresses,
+            },
+        )
+
+    def send_basket(self):
+        """Check out everything in the basket as a single order."""
+        return self._request("POST", "basket/send", body={})
+
+
+def get_handwrytten_client():
+    return HandwryttenClient(HANDWRYTTEN_API_KEY)
+
+
+def missing_handwrytten_config() -> list:
+    config = {
+        "handwrytten_api_key": HANDWRYTTEN_API_KEY,
+        "handwrytten_card_id": HANDWRYTTEN_CARD_ID,
+        "handwrytten_font_label": HANDWRYTTEN_FONT_LABEL,
+        "handwrytten_wishes": HANDWRYTTEN_WISHES,
+        "handwrytten_sender": HANDWRYTTEN_SENDER,
+    }
+    return [name for name, value in config.items() if not value]
+
+
+def sender_address_fields(sender_json: str) -> dict:
+    """Parse the sender (return address) config into Handwrytten from_*
+    fields. Raises ValueError if it isn't a JSON object."""
+    sender = json.loads(sender_json)
+    if not isinstance(sender, dict):
+        raise ValueError("handwrytten_sender must be a JSON object")
+    keys = ["first_name", "last_name", "address1", "address2", "city", "state", "zip"]
+    return {f"from_{key}": sender[key] for key in keys if sender.get(key)}
+
+
+def envelope_name(guest: str, partner: str) -> tuple:
+    """Split a letter's display names into Handwrytten's first/last name
+    fields so the envelope reads naturally (Handwrytten prints them as
+    "first last"):
+    - solo: "Jane Doe" -> ("Jane", "Doe")
+    - couple sharing a last name: ("Jane & John", "Smith")
+    - couple with different last names: ("Jane Doe &", "John Smith")
+    """
+    guest_parts = guest.split()
+    partner_parts = partner.split()
+    if not partner_parts:
+        if len(guest_parts) < 2:
+            return guest.strip(), ""
+        return " ".join(guest_parts[:-1]), guest_parts[-1]
+    if (
+        len(guest_parts) >= 2
+        and len(partner_parts) >= 2
+        and guest_parts[-1].lower() == partner_parts[-1].lower()
+    ):
+        first = f"{' '.join(guest_parts[:-1])} & {' '.join(partner_parts[:-1])}"
+        return first, guest_parts[-1]
+    return f"{' '.join(guest_parts)} &", " ".join(partner_parts)
+
+
+def letter_send_problems(letter, max_chars: int) -> list:
+    """Everything that would stop this letter from being mailed."""
+    problems = []
+    body = letter.letter_body or ""
+    if not body.strip():
+        problems.append("letter body is empty")
+    elif len(body) > max_chars:
+        problems.append(
+            f"letter body is {len(body)} characters; this card fits {max_chars}"
+        )
+    if not (letter.guest or "").strip():
+        problems.append("no recipient name")
+    for field, label in [
+        ("street", "street"),
+        ("city", "city"),
+        ("state_loc", "state"),
+        ("zipcode", "zip"),
+    ]:
+        if not (getattr(letter, field) or "").strip():
+            problems.append(f"missing {label}")
+    country = (letter.country or "").strip().upper()
+    if country not in US_COUNTRY_ALIASES:
+        problems.append(
+            f"non-US country '{letter.country}' — send this one manually"
+        )
+    return problems
+
+
+def recipient_row(letter, sender_fields: dict) -> dict:
+    """One Handwrytten placeBasket address row for this letter. Country is
+    omitted: Handwrytten defaults to US, and letter_send_problems() rejects
+    anything else."""
+    first_name, last_name = envelope_name(letter.guest or "", letter.partner or "")
+    row = {
+        "to_first_name": first_name,
+        "to_last_name": last_name,
+        "to_address1": letter.street.strip(),
+        "to_city": letter.city.strip(),
+        "to_state": letter.state_loc.strip(),
+        "to_zip": letter.zipcode.strip(),
+        "message": letter.letter_body,
+        "wishes": HANDWRYTTEN_WISHES,
+    }
+    if (letter.second_line or "").strip():
+        row["to_address2"] = letter.second_line.strip()
+    row.update(sender_fields)
+    return row
+
+
+def json_response(status_code, body):
+    return Response(status_code=status_code, content_type="application/json", body=body)
+
+
+def send_letters_via_handwrytten(letters, dry_run, mark_sent, hw_client, dynamo_client):
+    """
+    Validate and (unless dry_run) mail `letters` through Handwrytten as a
+    single basket checkout. Shared by POST /miatun/send and POST
+    /miatun/send-one so a one-card test exercises the exact batch path.
+
+    All-or-nothing: if any letter fails validation, nothing is sent. A dry
+    run still looks up the card (read-only) to verify the API key/card id
+    and learn the card's character capacity, but never touches the basket.
+    """
+    missing = missing_handwrytten_config()
+    if missing:
+        return json_response(
+            500, {"message": f"Handwrytten config missing: {', '.join(missing)}"}
+        )
+    try:
+        sender_fields = sender_address_fields(HANDWRYTTEN_SENDER)
+    except (ValueError, TypeError) as e:
+        return json_response(
+            500, {"message": f"handwrytten_sender is not valid JSON: {e}"}
+        )
+
+    try:
+        card = hw_client.get_card(HANDWRYTTEN_CARD_ID)
+    except HandwryttenError as e:
+        log.exception("Handwrytten card lookup failed")
+        return json_response(
+            502, {"message": "Could not look up the Handwrytten card", "error": str(e)}
+        )
+
+    max_chars = LETTER_BODY_MAX_CHARS
+    try:
+        card_chars = int(card.get("characters") or 0)
+    except (TypeError, ValueError):
+        card_chars = 0
+    if card_chars > 0:
+        max_chars = min(max_chars, card_chars)
+
+    invalid = []
+    for letter in letters:
+        problems = letter_send_problems(letter, max_chars)
+        if problems:
+            invalid.append(
+                {"letter_id": letter.id, "guest": letter.guest, "problems": problems}
+            )
+    if invalid:
+        return json_response(
+            400,
+            {
+                "message": f"{len(invalid)} letter(s) can't be sent; nothing was sent",
+                "max_chars": max_chars,
+                "invalid_letters": invalid,
+            },
+        )
+
+    rows = [recipient_row(letter, sender_fields) for letter in letters]
+
+    if dry_run:
+        return json_response(
+            200,
+            {
+                "message": "dry run; nothing was sent",
+                "dry_run": True,
+                "count": len(letters),
+                "max_chars": max_chars,
+                "card_id": HANDWRYTTEN_CARD_ID,
+                "font": HANDWRYTTEN_FONT_LABEL,
+                "recipients": [
+                    {"letter_id": letter.id, **row} for letter, row in zip(letters, rows)
+                ],
+            },
+        )
+
+    # Refuse to check out a basket we didn't fill: leftovers from an earlier
+    # failed attempt would otherwise get mailed alongside this batch.
+    try:
+        existing = hw_client.basket_count()
+    except HandwryttenError as e:
+        log.exception("Handwrytten basket count failed")
+        return json_response(
+            502, {"message": "Could not check the Handwrytten basket", "error": str(e)}
+        )
+    if existing:
+        return json_response(
+            409,
+            {
+                "message": f"The Handwrytten basket already has {existing} item(s). Review or clear it in the Handwrytten dashboard, then retry; nothing was sent."
+            },
+        )
+
+    try:
+        placed = hw_client.place_basket(HANDWRYTTEN_CARD_ID, HANDWRYTTEN_FONT_LABEL, rows)
+    except HandwryttenError as e:
+        log.exception("Handwrytten placeBasket failed")
+        return json_response(
+            502,
+            {
+                "message": "Could not add the cards to the Handwrytten basket; check the basket in the Handwrytten dashboard before retrying",
+                "error": str(e),
+            },
+        )
+
+    try:
+        sent = hw_client.send_basket()
+    except HandwryttenError as e:
+        log.exception("Handwrytten basket/send failed")
+        return json_response(
+            502,
+            {
+                "message": "The cards are in the Handwrytten basket but checkout failed. Check out or clear the basket in the Handwrytten dashboard; don't just retry, or they'll be ordered twice.",
+                "error": str(e),
+            },
+        )
+
+    order_id = str((placed or {}).get("order_id") or "")
+    log.info(f"handwrytten send complete count={len(letters)} order_id={order_id}")
+
+    failed_to_mark = []
+    if mark_sent:
+        sent_at = datetime.now().isoformat()
+        for letter in letters:
+            letter.status = LetterStatus.SENT
+            letter.handwrytten_order_id = order_id
+            letter.sent_at = sent_at
+            try:
+                letter.update_db(dynamo_client)
+            except Exception:
+                log.exception(f"Failed to mark letter {letter.id} SENT")
+                failed_to_mark.append(letter.id)
+
+    body = {
+        "message": f"sent {len(letters)} card(s) via Handwrytten",
+        "dry_run": False,
+        "count": len(letters),
+        "handwrytten_order_id": order_id,
+        "marked_sent": mark_sent,
+        "letter_ids": [letter.id for letter in letters],
+        "handwrytten_response": sent,
+    }
+    if failed_to_mark:
+        # The cards WERE ordered; these just weren't marked. Resending them
+        # would mail them twice, so set them to SENT by hand instead.
+        body["failed_to_mark_sent"] = failed_to_mark
+    return json_response(200, body)
+
+
+########################################################
 # Controller Action Handler
 ########################################################
 def validate_internal_route(func):
@@ -964,6 +1341,19 @@ def validate_internal_route(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def letter_body_too_long_response(letter_body):
+    """400 Response if letter_body exceeds LETTER_BODY_MAX_CHARS, else None."""
+    if letter_body and len(letter_body) > LETTER_BODY_MAX_CHARS:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body={
+                "message": f"letter_body is {len(letter_body)} characters; the max is {LETTER_BODY_MAX_CHARS}"
+            },
+        )
+    return None
 
 
 @app.get("/miatun/ping")
@@ -1077,6 +1467,10 @@ def create_letter():
     payload = app.current_event.json_body
 
     try:
+        too_long = letter_body_too_long_response(payload.get("letter_body", ""))
+        if too_long:
+            return too_long
+
         letter = LetterRecord(
             id=str(uuid.uuid4()),
             guest=payload.get("guest", ""),
@@ -1154,6 +1548,10 @@ def patch_letter():
             "country",
             "letter_body",
         ]
+        too_long = letter_body_too_long_response(payload.get("letter_body", ""))
+        if too_long:
+            return too_long
+
         for field in editable_fields:
             if field in payload:
                 setattr(letter, field, payload[field])
@@ -1331,6 +1729,87 @@ def disjoin_letter_pair():
             content_type="application/json",
             body={"message": "Failed to disjoin letter pair", "error": str(e)},
         )
+
+
+def request_payload() -> dict:
+    """JSON body as a dict, tolerating an empty/missing body."""
+    try:
+        return app.current_event.json_body or {}
+    except Exception:
+        return {}
+
+
+@app.post("/miatun/send")
+@validate_internal_route
+def send_ready_letters():
+    """
+    Mail every READY_TO_SEND letter through Handwrytten in one basket
+    checkout (one order, so batch pricing applies). Not exposed in the UI.
+
+    Body: {"dry_run": bool (default true), "mark_sent": bool (default true)}.
+    Only a literal `false` turns dry_run off, so nothing is mailed by
+    accident. mark_sent=false leaves statuses alone (for a rehearsal with
+    Handwrytten's account test mode on).
+    """
+    payload = request_payload()
+    dry_run = payload.get("dry_run", True) is not False
+    mark_sent = payload.get("mark_sent", True) is not False
+
+    try:
+        letters = [
+            letter
+            for letter in LetterRecord.get_all_letters_db(CW_DYNAMO_CLIENT)
+            if letter.status == LetterStatus.READY_TO_SEND
+        ]
+        if not letters:
+            return json_response(400, {"message": "No letters are READY_TO_SEND"})
+        letters.sort(key=lambda letter: letter.guest)
+
+        return send_letters_via_handwrytten(
+            letters, dry_run, mark_sent, get_handwrytten_client(), CW_DYNAMO_CLIENT
+        )
+    except Exception as e:
+        log.exception("Failed to send letters")
+        return json_response(500, {"message": "Failed to send letters", "error": str(e)})
+
+
+@app.post("/miatun/send-one")
+@validate_internal_route
+def send_one_letter():
+    """
+    Mail a single letter through Handwrytten — e.g. a test card addressed to
+    ourselves before the real batch. Uses the same path as /miatun/send.
+    Works for any status except SENT, so a test letter never has to be
+    READY_TO_SEND (and get swept into the batch). Not exposed in the UI.
+
+    Body: {"letter_id": str, "dry_run": bool (default true),
+           "mark_sent": bool (default true)}.
+    """
+    payload = request_payload()
+    letter_id = payload.get("letter_id")
+    dry_run = payload.get("dry_run", True) is not False
+    mark_sent = payload.get("mark_sent", True) is not False
+
+    try:
+        if not letter_id:
+            return json_response(400, {"message": "letter_id is required"})
+
+        letter = LetterRecord.from_letter_id_db(letter_id, CW_DYNAMO_CLIENT)
+        if not letter:
+            return json_response(
+                404, {"message": f"Letter with ID {letter_id} not found"}
+            )
+        if letter.status == LetterStatus.SENT:
+            return json_response(
+                409, {"message": f"Letter {letter_id} has already been sent"}
+            )
+
+        return send_letters_via_handwrytten(
+            [letter], dry_run, mark_sent, get_handwrytten_client(), CW_DYNAMO_CLIENT
+        )
+    except Exception as e:
+        log.exception(f"Failed to send letter {letter_id}")
+        return json_response(500, {"message": "Failed to send letter", "error": str(e)})
 
 
 # Fallback for unhandled routes

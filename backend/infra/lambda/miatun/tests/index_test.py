@@ -995,5 +995,355 @@ class TestDisjoinLetterPair(unittest.TestCase):
         self.assertEqual(response["statusCode"], 500)
 
 
+class TestLetterStatusAndLimits(unittest.TestCase):
+    """READY_TO_SEND status and the LETTER_BODY_MAX_CHARS cap."""
+
+    make_event = staticmethod(TestAPIEndpoints.make_event)
+    make_context = staticmethod(TestAPIEndpoints.make_context)
+
+    def setUp(self):
+        self.fake_db = FakeDynamoDB()
+        self.auth_headers = {"Internal-Api-Key": "test_internal_key"}
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "l1": make_raw_letter("l1", guest="John Smith")
+        }
+
+    def patch_letter(self, payload):
+        event = self.make_event(
+            "/miatun/letter", method="PATCH", headers=self.auth_headers,
+            body={"letter_id": "l1", **payload},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            return index.handler(event, self.make_context())
+
+    def test_ready_to_send_round_trips(self):
+        response = self.patch_letter({"status": "READY_TO_SEND"})
+        self.assertEqual(response["statusCode"], 200)
+        letter = index.LetterRecord.from_letter_id_db("l1", self.fake_db)
+        self.assertEqual(letter.status, index.LetterStatus.READY_TO_SEND)
+        self.assertEqual(letter.as_map()["status"], "READY_TO_SEND")
+
+    def test_patch_accepts_500_char_body(self):
+        response = self.patch_letter({"letter_body": "x" * 500})
+        self.assertEqual(response["statusCode"], 200)
+
+    def test_patch_rejects_501_char_body(self):
+        response = self.patch_letter({"letter_body": "x" * 501})
+        self.assertEqual(response["statusCode"], 400)
+        letter = index.LetterRecord.from_letter_id_db("l1", self.fake_db)
+        self.assertEqual(letter.letter_body, "")
+
+    def test_create_rejects_501_char_body(self):
+        event = self.make_event(
+            "/miatun/letter", method="POST", headers=self.auth_headers,
+            body={"guest": "Amy Pond", "letter_body": "x" * 501},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 400)
+        self.assertEqual(len(self.fake_db.tables[index.LETTERS_TABLE_NAME]), 1)
+
+    def test_create_accepts_500_char_body(self):
+        event = self.make_event(
+            "/miatun/letter", method="POST", headers=self.auth_headers,
+            body={"guest": "Amy Pond", "letter_body": "x" * 500},
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 200)
+
+
+class TestEnvelopeName(unittest.TestCase):
+    def test_solo(self):
+        self.assertEqual(index.envelope_name("Jane Doe", ""), ("Jane", "Doe"))
+
+    def test_solo_single_token(self):
+        self.assertEqual(index.envelope_name("Cher", ""), ("Cher", ""))
+
+    def test_couple_shared_last_name(self):
+        self.assertEqual(
+            index.envelope_name("Jane Smith", "John Smith"), ("Jane & John", "Smith")
+        )
+
+    def test_couple_different_last_names(self):
+        self.assertEqual(
+            index.envelope_name("Jane Doe", "John Smith"), ("Jane Doe &", "John Smith")
+        )
+
+
+HANDWRYTTEN_TEST_CONFIG = {
+    "HANDWRYTTEN_API_KEY": "hw_test_key",
+    "HANDWRYTTEN_CARD_ID": "123",
+    "HANDWRYTTEN_FONT_LABEL": "Fancy Jenna",
+    "HANDWRYTTEN_WISHES": "With love, Mitzi & Matthew",
+    "HANDWRYTTEN_SENDER": json.dumps(
+        {
+            "first_name": "Mitzi",
+            "last_name": "Saucedo",
+            "address1": "1 Home St",
+            "city": "Austin",
+            "state": "TX",
+            "zip": "78701",
+        }
+    ),
+}
+
+
+def make_ready_letter(letter_id, guest, status="READY_TO_SEND", **fields):
+    defaults = {
+        "guest": guest,
+        "street": "123 Main St",
+        "city": "Brooklyn",
+        "state_loc": "NY",
+        "zipcode": "11201",
+        "country": "USA",
+        "letter_body": f"Dear {guest}, thank you!",
+        "status": status,
+    }
+    defaults.update(fields)
+    return make_raw_letter(letter_id, **defaults)
+
+
+class TestSendLetters(unittest.TestCase):
+    """POST /miatun/send and /miatun/send-one, with Handwrytten mocked."""
+
+    make_event = staticmethod(TestAPIEndpoints.make_event)
+    make_context = staticmethod(TestAPIEndpoints.make_context)
+
+    def setUp(self):
+        self.fake_db = FakeDynamoDB()
+        self.auth_headers = {"Internal-Api-Key": "test_internal_key"}
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "l1": make_ready_letter("l1", "Jane Doe", partner="John Doe"),
+            "l2": make_ready_letter("l2", "Amy Pond"),
+            "l3": make_ready_letter("l3", "Rory Williams", status="WRITTEN"),
+        }
+        self.hw = MagicMock()
+        self.hw.get_card.return_value = {"id": 123, "characters": 400}
+        self.hw.basket_count.return_value = 0
+        self.hw.place_basket.return_value = {"order_id": 777}
+        self.hw.send_basket.return_value = {"status": "ok"}
+
+    def call(self, path, body):
+        event = self.make_event(path, method="POST", headers=self.auth_headers, body=body)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db), patch.object(
+            index, "get_handwrytten_client", return_value=self.hw
+        ), patch.multiple(index, **HANDWRYTTEN_TEST_CONFIG):
+            response = index.handler(event, self.make_context())
+        return response["statusCode"], json.loads(response["body"])
+
+    def status_of(self, letter_id):
+        return index.LetterRecord.from_letter_id_db(letter_id, self.fake_db).status
+
+    def assert_no_basket_calls(self):
+        self.hw.basket_count.assert_not_called()
+        self.hw.place_basket.assert_not_called()
+        self.hw.send_basket.assert_not_called()
+
+    def test_send_rejects_missing_api_key(self):
+        event = self.make_event("/miatun/send", method="POST", body={})
+        response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 401)
+
+    def test_send_defaults_to_dry_run(self):
+        status, body = self.call("/miatun/send", {})
+        self.assertEqual(status, 200)
+        self.assertTrue(body["dry_run"])
+        self.assertEqual(body["count"], 2)
+        self.assertEqual(body["max_chars"], 400)
+        self.assert_no_basket_calls()
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_dry_run_previews_recipients(self):
+        status, body = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 200)
+        by_id = {r["letter_id"]: r for r in body["recipients"]}
+        self.assertEqual(set(by_id), {"l1", "l2"})  # WRITTEN l3 excluded
+        couple = by_id["l1"]
+        self.assertEqual(couple["to_first_name"], "Jane & John")
+        self.assertEqual(couple["to_last_name"], "Doe")
+        self.assertEqual(couple["to_zip"], "11201")
+        self.assertEqual(couple["message"], "Dear Jane Doe, thank you!")
+        self.assertEqual(couple["wishes"], "With love, Mitzi & Matthew")
+        self.assertEqual(couple["from_city"], "Austin")
+        self.assertNotIn("to_address2", couple)
+
+    def test_send_success_submits_basket_once_and_marks_sent(self):
+        status, body = self.call("/miatun/send", {"dry_run": False})
+        self.assertEqual(status, 200)
+        self.assertEqual(body["count"], 2)
+        self.assertEqual(body["handwrytten_order_id"], "777")
+        self.hw.place_basket.assert_called_once()
+        self.hw.send_basket.assert_called_once()
+        card_id, font, rows = self.hw.place_basket.call_args.args
+        self.assertEqual((card_id, font, len(rows)), ("123", "Fancy Jenna", 2))
+
+        for letter_id in ("l1", "l2"):
+            letter = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+            self.assertEqual(letter.status, index.LetterStatus.SENT)
+            self.assertEqual(letter.handwrytten_order_id, "777")
+            self.assertTrue(letter.sent_at)
+        self.assertEqual(self.status_of("l3"), index.LetterStatus.WRITTEN)
+
+    def test_send_mark_sent_false_leaves_statuses(self):
+        status, _ = self.call("/miatun/send", {"dry_run": False, "mark_sent": False})
+        self.assertEqual(status, 200)
+        self.hw.send_basket.assert_called_once()
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_one_invalid_letter_blocks_whole_batch(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME]["l2"] = make_ready_letter(
+            "l2", "Amy Pond", zipcode=""
+        )
+        status, body = self.call("/miatun/send", {"dry_run": False})
+        self.assertEqual(status, 400)
+        self.assertEqual(body["invalid_letters"][0]["letter_id"], "l2")
+        self.assertIn("missing zip", body["invalid_letters"][0]["problems"])
+        self.assert_no_basket_calls()
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_body_longer_than_card_capacity_is_invalid(self):
+        self.hw.get_card.return_value = {"id": 123, "characters": 20}
+        status, body = self.call("/miatun/send", {"dry_run": False})
+        self.assertEqual(status, 400)
+        self.assertEqual(body["max_chars"], 20)
+        self.assert_no_basket_calls()
+
+    def test_non_us_country_is_invalid(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME]["l2"] = make_ready_letter(
+            "l2", "Amy Pond", country="Canada"
+        )
+        status, body = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 400)
+        self.assertIn("non-US", body["invalid_letters"][0]["problems"][0])
+
+    def test_empty_body_is_invalid(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME]["l2"] = make_ready_letter(
+            "l2", "Amy Pond", letter_body="   "
+        )
+        status, body = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 400)
+        self.assertIn("letter body is empty", body["invalid_letters"][0]["problems"])
+
+    def test_nonempty_basket_aborts(self):
+        self.hw.basket_count.return_value = 3
+        status, _ = self.call("/miatun/send", {"dry_run": False})
+        self.assertEqual(status, 409)
+        self.hw.place_basket.assert_not_called()
+        self.hw.send_basket.assert_not_called()
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_checkout_failure_does_not_mark_sent(self):
+        self.hw.send_basket.side_effect = index.HandwryttenError("card declined")
+        status, body = self.call("/miatun/send", {"dry_run": False})
+        self.assertEqual(status, 502)
+        self.assertIn("card declined", body["error"])
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_card_lookup_failure_returns_502(self):
+        self.hw.get_card.side_effect = index.HandwryttenError("bad api key")
+        status, _ = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 502)
+
+    def test_no_ready_letters(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "l3": make_ready_letter("l3", "Rory Williams", status="WRITTEN")
+        }
+        status, _ = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 400)
+
+    def test_missing_config_returns_500(self):
+        event = self.make_event(
+            "/miatun/send", method="POST", headers=self.auth_headers, body={"dry_run": True}
+        )
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db), patch.object(
+            index, "get_handwrytten_client", return_value=self.hw
+        ), patch.multiple(index, **{**HANDWRYTTEN_TEST_CONFIG, "HANDWRYTTEN_API_KEY": ""}):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 500)
+        self.assertIn("handwrytten_api_key", json.loads(response["body"])["message"])
+
+    def test_send_one_sends_only_that_letter(self):
+        status, body = self.call("/miatun/send-one", {"letter_id": "l3", "dry_run": False})
+        self.assertEqual(status, 200)
+        self.assertEqual(body["letter_ids"], ["l3"])
+        _, _, rows = self.hw.place_basket.call_args.args
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(self.status_of("l3"), index.LetterStatus.SENT)
+        # READY_TO_SEND letters are not swept in
+        self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
+
+    def test_send_one_dry_run(self):
+        status, body = self.call("/miatun/send-one", {"letter_id": "l3"})
+        self.assertEqual(status, 200)
+        self.assertTrue(body["dry_run"])
+        self.assert_no_basket_calls()
+
+    def test_send_one_refuses_already_sent(self):
+        self.fake_db.tables[index.LETTERS_TABLE_NAME]["l4"] = make_ready_letter(
+            "l4", "Clara Oswald", status="SENT"
+        )
+        status, _ = self.call("/miatun/send-one", {"letter_id": "l4", "dry_run": False})
+        self.assertEqual(status, 409)
+        self.assert_no_basket_calls()
+
+    def test_send_one_unknown_letter(self):
+        status, _ = self.call("/miatun/send-one", {"letter_id": "nope"})
+        self.assertEqual(status, 404)
+
+    def test_send_one_requires_letter_id(self):
+        status, _ = self.call("/miatun/send-one", {})
+        self.assertEqual(status, 400)
+
+
+class TestHandwryttenClient(unittest.TestCase):
+    """Request shape of the urllib-based Handwrytten client."""
+
+    @staticmethod
+    def fake_response(payload):
+        res = MagicMock()
+        res.read.return_value = json.dumps(payload).encode()
+        res.__enter__.return_value = res
+        return res
+
+    def test_place_basket_request(self):
+        client = index.HandwryttenClient("hw_key")
+        with patch.object(
+            index.urllib.request, "urlopen", return_value=self.fake_response({"order_id": 5})
+        ) as urlopen:
+            result = client.place_basket("123", "Fancy Jenna", [{"to_first_name": "Jane"}])
+        self.assertEqual(result, {"order_id": 5})
+        req = urlopen.call_args.args[0]
+        self.assertEqual(req.full_url, "https://api.handwrytten.com/v2/orders/placeBasket")
+        self.assertEqual(req.get_method(), "POST")
+        self.assertEqual(req.get_header("Authorization"), "hw_key")
+        self.assertEqual(
+            json.loads(req.data),
+            {"card_id": 123, "font": "Fancy Jenna", "addresses": [{"to_first_name": "Jane"}]},
+        )
+
+    def test_get_card_query_string(self):
+        client = index.HandwryttenClient("hw_key")
+        with patch.object(
+            index.urllib.request, "urlopen",
+            return_value=self.fake_response({"card": {"id": 123, "characters": 340}}),
+        ) as urlopen:
+            card = client.get_card("123")
+        self.assertEqual(card["characters"], 340)
+        self.assertEqual(
+            urlopen.call_args.args[0].full_url,
+            "https://api.handwrytten.com/v2/cards/view?card_id=123",
+        )
+
+    def test_status_error_body_raises(self):
+        client = index.HandwryttenClient("hw_key")
+        with patch.object(
+            index.urllib.request, "urlopen",
+            return_value=self.fake_response({"status": "error", "message": "nope"}),
+        ):
+            with self.assertRaises(index.HandwryttenError):
+                client.basket_count()
+
+
 if __name__ == "__main__":
     unittest.main()

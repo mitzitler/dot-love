@@ -70,6 +70,26 @@ class DotLoveCoreStack(Stack):
         self.internal_api_key = self.obtain_ssm_client_secret(
             secret_name="/dot-love/auth/internal-api-key"
         )
+        # Handwrytten (thank-you card mailing, see miatun POST /send)
+        self.handwrytten_config = {
+            "handwrytten_api_key": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/handwrytten/api-key"
+            ),
+            "handwrytten_card_id": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/handwrytten/card-id"
+            ),
+            "handwrytten_font_label": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/handwrytten/font-label"
+            ),
+            "handwrytten_wishes": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/handwrytten/wishes"
+            ),
+            # JSON return address: first_name, last_name, address1,
+            # address2, city, state, zip
+            "handwrytten_sender": self.obtain_ssm_client_secret(
+                secret_name="/dot-love/handwrytten/sender"
+            ),
+        }
         self.contact_info = {
             "matthew": {
                 "phone": self.obtain_ssm_client_secret(
@@ -634,10 +654,14 @@ class DotLoveCoreStack(Stack):
                 "TZ": "US/Eastern",
                 # Admin route auth
                 "internal_api_key": self.internal_api_key,
+                # Card mailing (POST /send, /send-one)
+                **self.handwrytten_config,
             },
             layers=[self.global_lambda_layer],
             memory_size=512,
-            timeout=Duration.seconds(15),
+            # /send makes several Handwrytten calls; stays under the 30s
+            # API Gateway HTTP API integration limit
+            timeout=Duration.seconds(29),
         )
 
         return {"function": miatun_lambda, "role": miatun_lambda_role}
@@ -996,6 +1020,24 @@ class DotLoveCoreStack(Stack):
         # gated by Internal-Api-Key)
         dot_love_api_gw.add_routes(
             path="/miatun/disjoin",
+            methods=[apigw.HttpMethod.POST],
+            integration=miatun_service_integration,
+        )
+        #
+        # POST /send
+        # Mail every READY_TO_SEND letter via Handwrytten in one checkout
+        # (admin only, gated by Internal-Api-Key; not exposed in the UI)
+        dot_love_api_gw.add_routes(
+            path="/miatun/send",
+            methods=[apigw.HttpMethod.POST],
+            integration=miatun_service_integration,
+        )
+        #
+        # POST /send-one
+        # Mail a single letter via Handwrytten, e.g. a test card to
+        # ourselves (admin only, gated by Internal-Api-Key)
+        dot_love_api_gw.add_routes(
+            path="/miatun/send-one",
             methods=[apigw.HttpMethod.POST],
             integration=miatun_service_integration,
         )
