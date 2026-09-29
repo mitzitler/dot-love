@@ -78,6 +78,7 @@ class DotLoveCoreStack(Stack):
             "handwrytten_card_id": self.obtain_ssm_client_secret(
                 secret_name="/dot-love/handwrytten/card-id"
             ),
+            # font id from GET fonts/list, e.g. "hwJenna"
             "handwrytten_font_label": self.obtain_ssm_client_secret(
                 secret_name="/dot-love/handwrytten/font-label"
             ),

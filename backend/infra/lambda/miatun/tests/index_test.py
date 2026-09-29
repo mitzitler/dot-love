@@ -1074,7 +1074,7 @@ class TestEnvelopeName(unittest.TestCase):
 HANDWRYTTEN_TEST_CONFIG = {
     "HANDWRYTTEN_API_KEY": "hw_test_key",
     "HANDWRYTTEN_CARD_ID": "123",
-    "HANDWRYTTEN_FONT_LABEL": "Fancy Jenna",
+    "HANDWRYTTEN_FONT_LABEL": "hwJenna",
     "HANDWRYTTEN_WISHES": "With love, Mitzi & Matthew",
     "HANDWRYTTEN_SENDER": json.dumps(
         {
@@ -1176,7 +1176,7 @@ class TestSendLetters(unittest.TestCase):
         self.hw.place_basket.assert_called_once()
         self.hw.send_basket.assert_called_once()
         card_id, font, rows = self.hw.place_basket.call_args.args
-        self.assertEqual((card_id, font, len(rows)), ("123", "Fancy Jenna", 2))
+        self.assertEqual((card_id, font, len(rows)), ("123", "hwJenna", 2))
 
         for letter_id in ("l1", "l2"):
             letter = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
@@ -1311,7 +1311,7 @@ class TestHandwryttenClient(unittest.TestCase):
         with patch.object(
             index.urllib.request, "urlopen", return_value=self.fake_response({"order_id": 5})
         ) as urlopen:
-            result = client.place_basket("123", "Fancy Jenna", [{"to_first_name": "Jane"}])
+            result = client.place_basket("123", "hwJenna", [{"to_first_name": "Jane"}])
         self.assertEqual(result, {"order_id": 5})
         req = urlopen.call_args.args[0]
         self.assertEqual(req.full_url, "https://api.handwrytten.com/v2/orders/placeBasket")
@@ -1319,7 +1319,7 @@ class TestHandwryttenClient(unittest.TestCase):
         self.assertEqual(req.get_header("Authorization"), "hw_key")
         self.assertEqual(
             json.loads(req.data),
-            {"card_id": 123, "font": "Fancy Jenna", "addresses": [{"to_first_name": "Jane"}]},
+            {"card_id": 123, "font": "hwJenna", "addresses": [{"to_first_name": "Jane"}]},
         )
 
     def test_get_card_query_string(self):

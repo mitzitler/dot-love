@@ -32,6 +32,8 @@ INTERNAL_API_KEY = os.environ.get("internal_api_key", "")
 # to run if any are missing.
 HANDWRYTTEN_API_KEY = os.environ.get("handwrytten_api_key", "")
 HANDWRYTTEN_CARD_ID = os.environ.get("handwrytten_card_id", "")
+# Handwriting font *id* from GET fonts/list, e.g. "hwJenna" — not the display
+# label ("Fancy Jenna"); placeBasket's "font" field takes the id
 HANDWRYTTEN_FONT_LABEL = os.environ.get("handwrytten_font_label", "")
 # Fixed sign-off, sent as Handwrytten's separate "wishes" field (not part of
 # letter_body, so it doesn't count against LETTER_BODY_MAX_CHARS)
