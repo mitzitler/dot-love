@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+    Checkbox,
     Table,
     TableBody,
     TableCell,
@@ -23,6 +24,7 @@ interface Data {
     partner: string;
     gifts: Gift[];
     status: string;
+    address_confirmed: boolean;
     updated_at: string;
 }
 
@@ -73,7 +75,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Partner',
-        width: 140,
+        width: 130,
         smallScreenWidth: 50,
     },
     {
@@ -81,7 +83,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Gifts',
-        width: 220,
+        width: 180,
         smallScreenWidth: 50,
     },
     {
@@ -90,6 +92,14 @@ const headCells: readonly HeadCell[] = [
         disablePadding: false,
         label: 'Status',
         width: 90,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'address_confirmed',
+        numeric: false,
+        disablePadding: false,
+        label: 'Addr',
+        width: 50,
         smallScreenWidth: 50,
     },
     {
@@ -128,8 +138,13 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 };
 
 function SortTableLetters(
-    { lettersData, selectedLetterId, onSelectLetter }:
-    { lettersData: Data[], selectedLetterId?: string, onSelectLetter: (row: Data) => void }
+    { lettersData, selectedLetterId, onSelectLetter, onToggleAddressConfirmed }:
+    {
+        lettersData: Data[],
+        selectedLetterId?: string,
+        onSelectLetter: (row: Data) => void,
+        onToggleAddressConfirmed: (row: Data) => void,
+    }
 ) {
 
     const [order, setOrder] = React.useState<Order>('asc');
@@ -204,9 +219,21 @@ function SortTableLetters(
                             minWidth: column.width
                         }}
                     >
-                        {column.id === 'gifts'
-                            ? row.gifts.map((g) => g.gift).join(', ')
-                            : row[column.id]}
+                        {column.id === 'gifts' ? (
+                            row.gifts.map((g) => g.gift).join(', ')
+                        ) : column.id === 'address_confirmed' ? (
+                            <Checkbox
+                                size="small"
+                                sx={{ padding: 0 }}
+                                checked={!!row.address_confirmed}
+                                // Tick without also selecting the row
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={() => onToggleAddressConfirmed(row)}
+                                inputProps={{ 'aria-label': `Address confirmed for ${row.guest}` }}
+                            />
+                        ) : (
+                            row[column.id]
+                        )}
                     </TableCell>
                 ))}
             </TableRow>

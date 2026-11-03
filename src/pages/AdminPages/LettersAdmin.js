@@ -1,12 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     Button,
+    Checkbox,
     Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    FormControlLabel,
     IconButton,
     MenuItem,
     Select,
@@ -44,6 +46,17 @@ const STATUS_CHIP_COLOR = {
 // LETTER_BODY_MAX_CHARS in the miatun lambda.
 export const LETTER_BODY_MAX_CHARS = 500;
 
+// How long typing must pause before the letter body autosaves. Status
+// changes save immediately.
+const AUTOSAVE_DELAY_MS = 1000;
+
+const SAVE_STATE_LABEL = {
+    saved: "All changes saved",
+    unsaved: "Unsaved changes...",
+    saving: "Saving...",
+    error: "Save failed",
+};
+
 const EMPTY_NEW_LETTER = {
     guest: "",
     partner: "",
@@ -66,10 +79,146 @@ function formatPriceCents(priceCents) {
 
 const toastOptions = { theme: "dark", position: "top-right", autoClose: 3000 };
 
+/**
+ * Status + body editor for one letter, autosaving as you go. Rendered with
+ * key={letter.id}, so drafts load once per letter and a save response
+ * landing mid-typing can't clobber newer text. Any pending edit is flushed
+ * when the editor unmounts (switching letters, leaving the tab), and the
+ * browser warns before closing the page with unsaved changes.
+ */
+function LetterDraftEditor({ letter, saveDraft, flushRef }) {
+    const [bodyDraft, setBodyDraft] = useState(letter.letter_body || "");
+    const [statusDraft, setStatusDraft] = useState(letter.status || "DRAFT");
+    const [saveState, setSaveState] = useState("saved");
+
+    // savedRef: the last draft sent to the server (in flight or done).
+    const savedRef = useRef({ letter_body: bodyDraft, status: statusDraft });
+    const draftRef = useRef(savedRef.current);
+    draftRef.current = { letter_body: bodyDraft, status: statusDraft };
+    const timerRef = useRef(null);
+    const inFlightRef = useRef(0);
+
+    const flush = useCallback(() => {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+        const draft = draftRef.current;
+        if (
+            draft.letter_body === savedRef.current.letter_body &&
+            draft.status === savedRef.current.status
+        ) {
+            return;
+        }
+        savedRef.current = draft;
+        inFlightRef.current += 1;
+        setSaveState("saving");
+        saveDraft(letter.id, draft)
+            .then(() => {
+                if (savedRef.current === draft) setSaveState("saved");
+            })
+            .catch((err) => {
+                console.error("Failed to autosave letter:", err);
+                // Only the newest save decides the indicator; a stale
+                // failure is superseded by the full-body save after it.
+                if (savedRef.current === draft) {
+                    savedRef.current = {};
+                    setSaveState("error");
+                    toast.error("Failed to save letter. Your text is still here.", toastOptions);
+                }
+            })
+            .finally(() => {
+                inFlightRef.current -= 1;
+            });
+    }, [letter.id, saveDraft]);
+
+    useEffect(() => {
+        const saved = savedRef.current;
+        if (bodyDraft === saved.letter_body && statusDraft === saved.status) {
+            // Edited back to what's already saved: nothing left to send.
+            clearTimeout(timerRef.current);
+            setSaveState((state) => (state === "unsaved" ? "saved" : state));
+            return;
+        }
+        setSaveState("unsaved");
+        clearTimeout(timerRef.current);
+        const delay = statusDraft !== saved.status ? 0 : AUTOSAVE_DELAY_MS;
+        timerRef.current = setTimeout(flush, delay);
+    }, [bodyDraft, statusDraft, flush]);
+
+    // Save anything pending when leaving this letter, and let the parent
+    // force a save before actions that re-key letters (sync, disjoin).
+    useEffect(() => {
+        flushRef.current = flush;
+        return () => {
+            flushRef.current = null;
+            flush();
+        };
+    }, [flush, flushRef]);
+
+    useEffect(() => {
+        const warnIfUnsaved = (e) => {
+            const dirty =
+                draftRef.current.letter_body !== savedRef.current.letter_body ||
+                draftRef.current.status !== savedRef.current.status;
+            if (!dirty && inFlightRef.current === 0) return;
+            flush();
+            e.preventDefault();
+            e.returnValue = "";
+        };
+        window.addEventListener("beforeunload", warnIfUnsaved);
+        return () => window.removeEventListener("beforeunload", warnIfUnsaved);
+    }, [flush]);
+
+    return (
+        <>
+            <div className="mb-3">
+                <label htmlFor="letter-status" className="mb-1 block text-xs font-semibold text-plum-500">
+                    Status
+                </label>
+                <Select
+                    id="letter-status"
+                    size="small"
+                    fullWidth
+                    value={statusDraft}
+                    onChange={(e) => setStatusDraft(e.target.value)}
+                >
+                    {STATUS_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                    ))}
+                </Select>
+            </div>
+
+            <TextField
+                multiline
+                fullWidth
+                minRows={8}
+                label="Letter body"
+                value={bodyDraft}
+                onChange={(e) => setBodyDraft(e.target.value.slice(0, LETTER_BODY_MAX_CHARS))}
+                inputProps={{ maxLength: LETTER_BODY_MAX_CHARS }}
+                helperText={`${bodyDraft.length}/${LETTER_BODY_MAX_CHARS}`}
+                FormHelperTextProps={{ sx: { textAlign: "right" } }}
+            />
+
+            <div className="mt-1 flex items-center gap-2 text-xs">
+                <span className={saveState === "error" ? "font-semibold text-terracotta-500" : "text-gray-500"}>
+                    {SAVE_STATE_LABEL[saveState]}
+                </span>
+                {saveState === "error" && (
+                    <button
+                        type="button"
+                        onClick={flush}
+                        className="font-semibold text-plum-500 underline"
+                    >
+                        Retry
+                    </button>
+                )}
+            </div>
+        </>
+    );
+}
+
 export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters }) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [bodyDraft, setBodyDraft] = useState("");
-    const [statusDraft, setStatusDraft] = useState("DRAFT");
     const [showNewLetterForm, setShowNewLetterForm] = useState(false);
     const [newLetterForm, setNewLetterForm] = useState(EMPTY_NEW_LETTER);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -77,21 +226,63 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
 
     const [syncLetters, { isLoading: isSyncing }] = useSyncLettersMutation();
     const [createLetter, { isLoading: isCreating }] = useCreateLetterMutation();
-    const [updateLetter, { isLoading: isSaving }] = useUpdateLetterMutation();
+    const [updateLetter] = useUpdateLetterMutation();
     const [deleteLetter, { isLoading: isDeleting }] = useDeleteLetterMutation();
     const [disjoinLetterPair, { isLoading: isDisjoining }] = useDisjoinLetterPairMutation();
 
     const currentLetter = letters && letters.length > 0 ? letters[currentIndex] : null;
 
-    useEffect(() => {
-        if (currentLetter) {
-            setBodyDraft(currentLetter.letter_body || "");
-            setStatusDraft(currentLetter.status || "DRAFT");
-        } else {
-            setBodyDraft("");
-            setStatusDraft("DRAFT");
-        }
-    }, [currentLetter]);
+    // PATCH reads the whole letter and writes every field back, so two
+    // overlapping updates to one letter could undo each other. Chain them
+    // so they reach the server one at a time, in order.
+    const updateChainRef = useRef(Promise.resolve());
+    const editorFlushRef = useRef(null);
+    const deletedIdsRef = useRef(new Set());
+
+    const enqueueUpdate = useCallback((letterId, updates) => {
+        const run = updateChainRef.current.then(() =>
+            updateLetter({ apiKey, letterId, updates }).unwrap()
+        );
+        updateChainRef.current = run.catch(() => {});
+        return run.then((result) => {
+            // Merge only the fields this update sent, so a response can't
+            // revert a newer optimistic change (e.g. a checkbox click
+            // queued behind a body save).
+            setLetters((prev) =>
+                prev.map((letter) =>
+                    letter.id === letterId
+                        ? { ...letter, ...updates, updated_at: result.letter.updated_at }
+                        : letter
+                )
+            );
+            return result;
+        });
+    }, [apiKey, updateLetter, setLetters]);
+
+    const saveDraft = useCallback((letterId, draft) => {
+        // The editor flushes on unmount, including right after a delete.
+        if (deletedIdsRef.current.has(letterId)) return Promise.resolve();
+        return enqueueUpdate(letterId, draft);
+    }, [enqueueUpdate]);
+
+    const flushPendingSaves = async () => {
+        editorFlushRef.current?.();
+        await updateChainRef.current;
+    };
+
+    const handleToggleAddressConfirmed = useCallback((letter) => {
+        const confirmed = !letter.address_confirmed;
+        const setConfirmed = (value) =>
+            setLetters((prev) =>
+                prev.map((l) => (l.id === letter.id ? { ...l, address_confirmed: value } : l))
+            );
+        setConfirmed(confirmed);
+        enqueueUpdate(letter.id, { address_confirmed: confirmed }).catch((err) => {
+            console.error("Failed to update address confirmation:", err);
+            setConfirmed(!confirmed);
+            toast.error(`Failed to update address confirmation for ${letter.guest}.`, toastOptions);
+        });
+    }, [enqueueUpdate, setLetters]);
 
     useEffect(() => {
         if (letters && currentIndex >= letters.length) {
@@ -101,6 +292,7 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
 
     const handleSync = async () => {
         try {
+            await flushPendingSaves();
             await syncLetters(apiKey).unwrap();
             const refreshed = await triggerGetAllLetters(apiKey).unwrap();
             setLetters(refreshed.letters);
@@ -144,29 +336,10 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
         }
     };
 
-    const handleSave = async () => {
-        if (!currentLetter) return;
-        try {
-            const result = await updateLetter({
-                apiKey,
-                letterId: currentLetter.id,
-                updates: { letter_body: bodyDraft, status: statusDraft },
-            }).unwrap();
-            setLetters(
-                letters.map((letter) =>
-                    letter.id === result.letter.id ? result.letter : letter
-                )
-            );
-            toast.success("Letter saved.", toastOptions);
-        } catch (err) {
-            console.error("Failed to save letter:", err);
-            toast.error("Failed to save letter.", toastOptions);
-        }
-    };
-
     const handleDeleteConfirmed = async () => {
         if (!currentLetter) return;
         const letterId = currentLetter.id;
+        deletedIdsRef.current.add(letterId);
         try {
             await deleteLetter({ apiKey, letterId }).unwrap();
             const updatedLetters = letters.filter((letter) => letter.id !== letterId);
@@ -174,6 +347,7 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
             setCurrentIndex((index) => Math.max(0, Math.min(index, updatedLetters.length - 1)));
             toast.success("Letter deleted.", toastOptions);
         } catch (err) {
+            deletedIdsRef.current.delete(letterId);
             console.error("Failed to delete letter:", err);
             toast.error("Failed to delete letter.", toastOptions);
         } finally {
@@ -185,6 +359,9 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
         if (!currentLetter) return;
         const originalClaimantId = currentLetter.claimant_id;
         try {
+            // Disjoin re-keys the letter and carries over the saved body,
+            // so get any pending edit to the server first.
+            await flushPendingSaves();
             await disjoinLetterPair({ apiKey, letterId: currentLetter.id }).unwrap();
             const refreshed = await triggerGetAllLetters(apiKey).unwrap();
             setLetters(refreshed.letters);
@@ -276,6 +453,7 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                             lettersData={letters}
                             selectedLetterId={currentLetter?.id}
                             onSelectLetter={handleSelectLetter}
+                            onToggleAddressConfirmed={handleToggleAddressConfirmed}
                         />
                     ) : (
                         <p className="text-sm italic">No letters yet. Sync from claims or add one manually.</p>
@@ -305,8 +483,8 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                             </h3>
                             <Chip
                                 size="small"
-                                label={statusDraft}
-                                color={STATUS_CHIP_COLOR[statusDraft] || "default"}
+                                label={currentLetter.status}
+                                color={STATUS_CHIP_COLOR[currentLetter.status] || "default"}
                             />
                         </div>
 
@@ -337,35 +515,24 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                                     <span>{currentLetter.phone}</span>
                                 </div>
                             )}
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        size="small"
+                                        checked={!!currentLetter.address_confirmed}
+                                        onChange={() => handleToggleAddressConfirmed(currentLetter)}
+                                    />
+                                }
+                                label="Address confirmed"
+                                componentsProps={{ typography: { fontSize: "0.875rem" } }}
+                            />
                         </div>
 
-                        <div className="mb-3">
-                            <label htmlFor="letter-status" className="mb-1 block text-xs font-semibold text-plum-500">
-                                Status
-                            </label>
-                            <Select
-                                id="letter-status"
-                                size="small"
-                                fullWidth
-                                value={statusDraft}
-                                onChange={(e) => setStatusDraft(e.target.value)}
-                            >
-                                {STATUS_OPTIONS.map((option) => (
-                                    <MenuItem key={option} value={option}>{option}</MenuItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        <TextField
-                            multiline
-                            fullWidth
-                            minRows={8}
-                            label="Letter body"
-                            value={bodyDraft}
-                            onChange={(e) => setBodyDraft(e.target.value.slice(0, LETTER_BODY_MAX_CHARS))}
-                            inputProps={{ maxLength: LETTER_BODY_MAX_CHARS }}
-                            helperText={`${bodyDraft.length}/${LETTER_BODY_MAX_CHARS}`}
-                            FormHelperTextProps={{ sx: { textAlign: "right" } }}
+                        <LetterDraftEditor
+                            key={currentLetter.id}
+                            letter={currentLetter}
+                            saveDraft={saveDraft}
+                            flushRef={editorFlushRef}
                         />
 
                         {currentLetter.partner && currentLetter.source === "SYNC" && (
@@ -380,15 +547,7 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                             </button>
                         )}
 
-                        <div className="mt-4 flex items-center justify-between">
-                            <button
-                                type="button"
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="rounded-full bg-plum-500 px-5 py-2 text-sm font-semibold text-cream-400 shadow-sm transition hover:bg-plum-500/80 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {isSaving ? "Saving..." : "Save"}
-                            </button>
+                        <div className="mt-4 flex items-center justify-end">
                             <IconButton
                                 aria-label="Delete letter"
                                 onClick={() => setDeleteDialogOpen(true)}

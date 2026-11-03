@@ -517,6 +517,7 @@ class LetterRecord:
         updated_at=None,
         handwrytten_order_id="",
         sent_at="",
+        address_confirmed=False,
     ):
         """
         A thank-you letter for a household (a solo guest, or a guest+partner
@@ -537,6 +538,9 @@ class LetterRecord:
         :param handwrytten_order_id (STR): set when mailed via
             Handwrytten (see POST /miatun/send).
         :param sent_at (STR): ISO timestamp of the Handwrytten send.
+        :param address_confirmed (BOOL): an admin checked off that the
+            guest confirmed their mailing address. Independent of status,
+            and never touched by the claims sync.
         """
         self.id = id
         self.guest = guest
@@ -556,6 +560,7 @@ class LetterRecord:
         self.updated_at = updated_at or datetime.now().isoformat()
         self.handwrytten_order_id = handwrytten_order_id
         self.sent_at = sent_at
+        self.address_confirmed = address_confirmed
 
     def as_map(self):
         return {
@@ -577,6 +582,7 @@ class LetterRecord:
             "updated_at": self.updated_at,
             "handwrytten_order_id": self.handwrytten_order_id,
             "sent_at": self.sent_at,
+            "address_confirmed": self.address_confirmed,
         }
 
     def __str__(self):
@@ -643,6 +649,7 @@ class LetterRecord:
                 updated_at=letter.get("updated_at"),
                 handwrytten_order_id=letter.get("handwrytten_order_id", ""),
                 sent_at=letter.get("sent_at", ""),
+                address_confirmed=bool(letter.get("address_confirmed", False)),
             )
         except Exception as e:
             log.exception(f"Error creating LetterRecord from data: {e}")
@@ -717,6 +724,7 @@ class LetterRecord:
             "source": self.source,
             "handwrytten_order_id": self.handwrytten_order_id,
             "sent_at": self.sent_at,
+            "address_confirmed": self.address_confirmed,
             "updated_at": datetime.now().isoformat(),
         }
 
@@ -727,8 +735,8 @@ class LetterRecord:
     def sync_upsert_db(self, dynamo_client):
         """
         Upsert used by the claims sync: writes only contact/gift fields and
-        never touches letter_body/status, so re-running sync can't overwrite
-        a letter that's already been written.
+        never touches letter_body/status/address_confirmed, so re-running
+        sync can't overwrite a letter that's already been written.
         """
         key_expression = {"id": {"S": self.id}}
         field_value_map = {
@@ -1513,7 +1521,8 @@ def create_letter():
 @validate_internal_route
 def patch_letter():
     """
-    Edit a letter (body text, status, or any contact/gift field). The
+    Edit a letter (body text, status, address_confirmed, or any
+    contact/gift field). The
     letter id is passed in the JSON body as `letter_id`, matching
     spectaculo's PATCH /spectaculo/item convention.
     """
@@ -1559,6 +1568,14 @@ def patch_letter():
                 setattr(letter, field, payload[field])
         if "status" in payload:
             letter.status = LetterStatus[payload["status"]]
+        if "address_confirmed" in payload:
+            if not isinstance(payload["address_confirmed"], bool):
+                return Response(
+                    status_code=400,
+                    content_type="application/json",
+                    body={"message": "address_confirmed must be true or false"},
+                )
+            letter.address_confirmed = payload["address_confirmed"]
 
         letter.update_db(CW_DYNAMO_CLIENT)
 
@@ -1697,6 +1714,7 @@ def disjoin_letter_pair():
         # Preserve any in-progress draft before recompute rewrites letter ids.
         preserved_body = letter.letter_body
         preserved_status = letter.status
+        preserved_address_confirmed = letter.address_confirmed
         original_claimant_id = letter.claimant_id
 
         letters, pruned_count = run_letters_sync(CW_DYNAMO_CLIENT)
@@ -1709,9 +1727,17 @@ def disjoin_letter_pair():
         # household with >=1 gift line, and no placeholder letter is created
         # for a zero-gift partner.
 
-        if primary and (preserved_body or preserved_status != LetterStatus.DRAFT):
+        # The primary keeps the original letter's address, so its
+        # confirmation carries over; the partner's new letter starts
+        # unconfirmed since it's going to their own address.
+        if primary and (
+            preserved_body
+            or preserved_status != LetterStatus.DRAFT
+            or preserved_address_confirmed
+        ):
             primary.letter_body = preserved_body
             primary.status = preserved_status
+            primary.address_confirmed = preserved_address_confirmed
             primary.update_db(CW_DYNAMO_CLIENT)
 
         log.info(f"disjoined pair pair_key={pair_key} pruned_count={pruned_count}")
