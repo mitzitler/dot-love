@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Button,
     Checkbox,
@@ -24,6 +24,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
 import SortTableLetters from "./SortTableLetters";
+import LetterAssigneeToggle, { ASSIGNEE_OPTIONS, assigneeOf } from "./LetterAssigneeToggle";
 import {
     useSyncLettersMutation,
     useCreateLetterMutation,
@@ -78,6 +79,16 @@ function formatPriceCents(priceCents) {
 }
 
 const toastOptions = { theme: "dark", position: "top-right", autoClose: 3000 };
+
+// Quick filters above the letters table: everything, or one assignee.
+const ASSIGNEE_FILTERS = [
+    { value: "ALL", label: "All", color: "#374151" },
+    ...ASSIGNEE_OPTIONS,
+];
+
+function matchesAssigneeFilter(letter, filter) {
+    return filter === "ALL" || assigneeOf(letter) === filter;
+}
 
 /**
  * Status + body editor for one letter, autosaving as you go. Rendered with
@@ -223,6 +234,7 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
     const [newLetterForm, setNewLetterForm] = useState(EMPTY_NEW_LETTER);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [disjoinDialogOpen, setDisjoinDialogOpen] = useState(false);
+    const [assigneeFilter, setAssigneeFilter] = useState("ALL");
 
     const [syncLetters, { isLoading: isSyncing }] = useSyncLettersMutation();
     const [createLetter, { isLoading: isCreating }] = useCreateLetterMutation();
@@ -231,6 +243,25 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
     const [disjoinLetterPair, { isLoading: isDisjoining }] = useDisjoinLetterPairMutation();
 
     const currentLetter = letters && letters.length > 0 ? letters[currentIndex] : null;
+
+    // The table and prev/next only cover letters matching the filter. The
+    // open letter stays open even if it's reassigned out of the filter, so
+    // the editor isn't yanked away mid-edit.
+    const visibleLetters = useMemo(
+        () => (letters || []).filter((letter) => matchesAssigneeFilter(letter, assigneeFilter)),
+        [letters, assigneeFilter]
+    );
+    const visiblePos = currentLetter
+        ? visibleLetters.findIndex((letter) => letter.id === currentLetter.id)
+        : -1;
+    const assigneeCounts = useMemo(() => {
+        const counts = { ALL: (letters || []).length };
+        for (const letter of letters || []) {
+            const assignee = assigneeOf(letter);
+            counts[assignee] = (counts[assignee] || 0) + 1;
+        }
+        return counts;
+    }, [letters]);
 
     // PATCH reads the whole letter and writes every field back, so two
     // overlapping updates to one letter could undo each other. Chain them
@@ -283,6 +314,33 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
             toast.error(`Failed to update address confirmation for ${letter.guest}.`, toastOptions);
         });
     }, [enqueueUpdate, setLetters]);
+
+    const handleSetAssignee = useCallback((letter, assignee) => {
+        const previous = assigneeOf(letter);
+        if (assignee === previous) return;
+        const setAssignee = (value) =>
+            setLetters((prev) =>
+                prev.map((l) => (l.id === letter.id ? { ...l, assignee: value } : l))
+            );
+        setAssignee(assignee);
+        enqueueUpdate(letter.id, { assignee }).catch((err) => {
+            console.error("Failed to update letter assignee:", err);
+            setAssignee(previous);
+            toast.error(`Failed to update who writes the letter for ${letter.guest}.`, toastOptions);
+        });
+    }, [enqueueUpdate, setLetters]);
+
+    const selectLetterById = (letterId) => {
+        const index = (letters || []).findIndex((letter) => letter.id === letterId);
+        if (index !== -1) setCurrentIndex(index);
+    };
+
+    const handleFilterChange = (filter) => {
+        setAssigneeFilter(filter);
+        if (currentLetter && matchesAssigneeFilter(currentLetter, filter)) return;
+        const firstMatch = (letters || []).find((letter) => matchesAssigneeFilter(letter, filter));
+        if (firstMatch) selectLetterById(firstMatch.id);
+    };
 
     useEffect(() => {
         if (letters && currentIndex >= letters.length) {
@@ -385,9 +443,17 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
         });
     }, [letters]);
 
-    const handlePrev = () => setCurrentIndex((index) => Math.max(0, index - 1));
-    const handleNext = () =>
-        setCurrentIndex((index) => Math.min((letters?.length || 1) - 1, index + 1));
+    // Step through the filtered list. If the open letter has been filtered
+    // out, either arrow jumps to the first visible letter.
+    const handlePrev = () => {
+        const target = visiblePos === -1 ? visibleLetters[0] : visibleLetters[visiblePos - 1];
+        if (target) selectLetterById(target.id);
+    };
+    const handleNext = () => {
+        const target = visiblePos === -1 ? visibleLetters[0] : visibleLetters[visiblePos + 1];
+        if (target) selectLetterById(target.id);
+    };
+    const filterLabel = ASSIGNEE_FILTERS.find((f) => f.value === assigneeFilter)?.label;
 
     return (
         <div className="font-suse">
@@ -446,17 +512,49 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                 </form>
             )}
 
+            {letters && letters.length > 0 && (
+                <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label="Filter letters by who writes them">
+                    <span className="text-xs font-semibold text-plum-500">Show:</span>
+                    {ASSIGNEE_FILTERS.map((filter) => {
+                        const selected = assigneeFilter === filter.value;
+                        return (
+                            <Chip
+                                key={filter.value}
+                                size="small"
+                                clickable
+                                label={`${filter.label} · ${assigneeCounts[filter.value] || 0}`}
+                                onClick={() => handleFilterChange(filter.value)}
+                                aria-pressed={selected}
+                                variant={selected ? "filled" : "outlined"}
+                                sx={{
+                                    fontWeight: 600,
+                                    borderColor: filter.color,
+                                    color: selected ? "#FBFBF2" : filter.color,
+                                    backgroundColor: selected ? filter.color : "rgba(255, 255, 255, 0.6)",
+                                    "&&:hover": {
+                                        backgroundColor: selected ? filter.color : `${filter.color}1f`,
+                                    },
+                                }}
+                            />
+                        );
+                    })}
+                </div>
+            )}
+
             <div className="flex flex-wrap items-start gap-6">
                 <div className="h-[600px] w-[750px]">
-                    {letters && letters.length > 0 ? (
+                    {!letters || letters.length === 0 ? (
+                        <p className="text-sm italic">No letters yet. Sync from claims or add one manually.</p>
+                    ) : visibleLetters.length === 0 ? (
+                        <p className="text-sm italic">No letters for {filterLabel}.</p>
+                    ) : (
                         <SortTableLetters
-                            lettersData={letters}
+                            lettersData={visibleLetters}
                             selectedLetterId={currentLetter?.id}
                             onSelectLetter={handleSelectLetter}
                             onToggleAddressConfirmed={handleToggleAddressConfirmed}
+                            onSetAssignee={handleSetAssignee}
                         />
-                    ) : (
-                        <p className="text-sm italic">No letters yet. Sync from claims or add one manually.</p>
                     )}
                 </div>
 
@@ -464,13 +562,24 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                     <div className="w-[380px] rounded-2xl bg-white/70 p-5 shadow-md">
                         <div className="mb-3 flex items-center justify-between">
                             <span className="text-xs font-semibold text-plum-500">
-                                Letter {currentIndex + 1} of {letters.length}
+                                {visiblePos !== -1
+                                    ? `Letter ${visiblePos + 1} of ${visibleLetters.length}`
+                                    : `Not in "${filterLabel}"`}
+                                {assigneeFilter !== "ALL" && visiblePos !== -1 ? ` (${filterLabel})` : ""}
                             </span>
                             <div className="flex items-center gap-1">
-                                <IconButton size="small" onClick={handlePrev} disabled={currentIndex === 0}>
+                                <IconButton
+                                    size="small"
+                                    onClick={handlePrev}
+                                    disabled={visibleLetters.length === 0 || visiblePos === 0}
+                                >
                                     <ArrowBackIosNewIcon fontSize="inherit" />
                                 </IconButton>
-                                <IconButton size="small" onClick={handleNext} disabled={currentIndex === letters.length - 1}>
+                                <IconButton
+                                    size="small"
+                                    onClick={handleNext}
+                                    disabled={visibleLetters.length === 0 || visiblePos === visibleLetters.length - 1}
+                                >
                                     <ArrowForwardIosIcon fontSize="inherit" />
                                 </IconButton>
                             </div>
@@ -525,6 +634,15 @@ export function LettersAdmin({ letters, setLetters, apiKey, triggerGetAllLetters
                                 }
                                 label="Address confirmed"
                                 componentsProps={{ typography: { fontSize: "0.875rem" } }}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <span className="mb-1 block text-xs font-semibold text-plum-500">For</span>
+                            <LetterAssigneeToggle
+                                value={assigneeOf(currentLetter)}
+                                guest={currentLetter.guest}
+                                onChange={(value) => handleSetAssignee(currentLetter, value)}
                             />
                         </div>
 

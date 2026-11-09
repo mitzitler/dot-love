@@ -496,6 +496,23 @@ class LetterStatus(Enum):
         return f"LetterStatus.{self.name}"
 
 
+# Who should write a letter. Stored as a plain string on the letter;
+# EITHER is the default for new and pre-existing letters.
+LETTER_ASSIGNEES = ("MITZI", "MATTHEW", "EITHER")
+DEFAULT_LETTER_ASSIGNEE = "EITHER"
+
+
+def invalid_assignee_response(payload):
+    """400 Response if the payload carries an unknown assignee, else None."""
+    if "assignee" in payload and payload["assignee"] not in LETTER_ASSIGNEES:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body={"message": f"assignee must be one of {', '.join(LETTER_ASSIGNEES)}"},
+        )
+    return None
+
+
 class LetterRecord:
     def __init__(
         self,
@@ -518,6 +535,7 @@ class LetterRecord:
         handwrytten_order_id="",
         sent_at="",
         address_confirmed=False,
+        assignee=DEFAULT_LETTER_ASSIGNEE,
     ):
         """
         A thank-you letter for a household (a solo guest, or a guest+partner
@@ -541,6 +559,9 @@ class LetterRecord:
         :param address_confirmed (BOOL): an admin checked off that the
             guest confirmed their mailing address. Independent of status,
             and never touched by the claims sync.
+        :param assignee (STR): who should write it, one of
+            LETTER_ASSIGNEES (MITZI/MATTHEW/EITHER). Never touched by the
+            claims sync.
         """
         self.id = id
         self.guest = guest
@@ -561,6 +582,7 @@ class LetterRecord:
         self.handwrytten_order_id = handwrytten_order_id
         self.sent_at = sent_at
         self.address_confirmed = address_confirmed
+        self.assignee = assignee
 
     def as_map(self):
         return {
@@ -583,6 +605,7 @@ class LetterRecord:
             "handwrytten_order_id": self.handwrytten_order_id,
             "sent_at": self.sent_at,
             "address_confirmed": self.address_confirmed,
+            "assignee": self.assignee,
         }
 
     def __str__(self):
@@ -650,6 +673,7 @@ class LetterRecord:
                 handwrytten_order_id=letter.get("handwrytten_order_id", ""),
                 sent_at=letter.get("sent_at", ""),
                 address_confirmed=bool(letter.get("address_confirmed", False)),
+                assignee=letter.get("assignee") or DEFAULT_LETTER_ASSIGNEE,
             )
         except Exception as e:
             log.exception(f"Error creating LetterRecord from data: {e}")
@@ -725,6 +749,7 @@ class LetterRecord:
             "handwrytten_order_id": self.handwrytten_order_id,
             "sent_at": self.sent_at,
             "address_confirmed": self.address_confirmed,
+            "assignee": self.assignee,
             "updated_at": datetime.now().isoformat(),
         }
 
@@ -735,7 +760,7 @@ class LetterRecord:
     def sync_upsert_db(self, dynamo_client):
         """
         Upsert used by the claims sync: writes only contact/gift fields and
-        never touches letter_body/status/address_confirmed, so re-running
+        never touches letter_body/status/address_confirmed/assignee, so re-running
         sync can't overwrite a letter that's already been written.
         """
         key_expression = {"id": {"S": self.id}}
@@ -1480,6 +1505,9 @@ def create_letter():
         too_long = letter_body_too_long_response(payload.get("letter_body", ""))
         if too_long:
             return too_long
+        bad_assignee = invalid_assignee_response(payload)
+        if bad_assignee:
+            return bad_assignee
 
         letter = LetterRecord(
             id=str(uuid.uuid4()),
@@ -1497,6 +1525,7 @@ def create_letter():
             letter_body=payload.get("letter_body", ""),
             status=LetterStatus.DRAFT,
             source="MANUAL",
+            assignee=payload.get("assignee", DEFAULT_LETTER_ASSIGNEE),
         )
         letter.update_db(CW_DYNAMO_CLIENT)
 
@@ -1521,7 +1550,7 @@ def create_letter():
 @validate_internal_route
 def patch_letter():
     """
-    Edit a letter (body text, status, address_confirmed, or any
+    Edit a letter (body text, status, address_confirmed, assignee, or any
     contact/gift field). The
     letter id is passed in the JSON body as `letter_id`, matching
     spectaculo's PATCH /spectaculo/item convention.
@@ -1576,6 +1605,11 @@ def patch_letter():
                     body={"message": "address_confirmed must be true or false"},
                 )
             letter.address_confirmed = payload["address_confirmed"]
+        bad_assignee = invalid_assignee_response(payload)
+        if bad_assignee:
+            return bad_assignee
+        if "assignee" in payload:
+            letter.assignee = payload["assignee"]
 
         letter.update_db(CW_DYNAMO_CLIENT)
 
@@ -1715,6 +1749,7 @@ def disjoin_letter_pair():
         preserved_body = letter.letter_body
         preserved_status = letter.status
         preserved_address_confirmed = letter.address_confirmed
+        preserved_assignee = letter.assignee
         original_claimant_id = letter.claimant_id
 
         letters, pruned_count = run_letters_sync(CW_DYNAMO_CLIENT)
@@ -1734,10 +1769,12 @@ def disjoin_letter_pair():
             preserved_body
             or preserved_status != LetterStatus.DRAFT
             or preserved_address_confirmed
+            or preserved_assignee != DEFAULT_LETTER_ASSIGNEE
         ):
             primary.letter_body = preserved_body
             primary.status = preserved_status
             primary.address_confirmed = preserved_address_confirmed
+            primary.assignee = preserved_assignee
             primary.update_db(CW_DYNAMO_CLIENT)
 
         log.info(f"disjoined pair pair_key={pair_key} pruned_count={pruned_count}")

@@ -11,6 +11,7 @@ import {
     TableSortLabel,
 } from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
+import LetterAssigneeToggle, { ASSIGNEE_OPTIONS, Assignee, assigneeOf } from './LetterAssigneeToggle';
 
 interface Gift {
     gift: string;
@@ -25,6 +26,7 @@ interface Data {
     gifts: Gift[];
     status: string;
     address_confirmed: boolean;
+    assignee?: string;
     updated_at: string;
 }
 
@@ -52,10 +54,20 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     return 0;
 }
 
+// Sort assignees in the order the toggle shows them (Mitzi, Matthew, Either)
+// rather than alphabetically.
+function assigneeRank(row: Data) {
+    return ASSIGNEE_OPTIONS.findIndex((o) => o.value === assigneeOf(row));
+}
+
 function getComparator<Key extends keyof any>(
     order: Order,
     orderBy: Key
 ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
+    if (orderBy === 'assignee') {
+        const sign = order === 'desc' ? -1 : 1;
+        return (a, b) => sign * (assigneeRank(a as Data) - assigneeRank(b as Data));
+    }
     return order === 'desc'
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
@@ -67,7 +79,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'Guest',
-        width: 140,
+        width: 125,
         smallScreenWidth: 50,
     },
     {
@@ -75,7 +87,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Partner',
-        width: 130,
+        width: 105,
         smallScreenWidth: 50,
     },
     {
@@ -83,7 +95,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Gifts',
-        width: 180,
+        width: 150,
         smallScreenWidth: 50,
     },
     {
@@ -91,7 +103,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Status',
-        width: 90,
+        width: 85,
         smallScreenWidth: 50,
     },
     {
@@ -99,7 +111,15 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Addr',
-        width: 50,
+        width: 45,
+        smallScreenWidth: 50,
+    },
+    {
+        id: 'assignee',
+        numeric: false,
+        disablePadding: false,
+        label: 'For',
+        width: 90,
         smallScreenWidth: 50,
     },
     {
@@ -107,7 +127,7 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: false,
         label: 'Updated',
-        width: 160,
+        width: 150,
         smallScreenWidth: 50,
     },
 ];
@@ -138,12 +158,13 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 };
 
 function SortTableLetters(
-    { lettersData, selectedLetterId, onSelectLetter, onToggleAddressConfirmed }:
+    { lettersData, selectedLetterId, onSelectLetter, onToggleAddressConfirmed, onSetAssignee }:
     {
         lettersData: Data[],
         selectedLetterId?: string,
         onSelectLetter: (row: Data) => void,
         onToggleAddressConfirmed: (row: Data) => void,
+        onSetAssignee: (row: Data, value: Assignee) => void,
     }
 ) {
 
@@ -216,7 +237,8 @@ function SortTableLetters(
                             fontWeight: isSelected ? 'bold' : 'normal',
                             width: column.width,
                             maxWidth: column.width,
-                            minWidth: column.width
+                            minWidth: column.width,
+                            ...(column.id === 'assignee' ? { paddingX: '4px' } : {}),
                         }}
                     >
                         {column.id === 'gifts' ? (
@@ -230,6 +252,13 @@ function SortTableLetters(
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={() => onToggleAddressConfirmed(row)}
                                 inputProps={{ 'aria-label': `Address confirmed for ${row.guest}` }}
+                            />
+                        ) : column.id === 'assignee' ? (
+                            <LetterAssigneeToggle
+                                compact
+                                value={assigneeOf(row)}
+                                guest={row.guest}
+                                onChange={(value) => onSetAssignee(row, value)}
                             />
                         ) : (
                             row[column.id]

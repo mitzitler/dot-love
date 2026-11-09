@@ -497,6 +497,19 @@ class TestSyncPreservesLetterBody(unittest.TestCase):
         self.assertTrue(reloaded.address_confirmed)
 
 
+    def test_second_sync_preserves_assignee(self):
+        letter_id = self.run_sync()[0].id
+
+        letter = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+        self.assertEqual(letter.assignee, "EITHER")
+        letter.assignee = "MITZI"
+        letter.update_db(self.fake_db)
+
+        self.run_sync()
+
+        reloaded = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+        self.assertEqual(reloaded.assignee, "MITZI")
+
 class TestAPIEndpoints(unittest.TestCase):
     """Test suite for the API routes through the full handler."""
 
@@ -771,6 +784,83 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertEqual(response["statusCode"], 200)
         self.assertIs(json.loads(response["body"])["letters"][0]["address_confirmed"], False)
 
+    def test_patch_letter_assignee_round_trips(self):
+        letter_id = "l1"
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            letter_id: make_raw_letter(letter_id, guest="John Smith", letter_body="Dear John")
+        }
+
+        def patch_assignee(value):
+            event = self.make_event(
+                "/miatun/letter",
+                method="PATCH",
+                headers=self.auth_headers,
+                body={"letter_id": letter_id, "assignee": value},
+            )
+            with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+                return index.handler(event, self.make_context())
+
+        for value in ("MITZI", "MATTHEW", "EITHER"):
+            response = patch_assignee(value)
+            self.assertEqual(response["statusCode"], 200)
+            body = json.loads(response["body"])
+            self.assertEqual(body["letter"]["assignee"], value)
+            # an assignee-only edit leaves the body alone
+            self.assertEqual(body["letter"]["letter_body"], "Dear John")
+            self.assertEqual(
+                index.LetterRecord.from_letter_id_db(letter_id, self.fake_db).assignee, value
+            )
+
+    def test_patch_rejects_unknown_assignee(self):
+        letter_id = "l1"
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            letter_id: make_raw_letter(letter_id, guest="John Smith", assignee="MITZI")
+        }
+        for bad in ("mitzi", "BOTH", "", None, True):
+            event = self.make_event(
+                "/miatun/letter",
+                method="PATCH",
+                headers=self.auth_headers,
+                body={"letter_id": letter_id, "assignee": bad, "letter_body": "changed"},
+            )
+            with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+                response = index.handler(event, self.make_context())
+            self.assertEqual(response["statusCode"], 400, bad)
+            stored = index.LetterRecord.from_letter_id_db(letter_id, self.fake_db)
+            self.assertEqual(stored.assignee, "MITZI")
+            # a rejected PATCH writes nothing at all
+            self.assertNotEqual(stored.letter_body, "changed")
+
+    def test_letter_without_assignee_field_defaults_either(self):
+        """Rows written before the field existed read back as EITHER."""
+        self.fake_db.tables[index.LETTERS_TABLE_NAME] = {
+            "l1": make_raw_letter("l1", guest="John Smith")
+        }
+        event = self.make_event("/miatun/letter", method="GET", headers=self.auth_headers)
+        with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+            response = index.handler(event, self.make_context())
+        self.assertEqual(response["statusCode"], 200)
+        self.assertEqual(json.loads(response["body"])["letters"][0]["assignee"], "EITHER")
+
+    def test_create_letter_assignee(self):
+        def create(body):
+            event = self.make_event(
+                "/miatun/letter", method="POST", headers=self.auth_headers, body=body
+            )
+            with patch.object(index, "CW_DYNAMO_CLIENT", self.fake_db):
+                return index.handler(event, self.make_context())
+
+        response = create({"guest": "Ann"})
+        self.assertEqual(response["statusCode"], 200)
+        self.assertEqual(json.loads(response["body"])["letter"]["assignee"], "EITHER")
+
+        response = create({"guest": "Bea", "assignee": "MATTHEW"})
+        self.assertEqual(response["statusCode"], 200)
+        self.assertEqual(json.loads(response["body"])["letter"]["assignee"], "MATTHEW")
+
+        response = create({"guest": "Cal", "assignee": "NOPE"})
+        self.assertEqual(response["statusCode"], 400)
+
     def test_patch_missing_letter_id(self):
         event = self.make_event(
             "/miatun/letter", method="PATCH", headers=self.auth_headers, body={}
@@ -1038,6 +1128,22 @@ class TestDisjoinLetterPair(unittest.TestCase):
         by_id = {letter.id: letter for letter in index.LetterRecord.get_all_letters_db(self.fake_db)}
         self.assertTrue(by_id["guest:jane_smith"].address_confirmed)
         self.assertFalse(by_id["guest:john_smith"].address_confirmed)
+
+    def test_disjoin_carries_assignee_to_original_claimant_only(self):
+        self.seed_couple(both_claim_a_gift=True)
+        self.run_sync()
+
+        letter = index.LetterRecord.from_letter_id_db(
+            "couple:jane_smith|john_smith", self.fake_db
+        )
+        letter.assignee = "MATTHEW"
+        letter.update_db(self.fake_db)
+
+        self.disjoin("couple:jane_smith|john_smith")
+
+        by_id = {letter.id: letter for letter in index.LetterRecord.get_all_letters_db(self.fake_db)}
+        self.assertEqual(by_id["guest:jane_smith"].assignee, "MATTHEW")
+        self.assertEqual(by_id["guest:john_smith"].assignee, "EITHER")
 
     def test_disjoin_partner_with_no_claimed_gifts_yields_single_letter(self):
         self.seed_couple(both_claim_a_gift=False)
