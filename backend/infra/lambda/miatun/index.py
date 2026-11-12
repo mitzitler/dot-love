@@ -1107,7 +1107,7 @@ class HandwryttenClient:
 
     def place_basket(self, card_id, font_label, addresses):
         """Add one order to the basket covering every address row. Each row
-        carries its own to_*/from_* fields plus message/wishes."""
+        carries its own to_*/return_* fields plus message/wishes."""
         return self._request(
             "POST",
             "orders/placeBasket",
@@ -1139,13 +1139,16 @@ def missing_handwrytten_config() -> list:
 
 
 def sender_address_fields(sender_json: str) -> dict:
-    """Parse the sender (return address) config into Handwrytten from_*
-    fields. Raises ValueError if it isn't a JSON object."""
+    """Parse the sender (return address) config into Handwrytten's return_*
+    address-row fields. (Handwrytten silently ignores from_* keys and falls
+    back to the account's default return address; this account has none,
+    so the envelope came out as "BLANK".) Raises ValueError if it isn't a
+    JSON object."""
     sender = json.loads(sender_json)
     if not isinstance(sender, dict):
         raise ValueError("handwrytten_sender must be a JSON object")
     keys = ["first_name", "last_name", "address1", "address2", "city", "state", "zip"]
-    return {f"from_{key}": sender[key] for key in keys if sender.get(key)}
+    return {f"return_{key}": sender[key] for key in keys if sender.get(key)}
 
 
 def envelope_name(guest: str, partner: str) -> tuple:

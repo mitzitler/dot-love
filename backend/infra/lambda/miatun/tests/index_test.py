@@ -1360,7 +1360,9 @@ class TestSendLetters(unittest.TestCase):
         self.assertEqual(couple["to_zip"], "11201")
         self.assertEqual(couple["message"], "Dear Jane Doe, thank you!")
         self.assertEqual(couple["wishes"], "With love, Mitzi & Matthew")
-        self.assertEqual(couple["from_city"], "Austin")
+        self.assertEqual(couple["return_city"], "Austin")
+        self.assertEqual(couple["return_first_name"], "Mitzi")
+        self.assertFalse(any(k.startswith("from_") for k in couple))
         self.assertNotIn("to_address2", couple)
 
     def test_send_success_submits_basket_once_and_marks_sent(self):
