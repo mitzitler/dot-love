@@ -35,17 +35,33 @@ HANDWRYTTEN_CARD_ID = os.environ.get("handwrytten_card_id", "")
 # Handwriting font *id* from GET fonts/list, e.g. "hwJenna" — not the display
 # label ("Fancy Jenna"); placeBasket's "font" field takes the id
 HANDWRYTTEN_FONT_LABEL = os.environ.get("handwrytten_font_label", "")
-# Fixed sign-off, sent as Handwrytten's separate "wishes" field (not part of
-# letter_body, so it doesn't count against LETTER_BODY_MAX_CHARS)
+# Fixed sign-off, sent as Handwrytten's separate "wishes" field. It is not
+# part of letter_body, but Handwrytten counts it toward the card's character
+# limit, so it shrinks how long a sendable body can be (see
+# letter_body_send_max_chars).
 HANDWRYTTEN_WISHES = os.environ.get("handwrytten_wishes", "")
 # JSON: {"first_name","last_name","address1","address2","city","state","zip"}
 HANDWRYTTEN_SENDER = os.environ.get("handwrytten_sender", "")
 HANDWRYTTEN_BASE_URL = "https://api.handwrytten.com/v2/"
 
-# Max chars of handwritten message (greeting + body). The envelope address
-# and the wishes sign-off are separate fields and don't count. Individual
-# card designs may allow fewer — /send checks the card's own capacity too.
+# Handwrytten's cap on the handwritten text: message (greeting + body) PLUS
+# the wishes sign-off together (verified against placeBasket, which rejects
+# a 475-char message with a 26-char sign-off as "longer than 500
+# characters"). Create/PATCH only enforce this as a storage cap on the body
+# alone, so a letter can be over the sendable length while it's being
+# trimmed; /send enforces the real limit via letter_body_send_max_chars.
+# Individual card designs may allow fewer; /send checks the card too.
 LETTER_BODY_MAX_CHARS = 500
+
+
+def letter_body_send_max_chars(card_chars=0):
+    """Longest letter_body that Handwrytten will accept on this card, once the
+    wishes sign-off is counted. The admin UI mirrors this as
+    LETTER_BODY_SEND_MAX_CHARS."""
+    cap = LETTER_BODY_MAX_CHARS
+    if card_chars and card_chars > 0:
+        cap = min(cap, card_chars)
+    return max(0, cap - len(HANDWRYTTEN_WISHES or ""))
 
 INTERNAL_ROUTE_LIST = ["ping", "sync", "letter", "disjoin", "send", "send-one"]
 
@@ -1165,6 +1181,7 @@ def letter_send_problems(letter, max_chars: int) -> list:
     elif len(body) > max_chars:
         problems.append(
             f"letter body is {len(body)} characters; this card fits {max_chars}"
+            " (after the sign-off)"
         )
     if not (letter.guest or "").strip():
         problems.append("no recipient name")
@@ -1239,13 +1256,11 @@ def send_letters_via_handwrytten(letters, dry_run, mark_sent, hw_client, dynamo_
             502, {"message": "Could not look up the Handwrytten card", "error": str(e)}
         )
 
-    max_chars = LETTER_BODY_MAX_CHARS
     try:
         card_chars = int(card.get("characters") or 0)
     except (TypeError, ValueError):
         card_chars = 0
-    if card_chars > 0:
-        max_chars = min(max_chars, card_chars)
+    max_chars = letter_body_send_max_chars(card_chars)
 
     invalid = []
     for letter in letters:

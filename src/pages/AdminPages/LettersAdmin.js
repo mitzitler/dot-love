@@ -42,10 +42,16 @@ const STATUS_CHIP_COLOR = {
     SENT: "secondary",
 };
 
-// Max handwritten message length (greeting + body) Handwrytten fits on a
-// card; the envelope address and sign-off are separate. Mirrors
-// LETTER_BODY_MAX_CHARS in the miatun lambda.
+// Storage cap on the letter body; mirrors LETTER_BODY_MAX_CHARS in the
+// miatun lambda, which rejects longer bodies on save.
 export const LETTER_BODY_MAX_CHARS = 500;
+
+// The card's sign-off (SSM /dot-love/handwrytten/wishes). Handwrytten counts
+// it toward the same 500-char limit as the body, so a sendable body is
+// shorter. Keep in sync with SSM; the lambda computes the same number in
+// letter_body_send_max_chars and /send rejects anything longer.
+const LETTER_SIGN_OFF = "With love, Mitzi & Matthew";
+export const LETTER_BODY_SEND_MAX_CHARS = LETTER_BODY_MAX_CHARS - LETTER_SIGN_OFF.length;
 
 // How long typing must pause before the letter body autosaves. Status
 // changes save immediately.
@@ -101,6 +107,7 @@ function LetterDraftEditor({ letter, saveDraft, flushRef }) {
     const [bodyDraft, setBodyDraft] = useState(letter.letter_body || "");
     const [statusDraft, setStatusDraft] = useState(letter.status || "DRAFT");
     const [saveState, setSaveState] = useState("saved");
+    const overBy = bodyDraft.length - LETTER_BODY_SEND_MAX_CHARS;
 
     // savedRef: the last draft sent to the server (in flight or done).
     const savedRef = useRef({ letter_body: bodyDraft, status: statusDraft });
@@ -204,9 +211,16 @@ function LetterDraftEditor({ letter, saveDraft, flushRef }) {
                 minRows={8}
                 label="Letter body"
                 value={bodyDraft}
+                // Over-length text stays editable (and keeps autosaving) so
+                // older letters can be trimmed down; only sending is blocked.
                 onChange={(e) => setBodyDraft(e.target.value.slice(0, LETTER_BODY_MAX_CHARS))}
                 inputProps={{ maxLength: LETTER_BODY_MAX_CHARS }}
-                helperText={`${bodyDraft.length}/${LETTER_BODY_MAX_CHARS}`}
+                error={overBy > 0}
+                helperText={
+                    overBy > 0
+                        ? `${bodyDraft.length}/${LETTER_BODY_SEND_MAX_CHARS} · ${overBy} too long to fit on the card with the sign-off`
+                        : `${bodyDraft.length}/${LETTER_BODY_SEND_MAX_CHARS}`
+                }
                 FormHelperTextProps={{ sx: { textAlign: "right" } }}
             />
 

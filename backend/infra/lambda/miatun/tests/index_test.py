@@ -1344,7 +1344,8 @@ class TestSendLetters(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(body["dry_run"])
         self.assertEqual(body["count"], 2)
-        self.assertEqual(body["max_chars"], 400)
+        # 400-char card minus the 26-char "With love, Mitzi & Matthew"
+        self.assertEqual(body["max_chars"], 374)
         self.assert_no_basket_calls()
         self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
 
@@ -1397,11 +1398,28 @@ class TestSendLetters(unittest.TestCase):
         self.assertEqual(self.status_of("l1"), index.LetterStatus.READY_TO_SEND)
 
     def test_body_longer_than_card_capacity_is_invalid(self):
-        self.hw.get_card.return_value = {"id": 123, "characters": 20}
+        self.hw.get_card.return_value = {"id": 123, "characters": 40}
         status, body = self.call("/miatun/send", {"dry_run": False})
         self.assertEqual(status, 400)
-        self.assertEqual(body["max_chars"], 20)
+        self.assertEqual(body["max_chars"], 14)
         self.assert_no_basket_calls()
+
+    def test_sign_off_counts_toward_the_500_char_limit(self):
+        """Handwrytten counts message + wishes together, so with the 26-char
+        sign-off a 475-char body is unsendable even on a 500-char card."""
+        self.hw.get_card.return_value = {"id": 123, "characters": 500}
+        letters = self.fake_db.tables[index.LETTERS_TABLE_NAME]
+        letters["l1"] = make_ready_letter("l1", "John Smith", letter_body="x" * 475)
+        letters.pop("l2", None)
+        status, body = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 400)
+        self.assertEqual(body["max_chars"], 474)
+        self.assertEqual(body["invalid_letters"][0]["letter_id"], "l1")
+
+        letters["l1"] = make_ready_letter("l1", "John Smith", letter_body="x" * 474)
+        status, body = self.call("/miatun/send", {"dry_run": True})
+        self.assertEqual(status, 200)
+        self.assertEqual(body["max_chars"], 474)
 
     def test_non_us_country_is_invalid(self):
         self.fake_db.tables[index.LETTERS_TABLE_NAME]["l2"] = make_ready_letter(
